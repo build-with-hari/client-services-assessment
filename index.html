@@ -58,6 +58,31 @@
 
         @keyframes pulse { 0% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.05); opacity: 0.8; } 100% { transform: scale(1); opacity: 1; } }
         
+        /* Premium Custom Modal Dialogs (Alert & Confirm Replacement) */
+        #custom-modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(15, 23, 42, 0.3); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+            z-index: 20000000; display: flex; align-items: center; justify-content: center;
+            opacity: 0; pointer-events: none; transition: opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        #custom-modal-overlay.active { opacity: 1; pointer-events: auto; }
+        .modal-card {
+            background: var(--glass-bg); border: 1px solid var(--glass-border);
+            padding: 30px; border-radius: 16px; width: 90%; max-width: 480px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.2); text-align: center;
+            transform: scale(0.95) translateY(15px); transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        #custom-modal-overlay.active .modal-card { transform: scale(1) translateY(0); }
+        .modal-title { font-size: 20px; font-weight: 700; color: var(--text-heading); margin: 0 0 12px 0; }
+        .modal-body-text { font-size: 15px; color: var(--text-body); margin: 0 0 24px 0; line-height: 1.5; }
+        .modal-footer-actions { display: flex; gap: 12px; justify-content: center; }
+        .btn-modal-primary { background: var(--primary-accent); color: white; border: none; padding: 12px 24px; font-family: inherit; font-size: 14.5px; font-weight: 600; border-radius: 8px; cursor: pointer; transition: background 0.2s; }
+        .btn-modal-primary:hover { background: var(--primary-hover); }
+        .btn-modal-danger { background: var(--danger); color: white; border: none; padding: 12px 24px; font-family: inherit; font-size: 14.5px; font-weight: 600; border-radius: 8px; cursor: pointer; transition: filter 0.2s; }
+        .btn-modal-danger:hover { filter: brightness(0.9); }
+        .btn-modal-secondary { background: rgba(0,0,0,0.05); color: var(--text-body); border: none; padding: 12px 24px; font-family: inherit; font-size: 14.5px; font-weight: 600; border-radius: 8px; cursor: pointer; transition: background 0.2s; }
+        .btn-modal-secondary:hover { background: rgba(0,0,0,0.1); }
+
         /* Layout */
         .wrapper { display: flex; flex-direction: column; align-items: center; min-height: 100vh; padding: 40px 20px; }
         #start-screen { display: flex; flex-direction: column; justify-content: center; align-items: center; min-height: 100vh; width: 100%; margin: 0; padding: 20px; transition: opacity 0.5s ease; }
@@ -141,6 +166,18 @@
 </head>
 <body>
 
+    <!-- ULTRAPREMIUM DIALOG POPUP MODAL COMPONENT (Replaces window.alert & window.confirm) -->
+    <div id="custom-modal-overlay">
+        <div class="modal-card">
+            <h2 class="modal-title" id="custom-modal-title">Notification</h2>
+            <p class="modal-body-text" id="custom-modal-text">Message contents go here...</p>
+            <div class="modal-footer-actions" id="custom-modal-actions">
+                <!-- Injected dynamically via JavaScript -->
+            </div>
+        </div>
+    </div>
+
+    <!-- SECURITY WARNING OVERLAY -->
     <div id="security-warning">
         <h1>⚠️ SECURITY WARNING ⚠️</h1>
         <p>You have exited Fullscreen or switched tabs. This is strictly prohibited.</p>
@@ -149,6 +186,7 @@
         <button class="btn-resume" onclick="resumeFullscreen()">Return to Exam</button>
     </div>
 
+    <!-- START SCREEN -->
     <div id="start-screen">
         <div class="main-container" style="max-width: 650px;">
             <h1>Secure Client Assessment</h1>
@@ -175,6 +213,7 @@
         </div>
     </div>
 
+    <!-- EXAM SCREEN -->
     <div class="wrapper" id="exam-screen">
         <div class="main-container">
             <div id="timer-container">
@@ -188,6 +227,7 @@
 
             <form id="assessmentForm">
                 <div id="steps-wrapper">
+                    <!-- Step 0: Candidate Details -->
                     <div class="step-container active" id="step-0">
                         <div class="ui-card">
                             <h3 class="section-header">Candidate Registration</h3>
@@ -209,6 +249,7 @@
         </div>
     </div>
 
+    <!-- RESULTS SCREEN -->
     <div class="wrapper" id="results-screen">
         <div class="main-container">
             <h1>Assessment Complete</h1>
@@ -219,6 +260,58 @@
     </div>
 
     <script>
+        // --- PREMIUM DIALOG ENGINE (Replaces Browser Alert / Confirm) ---
+        function showCustomAlert(message, title = "System Notification") {
+            return new Promise((resolve) => {
+                document.getElementById('custom-modal-title').innerText = title;
+                document.getElementById('custom-modal-text').innerText = message;
+                
+                const actionsContainer = document.getElementById('custom-modal-actions');
+                actionsContainer.innerHTML = ''; // Clear prior elements
+                
+                const okBtn = document.createElement('button');
+                okBtn.className = 'btn-modal-primary';
+                okBtn.innerText = 'OK';
+                okBtn.addEventListener('click', () => {
+                    document.getElementById('custom-modal-overlay').classList.remove('active');
+                    resolve(true);
+                });
+                
+                actionsContainer.appendChild(okBtn);
+                document.getElementById('custom-modal-overlay').classList.add('active');
+            });
+        }
+
+        function showCustomConfirm(message, title = "Confirm Action", confirmText = "Confirm", isDanger = false) {
+            return new Promise((resolve) => {
+                document.getElementById('custom-modal-title').innerText = title;
+                document.getElementById('custom-modal-text').innerText = message;
+                
+                const actionsContainer = document.getElementById('custom-modal-actions');
+                actionsContainer.innerHTML = '';
+                
+                const cancelBtn = document.createElement('button');
+                cancelBtn.className = 'btn-modal-secondary';
+                cancelBtn.innerText = 'Cancel';
+                cancelBtn.addEventListener('click', () => {
+                    document.getElementById('custom-modal-overlay').classList.remove('active');
+                    resolve(false);
+                });
+                
+                const actionBtn = document.createElement('button');
+                actionBtn.className = isDanger ? 'btn-modal-danger' : 'btn-modal-primary';
+                actionBtn.innerText = confirmText;
+                actionBtn.addEventListener('click', () => {
+                    document.getElementById('custom-modal-overlay').classList.remove('active');
+                    resolve(true);
+                });
+                
+                actionsContainer.appendChild(cancelBtn);
+                actionsContainer.appendChild(actionBtn);
+                document.getElementById('custom-modal-overlay').classList.add('active');
+            });
+        }
+
         // --- CHECK FOR SAVED DRAFT ON LOAD ---
         document.addEventListener('DOMContentLoaded', () => {
             const draft = localStorage.getItem('exam_draft');
@@ -237,8 +330,14 @@
             }
         });
 
-        function startFresh() {
-            if (confirm("Are you sure you want to clear your saved progress and start over?")) {
+        async function startFresh() {
+            const confirmed = await showCustomConfirm(
+                "Are you sure you want to clear your saved progress and start over?", 
+                "Clear Saved Progress?", 
+                "Reset & Restart", 
+                true
+            );
+            if (confirmed) {
                 localStorage.removeItem('exam_draft');
                 document.getElementById('start-btn-text').innerText = "I Understand — Enter Fullscreen & Start";
                 document.getElementById('btn-start-fresh').style.display = "none";
@@ -250,7 +349,10 @@
         document.addEventListener('contextmenu', e => e.preventDefault());
         document.addEventListener('copy', e => e.preventDefault());
         document.addEventListener('cut', e => e.preventDefault());
-        document.addEventListener('paste', e => { e.preventDefault(); alert("Pasting is disabled. Please type your answer."); });
+        document.addEventListener('paste', e => { 
+            e.preventDefault(); 
+            showCustomAlert("Security Restriction: Pasting contents is strictly disabled for this assessment. Please type out your answer response manually.", "Lockdown Warning"); 
+        });
         
         document.addEventListener('keydown', function(e) {
             if (e.keyCode === 123) { e.preventDefault(); return false; }
@@ -445,12 +547,10 @@
         }
 
         function updateUI() {
-            // Animate transition between steps
             document.querySelectorAll('.step-container').forEach(el => {
                 el.classList.remove('active');
             });
             
-            // Short timeout ensures the browser renders the opacity correctly
             setTimeout(() => {
                 document.getElementById(`step-${currentStep}`).classList.add('active');
             }, 10);
@@ -488,7 +588,7 @@
 
             // Check Support
             if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-                alert("Microphone Error: Your browser is blocking microphone access. Please ensure permissions are granted.");
+                showCustomAlert("Microphone Error: Your device environment is blocking audio hardware initialization. Please verify browser options allow recording devices.", "Hardware Inaccessible");
                 return;
             }
 
@@ -523,11 +623,11 @@
                 }, 1000);
             } catch (err) { 
                 if (err.name === "NotFoundError" || err.name === "DevicesNotFoundError") {
-                    alert("Microphone Error: No microphone detected. Please plug in a microphone or headset and try again.");
+                    showCustomAlert("Microphone Error: No active audio capture hardware detected. Please attach a workspace recording headset.", "Hardware Device Missing");
                 } else if (err.name === "NotAllowedError" || err.name === "PermissionDeniedError") {
-                    alert("Microphone Error: Permission denied. Please click the Lock icon next to the URL bar and 'Allow' microphone access.");
+                    showCustomAlert("Microphone Error: Platform capture layer access explicitly blocked. Please modify structural security site options to allow microphone input.", "Permission Blocked");
                 } else {
-                    alert("Microphone Error: " + err.message);
+                    showCustomAlert("Microphone Error: Failed initialization context setup: " + err.message, "System Layer Exception");
                 }
                 console.error(err);
             }
@@ -578,7 +678,6 @@
                 let display = document.getElementById('display-timer');
                 display.textContent = (m < 10 ? "0" + m : m) + ":" + (s < 10 ? "0" + s : s);
                 
-                // Pulse effect when under 5 minutes
                 if (timeLeft < 300) { 
                     display.style.color = "var(--danger)"; 
                     display.style.borderColor = "var(--danger)"; 
@@ -611,11 +710,13 @@
             if (desktopNotification) desktopNotification.close();
         }
 
-        function resumeFullscreen() {
+        async function resumeFullscreen() {
             if (fullscreenSupported && document.documentElement.requestFullscreen) {
                 document.documentElement.requestFullscreen().then(() => {
                     clearViolation();
-                }).catch(e => alert("Please click the button to return to the exam."));
+                }).catch(async (e) => {
+                    await showCustomAlert("Interaction Error: Web environment frame requires manual action to regain fullscreen execution focus.", "Action Required");
+                });
             } else {
                 clearViolation(); 
             }
@@ -691,21 +792,18 @@
             fcTxt.value = textarea.value;
             fcTxt.addEventListener('input', () => { textarea.value = fcTxt.value; saveState(); });
             
-            // Trigger entry animations
             requestAnimationFrame(() => {
                 bg.style.opacity = '1';
                 box.style.transform = 'scale(1) translateY(0)';
                 fcTxt.focus();
             });
 
-            // Smooth Close Function
             const closeFocus = () => {
                 bg.style.opacity = '0';
                 box.style.transform = 'scale(0.95) translateY(20px)';
                 setTimeout(() => bg.remove(), 300);
             };
 
-            // Event Listeners for Closing
             closeBtn.onclick = closeFocus;
             closeBtn.onmouseover = () => closeBtn.style.color = 'var(--danger)';
             closeBtn.onmouseout = () => closeBtn.style.color = 'var(--text-muted)';
@@ -806,8 +904,8 @@
                     throw new Error(data.error);
                 }
             })
-            .catch(error => {
-                alert("Upload failed. Please check your internet and click Retry. Error: " + error);
+            .catch(async (error) => {
+                await showCustomAlert("Data Sync Error: Failed to commit responses securely to server pipeline. Please confirm active networking status and retry.", "Transmission Failed");
                 submitBtn.innerText = "Retry Submission";
                 submitBtn.disabled = false;
                 submitBtn.style.background = "var(--success)";
