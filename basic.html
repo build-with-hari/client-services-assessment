@@ -3,75 +3,38 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Candidate Assessment | Entry Level</title>
+    <title>Secure Assessment | Entry-Level Profile</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        /* Ultra-Premium Light Glass Theme */
+        /* Premium UI Variables */
         :root {
             --bg-gradient: linear-gradient(135deg, #f0f4f8 0%, #e2e8f0 100%);
-            --text-heading: #0f172a;
-            --text-body: #334155;
-            --text-muted: #64748b;
-            --glass-bg: rgba(255, 255, 255, 0.75);
-            --glass-border: rgba(255, 255, 255, 0.6);
-            --input-bg: rgba(255, 255, 255, 0.6);
-            --primary-accent: #2563eb;
-            --primary-hover: #1e40af;
-            --danger: #ef4444;
-            --danger-bg: rgba(239, 68, 68, 0.95);
-            --success: #10b981;
-            --shadow-soft: 0 10px 40px -10px rgba(0, 0, 0, 0.08);
-            --shadow-inner: inset 0 2px 4px 0 rgba(0, 0, 0, 0.03);
+            --text-heading: #0f172a; --text-body: #334155; --text-muted: #64748b;
+            --glass-bg: rgba(255, 255, 255, 0.75); --glass-border: rgba(255, 255, 255, 0.6);
+            --input-bg: rgba(255, 255, 255, 0.6); --primary-accent: #2563eb; --primary-hover: #1e40af;
+            --danger: #ef4444; --danger-bg: rgba(239, 68, 68, 0.95); --success: #10b981;
+            --shadow-soft: 0 10px 40px -10px rgba(0, 0, 0, 0.08); --shadow-inner: inset 0 2px 4px 0 rgba(0, 0, 0, 0.03);
         }
 
         * { box-sizing: border-box; }
+        body { margin: 0; padding: 0; font-family: 'Inter', sans-serif; background: var(--bg-gradient); color: var(--text-body); line-height: 1.6; -webkit-font-smoothing: antialiased; min-height: 100vh; overflow-x: hidden; background-attachment: fixed; user-select: none; -webkit-user-select: none; }
+        input, textarea, select { user-select: auto; -webkit-user-select: auto; }
+        ::-webkit-scrollbar { width: 8px; } ::-webkit-scrollbar-track { background: transparent; } ::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.15); border-radius: 10px; }
 
-        body {
-            margin: 0; padding: 0; 
-            font-family: 'Inter', sans-serif;
-            background: var(--bg-gradient); color: var(--text-body);
-            line-height: 1.6; -webkit-font-smoothing: antialiased;
-            min-height: 100vh; overflow-x: hidden;
-            background-attachment: fixed;
-            user-select: none; -webkit-user-select: none;
-        }
-
-        input, textarea { user-select: auto; -webkit-user-select: auto; }
-
-        ::-webkit-scrollbar { width: 8px; }
-        ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.15); border-radius: 10px; }
-
-        /* Security Overlay */
-        #security-warning {
-            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: var(--danger-bg); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
-            z-index: 9999999; flex-direction: column; align-items: center; justify-content: center;
-            color: white; text-align: center; padding: 20px;
-        }
-        #security-warning h1 { color: white; font-size: 44px; margin-bottom: 10px; text-shadow: 0 4px 10px rgba(0,0,0,0.2); }
-        #security-warning p { font-size: 20px; max-width: 600px; font-weight: 500; opacity: 0.9; }
-        #violation-countdown { font-size: 100px; font-weight: 700; margin-top: 10px; margin-bottom: 20px; tabular-nums; text-shadow: 0 4px 20px rgba(0,0,0,0.3); animation: pulse 1s infinite; }
-        
+        /* Security Overlays */
+        #security-warning { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--danger-bg); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); z-index: 9999999; flex-direction: column; align-items: center; justify-content: center; color: white; text-align: center; padding: 20px; }
+        #security-warning h1 { font-size: 44px; margin-bottom: 10px; text-shadow: 0 4px 10px rgba(0,0,0,0.2); }
+        #violation-countdown { font-size: 100px; font-weight: 700; margin: 10px 0 20px 0; tabular-nums; text-shadow: 0 4px 20px rgba(0,0,0,0.3); animation: pulse 1s infinite; }
         .btn-resume { background: white; color: var(--danger); border: none; padding: 15px 30px; font-size: 18px; font-weight: bold; border-radius: 50px; cursor: pointer; box-shadow: 0 10px 25px rgba(0,0,0,0.2); transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1); }
         .btn-resume:hover { transform: scale(1.05); }
 
-        @keyframes pulse { 0% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.05); opacity: 0.8; } 100% { transform: scale(1); opacity: 1; } }
-        
-        /* Premium Custom Modal Dialogs */
-        #custom-modal-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(15, 23, 42, 0.3); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
-            z-index: 20000000; display: flex; align-items: center; justify-content: center;
-            opacity: 0; pointer-events: none; transition: opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-        }
+        @keyframes pulse { 0%, 100% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.05); opacity: 0.8; } }
+        @keyframes slideUpFade { to { opacity: 1; transform: translateY(0); } }
+
+        /* Custom Modal */
+        #custom-modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.3); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); z-index: 20000000; display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
         #custom-modal-overlay.active { opacity: 1; pointer-events: auto; }
-        .modal-card {
-            background: var(--glass-bg); border: 1px solid var(--glass-border);
-            padding: 30px; border-radius: 16px; width: 90%; max-width: 480px;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.2); text-align: center;
-            transform: scale(0.95) translateY(15px); transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-        }
+        .modal-card { background: var(--glass-bg); padding: 30px; border-radius: 16px; width: 90%; max-width: 480px; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.2); text-align: center; transform: scale(0.95) translateY(15px); transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
         #custom-modal-overlay.active .modal-card { transform: scale(1) translateY(0); }
         .modal-title { font-size: 20px; font-weight: 700; color: var(--text-heading); margin: 0 0 12px 0; }
         .modal-body-text { font-size: 15px; color: var(--text-body); margin: 0 0 24px 0; line-height: 1.5; }
@@ -83,60 +46,50 @@
         .btn-modal-secondary { background: rgba(0,0,0,0.05); color: var(--text-body); border: none; padding: 12px 24px; font-family: inherit; font-size: 14.5px; font-weight: 600; border-radius: 8px; cursor: pointer; transition: background 0.2s; }
         .btn-modal-secondary:hover { background: rgba(0,0,0,0.1); }
 
-        /* Layout */
+        /* Layout & UI */
         .wrapper { display: flex; flex-direction: column; align-items: center; min-height: 100vh; padding: 40px 20px; }
         #start-screen { display: flex; flex-direction: column; justify-content: center; align-items: center; min-height: 100vh; width: 100%; margin: 0; padding: 20px; transition: opacity 0.5s ease; }
         .main-container { width: 100%; max-width: 800px; position: relative; }
-
-        /* Typography */
         h1 { font-size: 32px; font-weight: 700; margin: 0 0 8px 0; color: var(--text-heading); text-align: center; letter-spacing: -0.5px; }
         p.subtitle { color: var(--text-muted); font-size: 16px; margin: 0 0 40px 0; text-align: center; }
         .section-header { font-size: 20px; color: var(--text-heading); display: flex; align-items: center; gap: 12px; margin: 0 0 24px 0; font-weight: 600; }
-
-        /* Pagination & Progress */
         .progress-container { width: 100%; background: rgba(0,0,0,0.05); border-radius: 50px; height: 8px; margin-bottom: 30px; overflow: hidden; }
         .progress-bar { height: 100%; background: var(--primary-accent); width: 0%; transition: width 0.5s cubic-bezier(0.16, 1, 0.3, 1); }
         .step-container { display: none; opacity: 0; transform: translateY(20px); transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1); }
         .step-container.active { display: block; opacity: 1; transform: translateY(0); }
-        
-        /* Premium Buttons */
+
+        /* Buttons & Inputs */
         .btn-primary { background: linear-gradient(135deg, var(--primary-accent) 0%, #1e40af 100%); color: #fff; border: none; padding: 18px 24px; font-family: inherit; font-size: 16px; font-weight: 600; letter-spacing: 0.5px; border-radius: 12px; cursor: pointer; width: 100%; box-shadow: 0 10px 20px -5px rgba(37, 99, 235, 0.4); transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1); display: flex; justify-content: center; align-items: center; gap: 10px;}
-        .btn-primary:hover { transform: translateY(-3px); box-shadow: 0 15px 25px -5px rgba(37, 99, 235, 0.5); }
-        
+        .btn-primary:hover:not(:disabled) { transform: translateY(-3px); box-shadow: 0 15px 25px -5px rgba(37, 99, 235, 0.5); }
+        .btn-primary:disabled { opacity: 0.7; cursor: not-allowed; }
         .btn-ghost { background: transparent; color: var(--text-muted); border: 2px solid transparent; padding: 14px 24px; font-family: inherit; font-size: 15px; font-weight: 600; border-radius: 12px; cursor: pointer; width: 100%; transition: all 0.3s ease; }
         .btn-ghost:hover { background: rgba(0,0,0,0.05); color: var(--text-heading); }
-
-        .btn-submit { background: linear-gradient(135deg, var(--success) 0%, #047857 100%); color: #fff; border: none; padding: 18px 24px; font-family: inherit; font-size: 16px; font-weight: 600; letter-spacing: 0.5px; border-radius: 12px; cursor: pointer; width: 100%; box-shadow: 0 10px 20px -5px rgba(16, 185, 129, 0.4); transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
+        .btn-submit { background: linear-gradient(135deg, var(--success) 0%, #047857 100%); color: #fff; border: none; padding: 18px 24px; font-family: inherit; font-size: 16px; font-weight: 600; border-radius: 12px; cursor: pointer; width: 100%; box-shadow: 0 10px 20px -5px rgba(16, 185, 129, 0.4); transition: all 0.3s; }
         .btn-submit:hover:not(:disabled) { transform: translateY(-3px); box-shadow: 0 15px 25px -5px rgba(16, 185, 129, 0.5); }
-
-        /* Navigation Buttons */
         .nav-actions { display: flex; justify-content: space-between; margin-top: 30px; gap: 15px; }
-        .btn-nav { padding: 15px 25px; border-radius: 10px; font-weight: 600; font-size: 15px; cursor: pointer; transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1); border: none; font-family: inherit; }
+        .btn-nav { padding: 15px 25px; border-radius: 10px; font-weight: 600; font-size: 15px; cursor: pointer; transition: all 0.2s; border: none; font-family: inherit; }
         .btn-prev { background: rgba(0,0,0,0.05); color: var(--text-body); }
         .btn-prev:hover { background: rgba(0,0,0,0.1); transform: translateX(-2px); }
         .btn-next { background: var(--primary-accent); color: white; flex: 1; text-align: center; box-shadow: 0 4px 15px rgba(37,99,235,0.2); }
         .btn-next:hover { background: var(--primary-hover); transform: translateY(-2px); }
 
-        /* Cards & Form Elements */
-        .ui-card { background: var(--glass-bg); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-radius: 16px; padding: 35px; border: 1px solid var(--glass-border); box-shadow: var(--shadow-soft); transition: box-shadow 0.3s ease; }
+        .ui-card { background: var(--glass-bg); backdrop-filter: blur(20px); border-radius: 16px; padding: 35px; border: 1px solid var(--glass-border); box-shadow: var(--shadow-soft); transition: box-shadow 0.3s ease; }
         .ui-card:hover { box-shadow: 0 15px 40px -10px rgba(0, 0, 0, 0.12); }
         .info-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; align-items: start; }
         label.input-label { display: block; font-weight: 600; margin-bottom: 10px; color: var(--text-heading); font-size: 16px; line-height: 1.5; }
-        input[type="text"], input[type="email"], textarea { width: 100%; padding: 14px 18px; border-radius: 10px; background: var(--input-bg); border: 2px solid #cbd5e1; color: var(--text-heading); font-size: 15px; font-family: inherit; transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1); box-shadow: var(--shadow-inner); }
-        input[type="text"]:focus, input[type="email"]:focus, textarea:focus { outline: none; border-color: var(--primary-accent); background: #fff; box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1); }
-        
+        input[type="text"], input[type="email"], textarea, select { width: 100%; padding: 14px 18px; border-radius: 10px; background: var(--input-bg); border: 2px solid #cbd5e1; color: var(--text-heading); font-size: 15px; font-family: inherit; transition: all 0.3s; box-shadow: var(--shadow-inner); }
+        input[type="text"]:focus, input[type="email"]:focus, textarea:focus, select:focus { outline: none; border-color: var(--primary-accent); background: #fff; box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1); }
         .textarea-wrapper { position: relative; margin-top: 15px; }
         textarea { resize: vertical; min-height: 150px; padding-right: 40px; }
-        .focus-btn { position: absolute; top: 12px; right: 12px; background: #e2e8f0; border: none; border-radius: 6px; color: var(--text-muted); font-size: 16px; cursor: pointer; padding: 6px 10px; transition: all 0.2s ease; font-weight: bold; z-index: 10;}
+        .focus-btn { position: absolute; top: 12px; right: 12px; background: #e2e8f0; border: none; border-radius: 6px; color: var(--text-muted); font-size: 16px; cursor: pointer; padding: 6px 10px; transition: all 0.2s; font-weight: bold; z-index: 10;}
         .focus-btn:hover { background: #cbd5e1; color: var(--text-heading); transform: scale(1.05); }
 
         /* Audio & Radios */
         .audio-container { background: var(--input-bg); border: 2px solid #cbd5e1; padding: 20px; border-radius: 12px; display: flex; flex-direction: column; gap: 15px; box-shadow: var(--shadow-inner); margin-top: 15px;}
         .audio-actions { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
-        .btn-record { background: #fff; border: 2px solid #cbd5e1; color: var(--text-heading); font-weight: 600; padding: 10px 20px; border-radius: 8px; cursor: pointer; transition: all 0.2s ease; display: inline-flex; align-items: center; gap: 8px; font-size: 14.5px; z-index: 10; pointer-events: auto;}
+        .btn-record { background: #fff; border: 2px solid #cbd5e1; color: var(--text-heading); font-weight: 600; padding: 10px 20px; border-radius: 8px; cursor: pointer; transition: all 0.2s; display: inline-flex; align-items: center; gap: 8px; font-size: 14.5px; z-index: 10; pointer-events: auto;}
         .btn-record:hover { border-color: var(--text-muted); background: #f8fafc; transform: translateY(-1px); }
         .btn-record.recording { background: #fee2e2; border-color: var(--danger); color: var(--danger); animation: recordPulse 1.5s infinite; transform: none; }
-        @keyframes recordPulse { 0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); } 70% { box-shadow: 0 0 0 15px rgba(239, 68, 68, 0); } 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); } }
         .recording-status { font-size: 13.5px; color: var(--danger); font-weight: 600; display: none; align-items: center; gap: 6px; }
         .audio-timer-display { font-variant-numeric: tabular-nums; background: rgba(239, 68, 68, 0.1); padding: 4px 8px; border-radius: 4px; border: 1px solid rgba(239, 68, 68, 0.2); }
         .audio-playback { width: 100%; height: 40px; border-radius: 8px; display: none; margin-top: 10px; }
@@ -144,14 +97,14 @@
         .radio-options-wrapper { margin-top: 20px; }
         .radio-label { display: flex; align-items: center; background: var(--input-bg); padding: 18px 20px; margin-bottom: 12px; border-radius: 12px; cursor: pointer; border: 2px solid #cbd5e1; transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1); font-size: 15px; color: var(--text-body); box-shadow: var(--shadow-inner); }
         .radio-label:hover { background: rgba(255,255,255,0.9); border-color: #94a3b8; transform: translateX(4px); }
-        .radio-label input[type="radio"] { appearance: none; -webkit-appearance: none; margin: 0 16px 0 0; width: 22px; height: 22px; border: 2px solid #94a3b8; border-radius: 50%; display: grid; place-content: center; cursor: pointer; flex-shrink: 0; transition: all 0.2s ease; }
-        .radio-label input[type="radio"]::before { content: ""; width: 10px; height: 10px; border-radius: 50%; transform: scale(0); transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1); background: var(--primary-accent); }
+        .radio-label input[type="radio"] { appearance: none; -webkit-appearance: none; margin: 0 16px 0 0; width: 22px; height: 22px; border: 2px solid #94a3b8; border-radius: 50%; display: grid; place-content: center; cursor: pointer; flex-shrink: 0; transition: all 0.2s; }
+        .radio-label input[type="radio"]::before { content: ""; width: 10px; height: 10px; border-radius: 50%; transform: scale(0); transition: transform 0.2s; background: var(--primary-accent); }
         .radio-label input[type="radio"]:checked::before { transform: scale(1); }
         .radio-label input[type="radio"]:checked { border-color: var(--primary-accent); }
         .radio-label.selected { background: #fff; border-color: var(--primary-accent); box-shadow: 0 4px 15px rgba(37,99,235,0.1); transform: translateX(6px); }
 
         #timer-container { position: sticky; top: 20px; z-index: 100; display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
-        .timer-badge { background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); padding: 10px 25px; border-radius: 50px; font-size: 18px; font-weight: 700; border: 1px solid var(--glass-border); box-shadow: 0 10px 30px -5px rgba(0,0,0,0.12); color: var(--text-heading); font-variant-numeric: tabular-nums; transition: all 0.3s ease; }
+        .timer-badge { background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(12px); padding: 10px 25px; border-radius: 50px; font-size: 18px; font-weight: 700; border: 1px solid var(--glass-border); box-shadow: 0 10px 30px -5px rgba(0,0,0,0.12); color: var(--text-heading); font-variant-numeric: tabular-nums; transition: all 0.3s; }
         .step-indicator { font-weight: 600; color: var(--text-muted); font-size: 15px; }
 
         #exam-screen, #results-screen { display: none; width: 100%; animation: slideUpFade 0.5s ease forwards; }
@@ -164,18 +117,14 @@
 </head>
 <body>
 
-    <!-- ULTRAPREMIUM DIALOG POPUP MODAL COMPONENT (Replaces window.alert & window.confirm) -->
     <div id="custom-modal-overlay">
         <div class="modal-card">
             <h2 class="modal-title" id="custom-modal-title">Notification</h2>
             <p class="modal-body-text" id="custom-modal-text">Message contents go here...</p>
-            <div class="modal-footer-actions" id="custom-modal-actions">
-                <!-- Injected dynamically via JavaScript -->
-            </div>
+            <div class="modal-footer-actions" id="custom-modal-actions"></div>
         </div>
     </div>
 
-    <!-- SECURITY WARNING OVERLAY -->
     <div id="security-warning">
         <h1>⚠️ SECURITY WARNING ⚠️</h1>
         <p>You have exited Fullscreen or switched tabs. This is strictly prohibited.</p>
@@ -184,48 +133,46 @@
         <button class="btn-resume" onclick="resumeFullscreen()">Return to Exam</button>
     </div>
 
-    <!-- START SCREEN -->
     <div id="start-screen">
         <div class="main-container" style="max-width: 650px;">
             <h1>Secure Client Assessment</h1>
-            <p class="subtitle">Entry-Level / Junior Support Profile</p>
+            <p class="subtitle" style="color: var(--primary-accent); font-weight: 600;">Junior / Entry-Level Support Profile</p>
             
-            <div class="ui-card" style="text-align: left;">
+            <div class="ui-card" style="text-align: left; margin-bottom: 25px;">
                 <ul style="color: var(--text-body); line-height: 2; margin: 0; padding-left: 20px; font-size: 15px;">
-                    <li><strong>Duration:</strong> <span style="color:var(--primary-accent); font-weight:600;">45 Minutes</span> strict limit.</li>
-                    <li><strong>Format:</strong> 18 foundational scenarios (MCQ, Text, and Audio).</li>
-                    <li><strong>Auto-Save:</strong> Your answers are automatically saved to your browser.</li>
-                    <li><strong style="color: var(--danger);">Strict Proctoring:</strong> The exam requires Fullscreen. Copy/Paste and Developer Tools are disabled. Exiting fullscreen or switching tabs triggers a failure countdown.</li>
+                    <li><strong>Duration:</strong> <span style="color:var(--primary-accent); font-weight:600;">60 Minutes</span> strict limit.</li>
+                    <li><strong>Format:</strong> 20 scenarios (MCQ, Text, Essay, Audio).</li>
+                    <li><strong>Access:</strong> A unique 6-digit access code is required to initiate.</li>
+                    <li><strong style="color: var(--danger);">Strict Proctoring:</strong> The exam requires Fullscreen. Exiting fullscreen or switching tabs triggers an auto-failure.</li>
                 </ul>
             </div>
             
-            <div style="display: flex; flex-direction: column; gap: 12px; width: 100%;">
-                <button class="btn-primary" onclick="startExam()">
+            <div style="display: flex; flex-direction: column; gap: 15px; width: 100%;">
+                <div id="access-code-wrapper" style="text-align: left; width: 100%;">
+                    <label class="input-label">Unique Access Code *</label>
+                    <input type="text" id="access-code-input" placeholder="e.g. A4X9BQ" required style="text-transform: uppercase; font-weight: bold; letter-spacing: 2px; text-align: center;">
+                </div>
+
+                <button class="btn-primary" id="btn-initiate" onclick="validateAndStart()">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path></svg>
-                    <span id="start-btn-text">I Understand — Enter Fullscreen & Start</span>
+                    <span id="start-btn-text">Validate Code & Start Assessment</span>
                 </button>
                 <button class="btn-ghost" id="btn-start-fresh" onclick="startFresh()" style="display: none;">
-                    Restart (Clear Saved Progress)
+                    Clear Saved Progress & Start Over
                 </button>
             </div>
         </div>
     </div>
 
-    <!-- EXAM SCREEN -->
     <div class="wrapper" id="exam-screen">
         <div class="main-container">
             <div id="timer-container">
                 <div class="step-indicator" id="step-counter">Registration</div>
-                <div class="timer-badge" id="display-timer">45:00</div>
+                <div class="timer-badge" id="display-timer">60:00</div>
             </div>
-            
-            <div class="progress-container">
-                <div class="progress-bar" id="progress-bar"></div>
-            </div>
-
+            <div class="progress-container"><div class="progress-bar" id="progress-bar"></div></div>
             <form id="assessmentForm">
                 <div id="steps-wrapper">
-                    <!-- Step 0: Candidate Details -->
                     <div class="step-container active" id="step-0">
                         <div class="ui-card">
                             <h3 class="section-header">Candidate Registration</h3>
@@ -237,7 +184,6 @@
                         </div>
                     </div>
                 </div>
-
                 <div class="nav-actions">
                     <button type="button" class="btn-nav btn-prev" id="btn-prev" onclick="changeStep(-1)" style="display:none;">← Previous</button>
                     <button type="button" class="btn-nav btn-next" id="btn-next" onclick="changeStep(1)">Next Question →</button>
@@ -247,7 +193,6 @@
         </div>
     </div>
 
-    <!-- RESULTS SCREEN -->
     <div class="wrapper" id="results-screen">
         <div class="main-container">
             <h1>Assessment Complete</h1>
@@ -258,23 +203,20 @@
     </div>
 
     <script>
-        // --- PREMIUM DIALOG ENGINE (Replaces Browser Alert / Confirm) ---
+        // ---- PASTE YOUR GOOGLE SCRIPT URL HERE ----
+        const GAS_URL = "https://script.google.com/macros/s/AKfycbyUxccuY7V_97Af5HZdrKD_eLMH9gpTaK0nA7km8hfiG6Zb56ag7GE_hFj8p0jLvJpn8Q/exec"; 
+
         function showCustomAlert(message, title = "System Notification") {
             return new Promise((resolve) => {
                 document.getElementById('custom-modal-title').innerText = title;
                 document.getElementById('custom-modal-text').innerText = message;
-                
                 const actionsContainer = document.getElementById('custom-modal-actions');
                 actionsContainer.innerHTML = ''; 
-                
                 const okBtn = document.createElement('button');
-                okBtn.className = 'btn-modal-primary';
-                okBtn.innerText = 'OK';
+                okBtn.className = 'btn-modal-primary'; okBtn.innerText = 'OK';
                 okBtn.addEventListener('click', () => {
-                    document.getElementById('custom-modal-overlay').classList.remove('active');
-                    resolve(true);
+                    document.getElementById('custom-modal-overlay').classList.remove('active'); resolve(true);
                 });
-                
                 actionsContainer.appendChild(okBtn);
                 document.getElementById('custom-modal-overlay').classList.add('active');
             });
@@ -284,33 +226,24 @@
             return new Promise((resolve) => {
                 document.getElementById('custom-modal-title').innerText = title;
                 document.getElementById('custom-modal-text').innerText = message;
-                
                 const actionsContainer = document.getElementById('custom-modal-actions');
                 actionsContainer.innerHTML = '';
-                
                 const cancelBtn = document.createElement('button');
-                cancelBtn.className = 'btn-modal-secondary';
-                cancelBtn.innerText = 'Cancel';
+                cancelBtn.className = 'btn-modal-secondary'; cancelBtn.innerText = 'Cancel';
                 cancelBtn.addEventListener('click', () => {
-                    document.getElementById('custom-modal-overlay').classList.remove('active');
-                    resolve(false);
+                    document.getElementById('custom-modal-overlay').classList.remove('active'); resolve(false);
                 });
-                
                 const actionBtn = document.createElement('button');
                 actionBtn.className = isDanger ? 'btn-modal-danger' : 'btn-modal-primary';
                 actionBtn.innerText = confirmText;
                 actionBtn.addEventListener('click', () => {
-                    document.getElementById('custom-modal-overlay').classList.remove('active');
-                    resolve(true);
+                    document.getElementById('custom-modal-overlay').classList.remove('active'); resolve(true);
                 });
-                
-                actionsContainer.appendChild(cancelBtn);
-                actionsContainer.appendChild(actionBtn);
+                actionsContainer.appendChild(cancelBtn); actionsContainer.appendChild(actionBtn);
                 document.getElementById('custom-modal-overlay').classList.add('active');
             });
         }
 
-        // --- CHECK FOR SAVED DRAFT ON LOAD ---
         document.addEventListener('DOMContentLoaded', () => {
             const draft = localStorage.getItem('exam_draft');
             if (draft) {
@@ -318,66 +251,85 @@
                     const parsed = JSON.parse(draft);
                     if (parsed.endTime > Date.now()) {
                         document.getElementById('start-btn-text').innerText = "Resume Saved Assessment";
+                        document.getElementById('access-code-wrapper').style.display = "none";
                         document.getElementById('btn-start-fresh').style.display = "block";
-                    } else {
-                        localStorage.removeItem('exam_draft');
-                    }
-                } catch(e) {
-                    localStorage.removeItem('exam_draft');
-                }
+                    } else { localStorage.removeItem('exam_draft'); }
+                } catch(e) { localStorage.removeItem('exam_draft'); }
             }
         });
 
         async function startFresh() {
-            const confirmed = await showCustomConfirm(
-                "Are you sure you want to clear your saved progress and start over?", 
-                "Clear Saved Progress?", 
-                "Reset & Restart", 
-                true
-            );
+            const confirmed = await showCustomConfirm("Are you sure you want to clear your saved progress? You will need a NEW valid access code to begin again.", "Clear Progress?", "Reset & Clear", true);
             if (confirmed) {
                 localStorage.removeItem('exam_draft');
-                document.getElementById('start-btn-text').innerText = "I Understand — Enter Fullscreen & Start";
+                document.getElementById('start-btn-text').innerText = "Validate Code & Start Assessment";
+                document.getElementById('access-code-wrapper').style.display = "block";
+                document.getElementById('access-code-input').value = "";
                 document.getElementById('btn-start-fresh').style.display = "none";
-                startExam();
             }
         }
 
-        // --- ANTI-CHEAT: Disable Paste, Copy, Right-Click, Dev Tools ---
+        async function validateAndStart() {
+            const draft = localStorage.getItem('exam_draft');
+            if (draft) {
+                enterFullscreenAndStart();
+                return;
+            }
+
+            const codeInput = document.getElementById('access-code-input').value.trim();
+            if (!codeInput) {
+                showCustomAlert("Please enter your 6-digit Access Code to begin.", "Code Required");
+                return;
+            }
+
+            const initiateBtn = document.getElementById('btn-initiate');
+            const startBtnText = document.getElementById('start-btn-text');
+            const originalText = startBtnText.innerText;
+            startBtnText.innerText = "Authenticating...";
+            initiateBtn.disabled = true;
+
+            try {
+                const response = await fetch(GAS_URL, {
+                    method: "POST",
+                    body: JSON.stringify({ action: 'validateCode', code: codeInput }),
+                    headers: { "Content-Type": "text/plain;charset=utf-8" }
+                });
+                const data = await response.json();
+                if (data.success) {
+                    enterFullscreenAndStart();
+                } else {
+                    showCustomAlert(data.error, "Access Denied");
+                    startBtnText.innerText = originalText;
+                    initiateBtn.disabled = false;
+                }
+            } catch (err) {
+                showCustomAlert("Network error while validating code. Please check your internet connection.", "Connection Error");
+                startBtnText.innerText = originalText;
+                initiateBtn.disabled = false;
+            }
+        }
+
         document.addEventListener('contextmenu', e => e.preventDefault());
         document.addEventListener('copy', e => e.preventDefault());
         document.addEventListener('cut', e => e.preventDefault());
-        document.addEventListener('paste', e => { 
-            e.preventDefault(); 
-            showCustomAlert("Security Restriction: Pasting contents is strictly disabled for this assessment. Please type out your answer response manually.", "Lockdown Warning"); 
-        });
-        
+        document.addEventListener('paste', e => { e.preventDefault(); showCustomAlert("Pasting contents is strictly disabled. Please type your response manually.", "Lockdown Warning"); });
         document.addEventListener('keydown', function(e) {
             if (e.keyCode === 123) { e.preventDefault(); return false; }
             if (e.ctrlKey && e.shiftKey && (e.keyCode === 73 || e.keyCode === 74)) { e.preventDefault(); return false; }
             if (e.ctrlKey && (e.keyCode === 85 || e.keyCode === 83 || e.keyCode === 67)) { e.preventDefault(); return false; }
         });
 
-        // --- GLOBAL EVENT DELEGATION ---
         document.addEventListener('click', function(e) {
             const audioBtn = e.target.closest('.audio-trigger-btn');
-            if (audioBtn) {
-                e.preventDefault();
-                toggleAudio(audioBtn, audioBtn.getAttribute('data-qid'));
-                return;
-            }
-
+            if (audioBtn) { e.preventDefault(); toggleAudio(audioBtn, audioBtn.getAttribute('data-qid')); return; }
             const fcBtn = e.target.closest('.fc-trigger-btn');
             if (fcBtn) {
                 e.preventDefault();
-                const qId = fcBtn.getAttribute('data-qid');
-                const qText = fcBtn.getAttribute('data-qtext');
-                const textarea = document.getElementById(`txt_${qId}`);
-                openFocusMode(textarea, qText);
+                openFocusMode(document.getElementById(`txt_${fcBtn.getAttribute('data-qid')}`), fcBtn.getAttribute('data-qtext'));
             }
         });
 
-        // --- FRESHER QUESTION BANKS ---
+        // --- BASIC QUESTION BANKS ---
         const mcqBank = [
             { id: "m1", q: "A customer writes an email in ALL CAPS stating that they cannot log into their account.", options: ["Ask them politely to stop using all caps before you continue assisting them.", "Apologize for the inconvenience, ask for their username, and offer to send a password reset link.", "Assume they are no longer a customer and archive the ticket.", "Tell them that the system is working fine and they must be typing their password incorrectly."] },
             { id: "m2", q: "You receive a question from a client, but you are completely unsure of the correct answer.", options: ["Give them your best guess so they don't have to wait for an answer.", "Transfer the ticket to a random department and hope they know how to handle it.", "Reply: 'I am not entirely sure, but I will investigate this with my team and get back to you shortly.'", "Ignore the ticket until a senior team member becomes available to help you."] },
@@ -388,7 +340,8 @@
             { id: "m7", q: "You realize you accidentally sent the wrong help article link to a customer.", options: ["Do nothing. They will probably figure it out on their own.", "Delete the email from your sent folder so no one knows.", "Reply to the email apologizing for the mix-up and provide the correct link immediately.", "Wait for the customer to reply and complain before sending the correct one."] },
             { id: "m8", q: "A client asks a highly technical question that you haven't been trained on yet.", options: ["Escalate the ticket to a senior engineer immediately without trying to find the answer in the internal knowledge base.", "Search the internal knowledge base first, and if you can't find it, ask a senior colleague for guidance before replying.", "Tell the client that their question is too advanced for your department.", "Copy and paste a random technical article from the internet that sounds similar."] },
             { id: "m9", q: "In customer service, what is the primary purpose of an SLA (Service Level Agreement)?", options: ["To guarantee a certain standard of service and response time for the customer.", "To ensure the customer pays their monthly subscription invoice on time.", "To track how many hours the support team works every week.", "To force customers to sign a legal contract before they can ask a question."] },
-            { id: "m10", q: "A customer leaves a very positive review about the help you provided them.", options: ["Ignore it, as you should only focus on negative reviews and complaints.", "Thank them warmly for their kind words and note the positive feedback.", "Ask them immediately if they want to upgrade their account to a more expensive tier.", "Forward it to all of your company's clients to show them how good you are."] }
+            { id: "m10", q: "A customer leaves a very positive review about the help you provided them.", options: ["Ignore it, as you should only focus on negative reviews and complaints.", "Thank them warmly for their kind words and note the positive feedback.", "Ask them immediately if they want to upgrade their account to a more expensive tier.", "Forward it to all of your company's clients to show them how good you are."] },
+            { id: "m11", q: "A customer reaches out because they are having trouble finding the 'Export' button on their dashboard. You know exactly where it is. What is the best response?", options: ["Send them a bulleted list of instructions clearly explaining where the button is located.", "Assume they are experiencing a glitch and send them a link to clear their browser cache.", "Tell them the Export button is on the main page and they just need to look closer.", "Offer to do the export for them this time so they don't have to learn how to do it."] }
         ];
 
         const textBank = [
@@ -399,71 +352,47 @@
             { id: "t5", q: "Describe a time you helped someone (a friend, classmate, or customer) solve a problem. How did you handle it?" }
         ];
 
+        const essayBank = [
+            { id: "e1", q: "📝 ANALYTICAL ESSAY: Please select a global affairs topic from the dropdown below and write a comprehensive, well-structured essay discussing its impact, challenges, and potential solutions. (Minimum 200 words recommended)", topics: ["Global Warming & Climate Change", "The Future of Artificial Intelligence in the Workplace", "The Global Shift to Remote Work vs. Office Culture", "Supply Chain Vulnerabilities in the Modern World"] }
+        ];
+
         const audioBank = [
             { id: "a1", title: "Voicemail Intro", q: "🎙️ AUDIO SCENARIO: You are leaving a voicemail for a new client to welcome them to the company and introduce yourself as their support contact. Hit Record and provide your voicemail." },
             { id: "a2", title: "Billing Complaint", q: "🎙️ AUDIO SCENARIO: A client calls and says they were overcharged on their last invoice. You need to look into their account history and call them back. Hit Record and verbally tell them what you are going to do." },
             { id: "a3", title: "Feature Request", q: "🎙️ AUDIO SCENARIO: A customer asks you for a feature that does not exist. Hit Record and politely explain that while you don't currently have it, you will pass the feedback along to the team." }
         ];
 
-        // --- GLOBAL STATE ---
-        let activeQuestions = [];
-        let isExamActive = false;
-        let examSubmitted = false;
-        let forcedSubmitReason = "";
-        let currentStep = 0;
-        let totalSteps = 18; 
-        let examEndTime = 0;
-        let fullscreenSupported = false;
-        
-        let mediaRecorders = {};
-        let audioChunks = {};
-        let finalAudioBlobs = {};
-        let rawAudioBlobs = {}; 
-        let audioTimers = {}; 
-        let audioSeconds = {}; 
+        let activeQuestions = [], isExamActive = false, examSubmitted = false, forcedSubmitReason = "", currentStep = 0, totalSteps = 20, examEndTime = 0, fullscreenSupported = false;
+        let mediaRecorders = {}, audioChunks = {}, finalAudioBlobs = {}, rawAudioBlobs = {}, audioTimers = {}, audioSeconds = {}; 
 
         function shuffleArray(array) {
             let curId = array.length;
-            while (0 !== curId) {
-                let randId = Math.floor(Math.random() * curId); curId -= 1;
-                let tmp = array[curId]; array[curId] = array[randId]; array[randId] = tmp;
-            }
+            while (0 !== curId) { let randId = Math.floor(Math.random() * curId); curId -= 1; let tmp = array[curId]; array[curId] = array[randId]; array[randId] = tmp; }
             return array;
         }
 
-        // --- AUTO-SAVE (LOCALSTORAGE) ---
         function saveState() {
             if (!isExamActive) return;
             const formData = new FormData(document.getElementById('assessmentForm'));
             const data = Object.fromEntries(formData.entries());
-            const state = {
-                questions: activeQuestions,
-                answers: data,
-                endTime: examEndTime,
-                step: currentStep
-            };
-            localStorage.setItem('exam_draft', JSON.stringify(state));
+            localStorage.setItem('exam_draft', JSON.stringify({ questions: activeQuestions, answers: data, endTime: examEndTime, step: currentStep }));
         }
 
         document.getElementById('assessmentForm').addEventListener('input', saveState);
         document.getElementById('assessmentForm').addEventListener('change', saveState);
 
-        // --- EXAM GENERATION & RESTORE ---
         function generateSteps() {
             const wrapper = document.getElementById('steps-wrapper');
             const savedState = JSON.parse(localStorage.getItem('exam_draft'));
 
             if (savedState && savedState.questions && savedState.endTime > Date.now()) {
-                activeQuestions = savedState.questions;
-                examEndTime = savedState.endTime;
-                currentStep = savedState.step || 0;
+                activeQuestions = savedState.questions; examEndTime = savedState.endTime; currentStep = savedState.step || 0;
             } else {
-                activeQuestions = shuffleArray([...mcqBank, ...textBank, ...audioBank]);
-                examEndTime = Date.now() + (45 * 60 * 1000);
+                activeQuestions = shuffleArray([...mcqBank, ...textBank, ...essayBank, ...audioBank]);
+                examEndTime = Date.now() + (60 * 60 * 1000); 
             }
 
             totalSteps = activeQuestions.length;
-
             let html = '';
             activeQuestions.forEach((item, index) => {
                 const stepNum = index + 1;
@@ -473,10 +402,17 @@
                 
                 if (item.options) {
                     html += `<div class="radio-options-wrapper">`;
-                    item.options.forEach(opt => { 
-                        html += `<label class="radio-label"><input type="radio" name="q_${item.id}" value="${opt}" required> ${opt}</label>`; 
-                    });
+                    item.options.forEach(opt => { html += `<label class="radio-label"><input type="radio" name="q_${item.id}" value="${opt}" required> ${opt}</label>`; });
                     html += `</div>`;
+                } else if (item.id.startsWith('e')) {
+                    html += `<div class="textarea-wrapper">
+                                <select name="q_${item.id}_topic" required style="width: 100%; padding: 14px; margin-bottom: 15px; border-radius: 10px; border: 2px solid #cbd5e1; font-family: inherit; font-size: 15px; background: var(--input-bg); cursor:pointer;">
+                                    <option value="">-- Select your Essay Topic --</option>`;
+                    item.topics.forEach(topic => { html += `<option value="${topic}">${topic}</option>`; });
+                    html += `   </select>
+                                <textarea name="q_${item.id}" id="txt_${item.id}" placeholder="Write your essay here..." required style="min-height: 250px;"></textarea>
+                                <button type="button" class="focus-btn fc-trigger-btn" data-qid="${item.id}" data-qtext="${item.q.replace(/"/g, '&quot;')}">⤢</button>
+                             </div>`;
                 } else if (item.id.startsWith('a')) {
                     html += `<div class="audio-container">
                                 <div class="audio-actions">
@@ -503,9 +439,7 @@
                         if (el.type === 'radio') {
                             const radio = document.querySelector(`input[name="${key}"][value="${value}"]`);
                             if (radio) { radio.checked = true; radio.parentElement.classList.add('selected'); }
-                        } else {
-                            el.value = value;
-                        }
+                        } else { el.value = value; }
                     }
                 }
             }
@@ -514,42 +448,27 @@
                 radio.addEventListener('change', function() {
                     const groupName = this.getAttribute('name');
                     document.querySelectorAll(`input[name="${groupName}"]`).forEach(r => r.parentElement.classList.remove('selected'));
-                    if (this.checked) this.parentElement.classList.add('selected');
-                    saveState();
+                    if (this.checked) this.parentElement.classList.add('selected'); saveState();
                 });
             });
-            
             updateUI();
         }
 
-        // --- PAGINATION LOGIC ---
         function validateStep() {
             const stepDiv = document.getElementById(`step-${currentStep}`);
-            const inputs = stepDiv.querySelectorAll('input[required], textarea[required]');
-            for (let input of inputs) {
-                if (!input.checkValidity()) {
-                    input.reportValidity();
-                    return false;
-                }
-            }
+            const inputs = stepDiv.querySelectorAll('input[required], textarea[required], select[required]');
+            for (let input of inputs) { if (!input.checkValidity()) { input.reportValidity(); return false; } }
             return true;
         }
 
         function changeStep(dir) {
             if (dir === 1 && !validateStep()) return;
-            currentStep += dir;
-            saveState();
-            updateUI();
+            currentStep += dir; saveState(); updateUI();
         }
 
         function updateUI() {
-            document.querySelectorAll('.step-container').forEach(el => {
-                el.classList.remove('active');
-            });
-            
-            setTimeout(() => {
-                document.getElementById(`step-${currentStep}`).classList.add('active');
-            }, 10);
+            document.querySelectorAll('.step-container').forEach(el => el.classList.remove('active'));
+            setTimeout(() => document.getElementById(`step-${currentStep}`).classList.add('active'), 10);
             
             document.getElementById('btn-prev').style.display = currentStep === 0 ? 'none' : 'block';
             if (currentStep === totalSteps) {
@@ -559,356 +478,181 @@
                 document.getElementById('btn-next').style.display = 'block';
                 document.getElementById('btn-submit').style.display = 'none';
             }
-
             const progress = (currentStep / totalSteps) * 100;
             document.getElementById('progress-bar').style.width = `${progress}%`;
             document.getElementById('step-counter').innerText = currentStep === 0 ? "Registration" : `Question ${currentStep} of ${totalSteps}`;
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
-        // --- AUDIO ENGINE ---
         async function toggleAudio(btn, qId) {
             const statusText = document.getElementById(`status_${qId}`);
             const player = document.getElementById(`player_${qId}`);
             const timerDisplay = document.getElementById(`audio_timer_${qId}`);
             
             if (mediaRecorders[qId] && mediaRecorders[qId].state === "recording") {
-                mediaRecorders[qId].stop();
-                clearInterval(audioTimers[qId]); 
-                btn.innerHTML = "🎙️ Re-Record Answer";
-                btn.classList.remove("recording");
-                statusText.style.display = "none";
-                return;
+                mediaRecorders[qId].stop(); clearInterval(audioTimers[qId]); 
+                btn.innerHTML = "🎙️ Re-Record Answer"; btn.classList.remove("recording"); statusText.style.display = "none"; return;
             }
-
-            if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-                showCustomAlert("Microphone Error: Your device environment is blocking audio hardware initialization. Please verify browser options allow recording devices.", "Hardware Inaccessible");
-                return;
-            }
+            if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) { showCustomAlert("Microphone Error: Hardware blocked.", "Error"); return; }
 
             try {
                 const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-                mediaRecorders[qId] = new MediaRecorder(stream);
-                audioChunks[qId] = [];
-                audioSeconds[qId] = 0; 
-
+                mediaRecorders[qId] = new MediaRecorder(stream); audioChunks[qId] = []; audioSeconds[qId] = 0; 
                 mediaRecorders[qId].ondataavailable = e => { if (e.data.size > 0) audioChunks[qId].push(e.data); };
                 mediaRecorders[qId].onstop = () => {
                     const blob = new Blob(audioChunks[qId], { type: 'audio/webm' });
-                    rawAudioBlobs[qId] = blob; 
-                    finalAudioBlobs[qId] = URL.createObjectURL(blob); 
-                    player.src = finalAudioBlobs[qId];
-                    player.style.display = "block";
-                    stream.getTracks().forEach(track => track.stop());
+                    rawAudioBlobs[qId] = blob; finalAudioBlobs[qId] = URL.createObjectURL(blob); 
+                    player.src = finalAudioBlobs[qId]; player.style.display = "block"; stream.getTracks().forEach(track => track.stop());
                 };
-
                 mediaRecorders[qId].start();
-                btn.innerHTML = "⏹️ Stop Recording";
-                btn.classList.add("recording");
-                statusText.style.display = "inline-flex";
-                player.style.display = "none";
-                
+                btn.innerHTML = "⏹️ Stop Recording"; btn.classList.add("recording"); statusText.style.display = "inline-flex"; player.style.display = "none";
                 timerDisplay.innerText = "00:00";
                 audioTimers[qId] = setInterval(() => {
-                    audioSeconds[qId]++;
-                    let m = Math.floor(audioSeconds[qId] / 60); let s = audioSeconds[qId] % 60;
+                    audioSeconds[qId]++; let m = Math.floor(audioSeconds[qId] / 60); let s = audioSeconds[qId] % 60;
                     timerDisplay.innerText = (m < 10 ? "0" + m : m) + ":" + (s < 10 ? "0" + s : s);
                 }, 1000);
-            } catch (err) { 
-                if (err.name === "NotFoundError" || err.name === "DevicesNotFoundError") {
-                    showCustomAlert("Microphone Error: No active audio capture hardware detected. Please attach a workspace recording headset.", "Hardware Device Missing");
-                } else if (err.name === "NotAllowedError" || err.name === "PermissionDeniedError") {
-                    showCustomAlert("Microphone Error: Platform capture layer access explicitly blocked. Please modify structural security site options to allow microphone input.", "Permission Blocked");
-                } else {
-                    showCustomAlert("Microphone Error: Failed initialization context setup: " + err.message, "System Layer Exception");
-                }
-                console.error(err);
-            }
+            } catch (err) { showCustomAlert("Microphone Error: " + err.message, "Permission Error"); }
         }
 
-        // --- FULLSCREEN & START ---
-        function startExam() {
-            if ("Notification" in window && Notification.permission !== "granted") Notification.requestPermission();
-            
+        function enterFullscreenAndStart() {
             const startSequence = () => {
                 document.getElementById('start-screen').style.opacity = '0';
                 setTimeout(() => {
                     document.getElementById('start-screen').style.display = 'none';
                     document.getElementById('exam-screen').style.display = 'flex';
-                    generateSteps();
-                    startTimer();
-                    initAudio();
-                    isExamActive = true;
+                    generateSteps(); startTimer(); initAudio(); isExamActive = true;
                 }, 500);
             };
-
             if (document.documentElement.requestFullscreen) {
-                document.documentElement.requestFullscreen().then(() => {
-                    fullscreenSupported = true; 
-                    startSequence();
-                }).catch(err => {
-                    console.warn("Fullscreen blocked. Starting in windowed mode.");
-                    fullscreenSupported = false; 
-                    startSequence(); 
-                });
-            } else {
-                startSequence(); 
-            }
+                document.documentElement.requestFullscreen().then(() => { fullscreenSupported = true; startSequence();
+                }).catch(err => { fullscreenSupported = false; startSequence(); });
+            } else { startSequence(); }
         }
 
-        // --- TIMER ---
         let mainTimerInterval;
         function startTimer() {
             mainTimerInterval = setInterval(function () {
                 let timeLeft = Math.floor((examEndTime - Date.now()) / 1000);
-                if (timeLeft <= 0) {
-                    clearInterval(mainTimerInterval);
-                    forcedSubmitReason = "TIME EXPIRED";
-                    triggerSubmit();
-                    return;
-                }
+                if (timeLeft <= 0) { clearInterval(mainTimerInterval); forcedSubmitReason = "TIME EXPIRED"; triggerSubmit(); return; }
                 let m = Math.floor(timeLeft / 60); let s = timeLeft % 60;
                 let display = document.getElementById('display-timer');
                 display.textContent = (m < 10 ? "0" + m : m) + ":" + (s < 10 ? "0" + s : s);
-                
-                if (timeLeft < 300) { 
-                    display.style.color = "var(--danger)"; 
-                    display.style.borderColor = "var(--danger)"; 
-                    display.style.boxShadow = "0 0 15px rgba(239, 68, 68, 0.4)";
-                }
+                if (timeLeft < 300) { display.style.color = "var(--danger)"; display.style.borderColor = "var(--danger)"; display.style.boxShadow = "0 0 15px rgba(239, 68, 68, 0.4)"; }
             }, 1000);
         }
 
-        // --- SECURITY (FULLSCREEN & TAB CHECK) ---
-        let audioCtx;
-        function initAudio() { audioCtx = new (window.AudioContext || window.webkitAudioContext)(); }
+        let audioCtx; function initAudio() { audioCtx = new (window.AudioContext || window.webkitAudioContext)(); }
         function playAlarmBeep() {
-            if (!audioCtx) return;
-            if (audioCtx.state === 'suspended') audioCtx.resume();
+            if (!audioCtx) return; if (audioCtx.state === 'suspended') audioCtx.resume();
             const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain();
             osc.type = 'square'; osc.frequency.setValueAtTime(440, audioCtx.currentTime); osc.frequency.setValueAtTime(880, audioCtx.currentTime + 0.2);
             gain.gain.setValueAtTime(0.1, audioCtx.currentTime); osc.connect(gain); gain.connect(audioCtx.destination);
             osc.start(); osc.stop(audioCtx.currentTime + 0.4);
         }
 
-        let violationTimerInterval;
-        let violationTimeLeft = 10;
-        let inViolationState = false;
-        let desktopNotification = null;
+        let violationTimerInterval, violationTimeLeft = 10, inViolationState = false;
 
         function clearViolation() {
-            inViolationState = false;
-            clearInterval(violationTimerInterval);
+            inViolationState = false; clearInterval(violationTimerInterval);
             document.getElementById('security-warning').style.display = 'none';
-            if (desktopNotification) desktopNotification.close();
         }
 
         async function resumeFullscreen() {
             if (fullscreenSupported && document.documentElement.requestFullscreen) {
-                document.documentElement.requestFullscreen().then(() => {
-                    clearViolation();
-                }).catch(async (e) => {
-                    await showCustomAlert("Interaction Error: Web environment frame requires manual action to regain fullscreen execution focus.", "Action Required");
-                });
-            } else {
-                clearViolation(); 
-            }
+                document.documentElement.requestFullscreen().then(() => { clearViolation();
+                }).catch(async (e) => { await showCustomAlert("Web environment requires manual action to regain fullscreen.", "Action Required"); });
+            } else { clearViolation(); }
         }
 
         function checkViolations() {
             if (!isExamActive || examSubmitted) return;
-
             const isHidden = document.hidden || !document.hasFocus();
             const notFullscreen = fullscreenSupported && !document.fullscreenElement;
 
             if (isHidden || notFullscreen) {
                 if (!inViolationState) {
-                    inViolationState = true;
-                    violationTimeLeft = 10;
+                    inViolationState = true; violationTimeLeft = 10;
                     document.getElementById('violation-countdown').innerText = violationTimeLeft;
                     document.getElementById('security-warning').style.display = 'flex';
-                    
-                    if ("Notification" in window && Notification.permission === "granted") {
-                        desktopNotification = new Notification("⚠️ EXAM SECURITY WARNING", {
-                            body: "Return to the exam immediately! Auto-submit in 10 seconds.",
-                            requireInteraction: true
-                        });
-                    }
-                    
                     playAlarmBeep();
                     violationTimerInterval = setInterval(() => {
-                        violationTimeLeft--;
-                        document.getElementById('violation-countdown').innerText = violationTimeLeft;
-                        playAlarmBeep();
-                        
-                        if (violationTimeLeft <= 0) {
-                            clearInterval(violationTimerInterval);
-                            if (desktopNotification) desktopNotification.close();
-                            forcedSubmitReason = "SECURITY VIOLATION (TAB/FULLSCREEN EXIT)";
-                            triggerSubmit();
-                        }
+                        violationTimeLeft--; document.getElementById('violation-countdown').innerText = violationTimeLeft; playAlarmBeep();
+                        if (violationTimeLeft <= 0) { clearInterval(violationTimerInterval); forcedSubmitReason = "SECURITY VIOLATION (TAB/FULLSCREEN EXIT)"; triggerSubmit(); }
                     }, 1000);
                 }
-            } else if (inViolationState && violationTimeLeft > 0 && !notFullscreen) {
-                clearViolation();
-            }
+            } else if (inViolationState && violationTimeLeft > 0 && !notFullscreen) { clearViolation(); }
         }
 
-        window.addEventListener('blur', checkViolations);
-        window.addEventListener('focus', checkViolations);
-        document.addEventListener('visibilitychange', checkViolations);
-        document.addEventListener('fullscreenchange', checkViolations);
+        window.addEventListener('blur', checkViolations); window.addEventListener('focus', checkViolations);
+        document.addEventListener('visibilitychange', checkViolations); document.addEventListener('fullscreenchange', checkViolations);
 
-        // --- ANIMATED FOCUS MODE ---
         function openFocusMode(textarea, qText) {
             const bg = document.createElement('div');
-            bg.style.cssText = 'position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(17,24,39,0.4); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); z-index: 100000; display: flex; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.3s ease;';
-            
+            bg.style.cssText = 'position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(17,24,39,0.4); backdrop-filter: blur(8px); z-index: 100000; display: flex; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.3s ease;';
             const box = document.createElement('div');
             box.style.cssText = 'background: #fff; padding: 30px; border-radius: 16px; width: 90%; max-width: 700px; display: flex; flex-direction: column; gap: 15px; transform: scale(0.95) translateY(20px); transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1); box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);';
-            
             box.innerHTML = `
                 <div style="display:flex; justify-content:space-between; align-items:center;">
                     <h3 style="margin:0; font-size:18px; color:var(--text-heading);">${qText}</h3>
                     <button id="fc-close" style="font-size:28px; border:none; background:none; cursor:pointer; color:var(--text-muted); transition: color 0.2s;">&times;</button>
                 </div>
                 <textarea id="fc-txt" style="height:400px; font-size:16px; padding:20px; border: 2px solid var(--primary-accent); border-radius: 12px; font-family: inherit; resize: none; outline: none; box-shadow: var(--shadow-inner);"></textarea>
-                <div style="text-align: right; font-size: 13px; color: var(--text-muted); font-weight: 500;">Press Esc or click outside to save and close</div>
-            `;
-            
-            bg.appendChild(box); 
-            document.body.appendChild(bg);
-            
-            const fcTxt = document.getElementById('fc-txt');
-            const closeBtn = document.getElementById('fc-close');
-            
-            fcTxt.value = textarea.value;
-            fcTxt.addEventListener('input', () => { textarea.value = fcTxt.value; saveState(); });
-            
-            requestAnimationFrame(() => {
-                bg.style.opacity = '1';
-                box.style.transform = 'scale(1) translateY(0)';
-                fcTxt.focus();
-            });
-
-            const closeFocus = () => {
-                bg.style.opacity = '0';
-                box.style.transform = 'scale(0.95) translateY(20px)';
-                setTimeout(() => bg.remove(), 300);
-            };
-
-            closeBtn.onclick = closeFocus;
-            closeBtn.onmouseover = () => closeBtn.style.color = 'var(--danger)';
-            closeBtn.onmouseout = () => closeBtn.style.color = 'var(--text-muted)';
-            
-            bg.addEventListener('mousedown', (e) => {
-                if (e.target === bg) closeFocus();
-            });
-            
-            document.addEventListener('keydown', function escHandler(e) {
-                if (e.key === 'Escape') {
-                    closeFocus();
-                    document.removeEventListener('keydown', escHandler);
-                }
-            });
+                <div style="text-align: right; font-size: 13px; color: var(--text-muted); font-weight: 500;">Press Esc or click outside to save</div>`;
+            bg.appendChild(box); document.body.appendChild(bg);
+            const fcTxt = document.getElementById('fc-txt'); const closeBtn = document.getElementById('fc-close');
+            fcTxt.value = textarea.value; fcTxt.addEventListener('input', () => { textarea.value = fcTxt.value; saveState(); });
+            requestAnimationFrame(() => { bg.style.opacity = '1'; box.style.transform = 'scale(1) translateY(0)'; fcTxt.focus(); });
+            const closeFocus = () => { bg.style.opacity = '0'; box.style.transform = 'scale(0.95) translateY(20px)'; setTimeout(() => bg.remove(), 300); };
+            closeBtn.onclick = closeFocus; closeBtn.onmouseover = () => closeBtn.style.color = 'var(--danger)'; closeBtn.onmouseout = () => closeBtn.style.color = 'var(--text-muted)';
+            bg.addEventListener('mousedown', (e) => { if (e.target === bg) closeFocus(); });
+            document.addEventListener('keydown', function escHandler(e) { if (e.key === 'Escape') { closeFocus(); document.removeEventListener('keydown', escHandler); } });
         }
 
-        // --- EXPORT TO BACKEND ---
-        function blobToBase64(blob) {
-            return new Promise((resolve, _) => {
-                const reader = new FileReader();
-                reader.onloadend = () => resolve(reader.result.split(',')[1]);
-                reader.readAsDataURL(blob);
-            });
-        }
-
+        function blobToBase64(blob) { return new Promise((resolve, _) => { const reader = new FileReader(); reader.onloadend = () => resolve(reader.result.split(',')[1]); reader.readAsDataURL(blob); }); }
         function triggerSubmit() { document.getElementById('assessmentForm').dispatchEvent(new Event('submit', { cancelable: true, bubbles: true })); }
 
         document.getElementById('assessmentForm').addEventListener('submit', async function(e) {
-            e.preventDefault();
-            if (!validateStep() && !forcedSubmitReason) return; 
-
-            examSubmitted = true; isExamActive = false;
-            clearInterval(mainTimerInterval); clearInterval(violationTimerInterval);
+            e.preventDefault(); if (!validateStep() && !forcedSubmitReason) return; 
+            examSubmitted = true; isExamActive = false; clearInterval(mainTimerInterval); clearInterval(violationTimerInterval);
             document.getElementById('security-warning').style.display = 'none';
-            if (desktopNotification) desktopNotification.close();
-            if (document.fullscreenElement) document.exitFullscreen();
-            localStorage.removeItem('exam_draft'); 
-
+            if (document.fullscreenElement) document.exitFullscreen(); localStorage.removeItem('exam_draft'); 
             const submitBtn = document.getElementById('btn-submit');
-            submitBtn.innerText = "⏳ Uploading Securely to Server...";
-            submitBtn.disabled = true;
-            submitBtn.style.background = "#94a3b8";
+            submitBtn.innerText = "⏳ Uploading Securely to Server..."; submitBtn.disabled = true; submitBtn.style.background = "#94a3b8";
 
-            Object.keys(audioTimers).forEach(id => clearInterval(audioTimers[id]));
-            Object.values(mediaRecorders).forEach(rec => { if(rec.state === "recording") rec.stop(); });
-            
+            Object.keys(audioTimers).forEach(id => clearInterval(audioTimers[id])); Object.values(mediaRecorders).forEach(rec => { if(rec.state === "recording") rec.stop(); });
             const formData = new FormData(this);
-            
             let qnaData = [];
             activeQuestions.forEach((item, index) => {
                 let answerText = "";
-                if (item.id.startsWith('a')) {
-                    answerText = finalAudioBlobs[item.id] ? "[Audio recorded and saved to Google Drive]" : "[No audio recorded]";
-                } else {
-                    answerText = formData.get(`q_${item.id}`) || "No answer provided.";
-                }
-                qnaData.push({
-                    question: `${index + 1}. ${item.q}`,
-                    answer: answerText
-                });
+                if (item.id.startsWith('a')) { answerText = finalAudioBlobs[item.id] ? "[Audio recorded and saved to Google Drive]" : "[No audio recorded]"; } 
+                else if (item.id.startsWith('e')) {
+                    let topic = formData.get(`q_${item.id}_topic`); let text = formData.get(`q_${item.id}`);
+                    answerText = `[Topic Selected: ${topic}]\n\n${text}`;
+                } else { answerText = formData.get(`q_${item.id}`) || "No answer provided."; }
+                qnaData.push({ question: `${index + 1}. ${item.q}`, answer: answerText });
             });
 
-            // Map custom titles to the audio files in the payload
-            let audioTitlesMap = {};
-            audioBank.forEach(item => {
-                audioTitlesMap[item.id] = item.title;
-            });
-
-            let audioBase64Data = {};
-            for (let qId of Object.keys(rawAudioBlobs || {})) {
-                if (rawAudioBlobs[qId]) {
-                    audioBase64Data[qId] = await blobToBase64(rawAudioBlobs[qId]);
-                }
-            }
+            let audioTitlesMap = {}; audioBank.forEach(item => { audioTitlesMap[item.id] = item.title; });
+            let audioBase64Data = {}; for (let qId of Object.keys(rawAudioBlobs || {})) { if (rawAudioBlobs[qId]) { audioBase64Data[qId] = await blobToBase64(rawAudioBlobs[qId]); } }
 
             const payload = {
+                action: 'submitExam',
                 candidateName: formData.get("FirstName") + " " + formData.get("LastName"),
                 candidateEmail: formData.get("Email"),
-                qnaData: qnaData, 
-                audioFiles: audioBase64Data,
-                audioTitles: audioTitlesMap, // Passing titles for backend naming
-                forcedSubmitReason: forcedSubmitReason 
+                qnaData: qnaData, audioFiles: audioBase64Data, audioTitles: audioTitlesMap, forcedSubmitReason: forcedSubmitReason 
             };
 
-            // ---- PASTE YOUR GOOGLE SCRIPT URL HERE ----
-            const GAS_URL = "https://script.google.com/macros/s/AKfycbzdwZPG3mrDGsc6OJ2EUNR06yEhqJq4jTcvTgCgKwUuEpJLcANUya0vuDVJSN8b9HSd1A/exec"; 
-
-            fetch(GAS_URL, {
-                method: "POST",
-                body: JSON.stringify(payload),
-                headers: { "Content-Type": "text/plain;charset=utf-8" }
-            })
+            fetch(GAS_URL, { method: "POST", body: JSON.stringify(payload), headers: { "Content-Type": "text/plain;charset=utf-8" } })
             .then(response => response.json())
             .then(data => {
                 if(data.success) {
-                    document.getElementById('exam-screen').style.display = 'none';
-                    document.getElementById('results-screen').style.display = 'flex';
-                    window.scrollTo(0,0);
-                    
-                    if (forcedSubmitReason) {
-                        document.getElementById('violation-notice').innerHTML = `<div class="violation-flag">⚠️ EXAM AUTO-SUBMITTED: ${forcedSubmitReason}</div>`;
-                    }
+                    document.getElementById('exam-screen').style.display = 'none'; document.getElementById('results-screen').style.display = 'flex'; window.scrollTo(0,0);
+                    if (forcedSubmitReason) { document.getElementById('violation-notice').innerHTML = `<div class="violation-flag">⚠️ EXAM AUTO-SUBMITTED: ${forcedSubmitReason}</div>`; }
                     document.getElementById('results-output').innerHTML = "<div class='res-a' style='padding:20px; font-size:16px; text-align:center;'><b>Success:</b> Your assessment, audio files, and PDF have been securely transmitted to the hiring team. You may safely close this window.</div>";
-                } else {
-                    throw new Error(data.error);
-                }
-            })
-            .catch(async (error) => {
+                } else { throw new Error(data.error); }
+            }).catch(async (error) => {
                 await showCustomAlert("Data Sync Error: Failed to commit responses securely to server pipeline. Please confirm active networking status and retry.", "Transmission Failed");
-                submitBtn.innerText = "Retry Submission";
-                submitBtn.disabled = false;
-                submitBtn.style.background = "var(--success)";
+                submitBtn.innerText = "Retry Submission"; submitBtn.disabled = false; submitBtn.style.background = "var(--success)";
             });
         });
     </script>
