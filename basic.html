@@ -6,7 +6,6 @@
     <title>Secure Assessment | Entry-Level Profile</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        /* Premium UI Variables */
         :root {
             --bg-gradient: linear-gradient(135deg, #f0f4f8 0%, #e2e8f0 100%);
             --text-heading: #0f172a; --text-body: #334155; --text-muted: #64748b;
@@ -21,7 +20,6 @@
         input, textarea, select { user-select: auto; -webkit-user-select: auto; }
         ::-webkit-scrollbar { width: 8px; } ::-webkit-scrollbar-track { background: transparent; } ::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.15); border-radius: 10px; }
 
-        /* Security Overlays */
         #security-warning { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--danger-bg); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); z-index: 9999999; flex-direction: column; align-items: center; justify-content: center; color: white; text-align: center; padding: 20px; }
         #security-warning h1 { font-size: 44px; margin-bottom: 10px; text-shadow: 0 4px 10px rgba(0,0,0,0.2); }
         #violation-countdown { font-size: 100px; font-weight: 700; margin: 10px 0 20px 0; tabular-nums; text-shadow: 0 4px 20px rgba(0,0,0,0.3); animation: pulse 1s infinite; }
@@ -31,7 +29,6 @@
         @keyframes pulse { 0%, 100% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.05); opacity: 0.8; } }
         @keyframes slideUpFade { to { opacity: 1; transform: translateY(0); } }
 
-        /* Custom Modal */
         #custom-modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.3); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); z-index: 20000000; display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
         #custom-modal-overlay.active { opacity: 1; pointer-events: auto; }
         .modal-card { background: var(--glass-bg); padding: 30px; border-radius: 16px; width: 90%; max-width: 480px; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.2); text-align: center; transform: scale(0.95) translateY(15px); transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
@@ -46,7 +43,6 @@
         .btn-modal-secondary { background: rgba(0,0,0,0.05); color: var(--text-body); border: none; padding: 12px 24px; font-family: inherit; font-size: 14.5px; font-weight: 600; border-radius: 8px; cursor: pointer; transition: background 0.2s; }
         .btn-modal-secondary:hover { background: rgba(0,0,0,0.1); }
 
-        /* Layout & UI */
         .wrapper { display: flex; flex-direction: column; align-items: center; min-height: 100vh; padding: 40px 20px; }
         #start-screen { display: flex; flex-direction: column; justify-content: center; align-items: center; min-height: 100vh; width: 100%; margin: 0; padding: 20px; transition: opacity 0.5s ease; }
         .main-container { width: 100%; max-width: 800px; position: relative; }
@@ -58,7 +54,6 @@
         .step-container { display: none; opacity: 0; transform: translateY(20px); transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1); }
         .step-container.active { display: block; opacity: 1; transform: translateY(0); }
 
-        /* Buttons & Inputs */
         .btn-primary { background: linear-gradient(135deg, var(--primary-accent) 0%, #1e40af 100%); color: #fff; border: none; padding: 18px 24px; font-family: inherit; font-size: 16px; font-weight: 600; letter-spacing: 0.5px; border-radius: 12px; cursor: pointer; width: 100%; box-shadow: 0 10px 20px -5px rgba(37, 99, 235, 0.4); transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1); display: flex; justify-content: center; align-items: center; gap: 10px;}
         .btn-primary:hover:not(:disabled) { transform: translateY(-3px); box-shadow: 0 15px 25px -5px rgba(37, 99, 235, 0.5); }
         .btn-primary:disabled { opacity: 0.7; cursor: not-allowed; }
@@ -84,7 +79,6 @@
         .focus-btn { position: absolute; top: 12px; right: 12px; background: #e2e8f0; border: none; border-radius: 6px; color: var(--text-muted); font-size: 16px; cursor: pointer; padding: 6px 10px; transition: all 0.2s; font-weight: bold; z-index: 10;}
         .focus-btn:hover { background: #cbd5e1; color: var(--text-heading); transform: scale(1.05); }
 
-        /* Audio & Radios */
         .audio-container { background: var(--input-bg); border: 2px solid #cbd5e1; padding: 20px; border-radius: 12px; display: flex; flex-direction: column; gap: 15px; box-shadow: var(--shadow-inner); margin-top: 15px;}
         .audio-actions { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
         .btn-record { background: #fff; border: 2px solid #cbd5e1; color: var(--text-heading); font-weight: 600; padding: 10px 20px; border-radius: 8px; cursor: pointer; transition: all 0.2s; display: inline-flex; align-items: center; gap: 8px; font-size: 14.5px; z-index: 10; pointer-events: auto;}
@@ -203,44 +197,32 @@
     </div>
 
     <script>
-        // ---- PASTE YOUR GOOGLE SCRIPT URL HERE ----
-        const GAS_URL = "https://script.google.com/macros/s/AKfycbyUxccuY7V_97Af5HZdrKD_eLMH9gpTaK0nA7km8hfiG6Zb56ag7GE_hFj8p0jLvJpn8Q/exec"; 
+        // ---- UPDATED GAS DEPLOYMENT URL ----
+        const GAS_URL = "https://script.google.com/macros/s/AKfycbyERI2bnZTExqDgn5uXoz9lsX4FvON3VrdxEQKgy4tmza8iKzDHmCkNauQtgS6SAQiThw/exec"; 
+
+        let activeQuestions = [], isExamActive = false, examSubmitted = false, forcedSubmitReason = "", currentStep = 0, totalSteps = 20, examEndTime = 0, fullscreenSupported = false;
+        let globalAudioBank = []; 
+        let mediaRecorders = {}, audioChunks = {}, finalAudioBlobs = {}, rawAudioBlobs = {}, audioTimers = {}, audioSeconds = {}; 
 
         function showCustomAlert(message, title = "System Notification") {
             return new Promise((resolve) => {
-                document.getElementById('custom-modal-title').innerText = title;
-                document.getElementById('custom-modal-text').innerText = message;
-                const actionsContainer = document.getElementById('custom-modal-actions');
-                actionsContainer.innerHTML = ''; 
-                const okBtn = document.createElement('button');
-                okBtn.className = 'btn-modal-primary'; okBtn.innerText = 'OK';
-                okBtn.addEventListener('click', () => {
-                    document.getElementById('custom-modal-overlay').classList.remove('active'); resolve(true);
-                });
-                actionsContainer.appendChild(okBtn);
-                document.getElementById('custom-modal-overlay').classList.add('active');
+                document.getElementById('custom-modal-title').innerText = title; document.getElementById('custom-modal-text').innerText = message;
+                const actionsContainer = document.getElementById('custom-modal-actions'); actionsContainer.innerHTML = ''; 
+                const okBtn = document.createElement('button'); okBtn.className = 'btn-modal-primary'; okBtn.innerText = 'OK';
+                okBtn.addEventListener('click', () => { document.getElementById('custom-modal-overlay').classList.remove('active'); resolve(true); });
+                actionsContainer.appendChild(okBtn); document.getElementById('custom-modal-overlay').classList.add('active');
             });
         }
 
         function showCustomConfirm(message, title = "Confirm Action", confirmText = "Confirm", isDanger = false) {
             return new Promise((resolve) => {
-                document.getElementById('custom-modal-title').innerText = title;
-                document.getElementById('custom-modal-text').innerText = message;
-                const actionsContainer = document.getElementById('custom-modal-actions');
-                actionsContainer.innerHTML = '';
-                const cancelBtn = document.createElement('button');
-                cancelBtn.className = 'btn-modal-secondary'; cancelBtn.innerText = 'Cancel';
-                cancelBtn.addEventListener('click', () => {
-                    document.getElementById('custom-modal-overlay').classList.remove('active'); resolve(false);
-                });
-                const actionBtn = document.createElement('button');
-                actionBtn.className = isDanger ? 'btn-modal-danger' : 'btn-modal-primary';
-                actionBtn.innerText = confirmText;
-                actionBtn.addEventListener('click', () => {
-                    document.getElementById('custom-modal-overlay').classList.remove('active'); resolve(true);
-                });
-                actionsContainer.appendChild(cancelBtn); actionsContainer.appendChild(actionBtn);
-                document.getElementById('custom-modal-overlay').classList.add('active');
+                document.getElementById('custom-modal-title').innerText = title; document.getElementById('custom-modal-text').innerText = message;
+                const actionsContainer = document.getElementById('custom-modal-actions'); actionsContainer.innerHTML = '';
+                const cancelBtn = document.createElement('button'); cancelBtn.className = 'btn-modal-secondary'; cancelBtn.innerText = 'Cancel';
+                cancelBtn.addEventListener('click', () => { document.getElementById('custom-modal-overlay').classList.remove('active'); resolve(false); });
+                const actionBtn = document.createElement('button'); actionBtn.className = isDanger ? 'btn-modal-danger' : 'btn-modal-primary'; actionBtn.innerText = confirmText;
+                actionBtn.addEventListener('click', () => { document.getElementById('custom-modal-overlay').classList.remove('active'); resolve(true); });
+                actionsContainer.appendChild(cancelBtn); actionsContainer.appendChild(actionBtn); document.getElementById('custom-modal-overlay').classList.add('active');
             });
         }
 
@@ -272,47 +254,65 @@
         async function validateAndStart() {
             const draft = localStorage.getItem('exam_draft');
             if (draft) {
+                const parsed = JSON.parse(draft);
+                activeQuestions = parsed.questions;
+                globalAudioBank = parsed.audioBank || [];
+                examEndTime = parsed.endTime;
+                currentStep = parsed.step || 0;
+                totalSteps = activeQuestions.length;
                 enterFullscreenAndStart();
                 return;
             }
 
             const codeInput = document.getElementById('access-code-input').value.trim();
-            if (!codeInput) {
-                showCustomAlert("Please enter your 6-digit Access Code to begin.", "Code Required");
-                return;
-            }
+            if (!codeInput) { showCustomAlert("Please enter your 6-digit Access Code to begin.", "Code Required"); return; }
 
             const initiateBtn = document.getElementById('btn-initiate');
             const startBtnText = document.getElementById('start-btn-text');
             const originalText = startBtnText.innerText;
-            startBtnText.innerText = "Authenticating...";
+            startBtnText.innerText = "Authenticating & Downloading Files...";
             initiateBtn.disabled = true;
 
             try {
+                // Notice the examType: 'junior' tag here!
                 const response = await fetch(GAS_URL, {
-                    method: "POST",
-                    body: JSON.stringify({ action: 'validateCode', code: codeInput }),
-                    headers: { "Content-Type": "text/plain;charset=utf-8" }
+                    method: "POST", body: JSON.stringify({ action: 'validateCode', code: codeInput, examType: 'junior' }), headers: { "Content-Type": "text/plain;charset=utf-8" }
                 });
                 const data = await response.json();
+                
                 if (data.success) {
+                    const qs = data.questions;
+                    globalAudioBank = qs.audio; 
+                    activeQuestions = shuffleArray([...qs.mcq, ...qs.text, ...qs.essay, ...qs.audio]);
+                    examEndTime = Date.now() + (60 * 60 * 1000); 
+                    totalSteps = activeQuestions.length;
                     enterFullscreenAndStart();
                 } else {
                     showCustomAlert(data.error, "Access Denied");
-                    startBtnText.innerText = originalText;
-                    initiateBtn.disabled = false;
+                    startBtnText.innerText = originalText; initiateBtn.disabled = false;
                 }
             } catch (err) {
                 showCustomAlert("Network error while validating code. Please check your internet connection.", "Connection Error");
-                startBtnText.innerText = originalText;
-                initiateBtn.disabled = false;
+                startBtnText.innerText = originalText; initiateBtn.disabled = false;
             }
+        }
+
+        function shuffleArray(array) {
+            let curId = array.length;
+            while (0 !== curId) { let randId = Math.floor(Math.random() * curId); curId -= 1; let tmp = array[curId]; array[curId] = array[randId]; array[randId] = tmp; }
+            return array;
         }
 
         document.addEventListener('contextmenu', e => e.preventDefault());
         document.addEventListener('copy', e => e.preventDefault());
         document.addEventListener('cut', e => e.preventDefault());
-        document.addEventListener('paste', e => { e.preventDefault(); showCustomAlert("Pasting contents is strictly disabled. Please type your response manually.", "Lockdown Warning"); });
+        
+        document.addEventListener('paste', e => { 
+            if (e.target && e.target.id === 'access-code-input') return;
+            e.preventDefault(); 
+            showCustomAlert("Security Restriction: Pasting contents is strictly disabled for the exam. Please type your response manually.", "Lockdown Warning"); 
+        });
+        
         document.addEventListener('keydown', function(e) {
             if (e.keyCode === 123) { e.preventDefault(); return false; }
             if (e.ctrlKey && e.shiftKey && (e.keyCode === 73 || e.keyCode === 74)) { e.preventDefault(); return false; }
@@ -323,59 +323,16 @@
             const audioBtn = e.target.closest('.audio-trigger-btn');
             if (audioBtn) { e.preventDefault(); toggleAudio(audioBtn, audioBtn.getAttribute('data-qid')); return; }
             const fcBtn = e.target.closest('.fc-trigger-btn');
-            if (fcBtn) {
-                e.preventDefault();
-                openFocusMode(document.getElementById(`txt_${fcBtn.getAttribute('data-qid')}`), fcBtn.getAttribute('data-qtext'));
-            }
+            if (fcBtn) { e.preventDefault(); openFocusMode(document.getElementById(`txt_${fcBtn.getAttribute('data-qid')}`), fcBtn.getAttribute('data-qtext')); }
         });
-
-        // --- BASIC QUESTION BANKS ---
-        const mcqBank = [
-            { id: "m1", q: "A customer writes an email in ALL CAPS stating that they cannot log into their account.", options: ["Ask them politely to stop using all caps before you continue assisting them.", "Apologize for the inconvenience, ask for their username, and offer to send a password reset link.", "Assume they are no longer a customer and archive the ticket.", "Tell them that the system is working fine and they must be typing their password incorrectly."] },
-            { id: "m2", q: "You receive a question from a client, but you are completely unsure of the correct answer.", options: ["Give them your best guess so they don't have to wait for an answer.", "Transfer the ticket to a random department and hope they know how to handle it.", "Reply: 'I am not entirely sure, but I will investigate this with my team and get back to you shortly.'", "Ignore the ticket until a senior team member becomes available to help you."] },
-            { id: "m3", q: "You receive two tickets at the exact same time: One is a request for a password reset, and the other is reporting that the main website has crashed for everyone.", options: ["Handle the password reset first, because it will be faster to resolve.", "Handle the website crash first, because it affects a larger number of users.", "Process them in alphabetical order based on the client's first name.", "Wait for a manager to assign the tickets before touching either of them."] },
-            { id: "m4", q: "A customer asks for a feature that your product currently does not have.", options: ["Promise them the engineering team will build it for them by next week to keep them happy.", "Politely explain that the feature isn't available right now, but you will pass their feedback to the product team.", "Tell them they should probably find a different software provider that has that feature.", "Ignore the request and ask if they need help with anything else."] },
-            { id: "m5", q: "What is generally considered the best practice for acknowledging a new support email?", options: ["Wait until you have the complete solution before replying, even if it takes a few days.", "Reply quickly to acknowledge receipt of their email, even if you need more time to find the actual solution.", "Only reply on Fridays when you batch all of your customer communications together.", "Send them a link to the help center and automatically close the ticket."] },
-            { id: "m6", q: "A customer calls in and is clearly very frustrated and venting about an issue.", options: ["Interrupt them immediately to give them the technical solution so they can move on.", "Listen actively without interrupting, acknowledge their frustration, and then offer a solution.", "Put them on hold for 5 minutes so they have time to calm down.", "Transfer them immediately to a manager since they are upset."] },
-            { id: "m7", q: "You realize you accidentally sent the wrong help article link to a customer.", options: ["Do nothing. They will probably figure it out on their own.", "Delete the email from your sent folder so no one knows.", "Reply to the email apologizing for the mix-up and provide the correct link immediately.", "Wait for the customer to reply and complain before sending the correct one."] },
-            { id: "m8", q: "A client asks a highly technical question that you haven't been trained on yet.", options: ["Escalate the ticket to a senior engineer immediately without trying to find the answer in the internal knowledge base.", "Search the internal knowledge base first, and if you can't find it, ask a senior colleague for guidance before replying.", "Tell the client that their question is too advanced for your department.", "Copy and paste a random technical article from the internet that sounds similar."] },
-            { id: "m9", q: "In customer service, what is the primary purpose of an SLA (Service Level Agreement)?", options: ["To guarantee a certain standard of service and response time for the customer.", "To ensure the customer pays their monthly subscription invoice on time.", "To track how many hours the support team works every week.", "To force customers to sign a legal contract before they can ask a question."] },
-            { id: "m10", q: "A customer leaves a very positive review about the help you provided them.", options: ["Ignore it, as you should only focus on negative reviews and complaints.", "Thank them warmly for their kind words and note the positive feedback.", "Ask them immediately if they want to upgrade their account to a more expensive tier.", "Forward it to all of your company's clients to show them how good you are."] },
-            { id: "m11", q: "A customer reaches out because they are having trouble finding the 'Export' button on their dashboard. You know exactly where it is. What is the best response?", options: ["Send them a bulleted list of instructions clearly explaining where the button is located.", "Assume they are experiencing a glitch and send them a link to clear their browser cache.", "Tell them the Export button is on the main page and they just need to look closer.", "Offer to do the export for them this time so they don't have to learn how to do it."] }
-        ];
-
-        const textBank = [
-            { id: "t1", q: "A customer emails saying they are getting an 'Error 404' when trying to upload a photo. Draft a short, polite email asking them to provide a screenshot of the error." },
-            { id: "t2", q: "A customer emails asking: 'Where is my weekly report?' You need their Account ID to look it up, which they forgot to include. Reply to them." },
-            { id: "t3", q: "Explain how to copy and paste text on a computer as if you are speaking to someone who has never used a computer before." },
-            { id: "t4", q: "You accidentally told a client their software would be set up by Tuesday, but it actually won't be ready until Friday. Draft an apology email." },
-            { id: "t5", q: "Describe a time you helped someone (a friend, classmate, or customer) solve a problem. How did you handle it?" }
-        ];
-
-        const essayBank = [
-            { id: "e1", q: "📝 ANALYTICAL ESSAY: Please select a global affairs topic from the dropdown below and write a comprehensive, well-structured essay discussing its impact, challenges, and potential solutions. (Minimum 200 words recommended)", topics: ["Global Warming & Climate Change", "The Future of Artificial Intelligence in the Workplace", "The Global Shift to Remote Work vs. Office Culture", "Supply Chain Vulnerabilities in the Modern World"] }
-        ];
-
-        const audioBank = [
-            { id: "a1", title: "Voicemail Intro", q: "🎙️ AUDIO SCENARIO: You are leaving a voicemail for a new client to welcome them to the company and introduce yourself as their support contact. Hit Record and provide your voicemail." },
-            { id: "a2", title: "Billing Complaint", q: "🎙️ AUDIO SCENARIO: A client calls and says they were overcharged on their last invoice. You need to look into their account history and call them back. Hit Record and verbally tell them what you are going to do." },
-            { id: "a3", title: "Feature Request", q: "🎙️ AUDIO SCENARIO: A customer asks you for a feature that does not exist. Hit Record and politely explain that while you don't currently have it, you will pass the feedback along to the team." }
-        ];
-
-        let activeQuestions = [], isExamActive = false, examSubmitted = false, forcedSubmitReason = "", currentStep = 0, totalSteps = 20, examEndTime = 0, fullscreenSupported = false;
-        let mediaRecorders = {}, audioChunks = {}, finalAudioBlobs = {}, rawAudioBlobs = {}, audioTimers = {}, audioSeconds = {}; 
-
-        function shuffleArray(array) {
-            let curId = array.length;
-            while (0 !== curId) { let randId = Math.floor(Math.random() * curId); curId -= 1; let tmp = array[curId]; array[curId] = array[randId]; array[randId] = tmp; }
-            return array;
-        }
 
         function saveState() {
             if (!isExamActive) return;
             const formData = new FormData(document.getElementById('assessmentForm'));
             const data = Object.fromEntries(formData.entries());
-            localStorage.setItem('exam_draft', JSON.stringify({ questions: activeQuestions, answers: data, endTime: examEndTime, step: currentStep }));
+            localStorage.setItem('exam_draft', JSON.stringify({ 
+                questions: activeQuestions, answers: data, endTime: examEndTime, step: currentStep, audioBank: globalAudioBank 
+            }));
         }
 
         document.getElementById('assessmentForm').addEventListener('input', saveState);
@@ -384,16 +341,8 @@
         function generateSteps() {
             const wrapper = document.getElementById('steps-wrapper');
             const savedState = JSON.parse(localStorage.getItem('exam_draft'));
-
-            if (savedState && savedState.questions && savedState.endTime > Date.now()) {
-                activeQuestions = savedState.questions; examEndTime = savedState.endTime; currentStep = savedState.step || 0;
-            } else {
-                activeQuestions = shuffleArray([...mcqBank, ...textBank, ...essayBank, ...audioBank]);
-                examEndTime = Date.now() + (60 * 60 * 1000); 
-            }
-
-            totalSteps = activeQuestions.length;
             let html = '';
+
             activeQuestions.forEach((item, index) => {
                 const stepNum = index + 1;
                 html += `<div class="step-container" id="step-${stepNum}">
@@ -405,11 +354,13 @@
                     item.options.forEach(opt => { html += `<label class="radio-label"><input type="radio" name="q_${item.id}" value="${opt}" required> ${opt}</label>`; });
                     html += `</div>`;
                 } else if (item.id.startsWith('e')) {
-                    html += `<div class="textarea-wrapper">
-                                <select name="q_${item.id}_topic" required style="width: 100%; padding: 14px; margin-bottom: 15px; border-radius: 10px; border: 2px solid #cbd5e1; font-family: inherit; font-size: 15px; background: var(--input-bg); cursor:pointer;">
+                    html += `<div style="margin-bottom: 15px;">
+                                <select name="q_${item.id}_topic" required style="width: 100%; padding: 14px; border-radius: 10px; border: 2px solid #cbd5e1; font-family: inherit; font-size: 15px; background: var(--input-bg); cursor:pointer;">
                                     <option value="">-- Select your Essay Topic --</option>`;
                     item.topics.forEach(topic => { html += `<option value="${topic}">${topic}</option>`; });
                     html += `   </select>
+                             </div>
+                             <div class="textarea-wrapper">
                                 <textarea name="q_${item.id}" id="txt_${item.id}" placeholder="Write your essay here..." required style="min-height: 250px;"></textarea>
                                 <button type="button" class="focus-btn fc-trigger-btn" data-qid="${item.id}" data-qtext="${item.q.replace(/"/g, '&quot;')}">⤢</button>
                              </div>`;
@@ -632,14 +583,12 @@
                 qnaData.push({ question: `${index + 1}. ${item.q}`, answer: answerText });
             });
 
-            let audioTitlesMap = {}; audioBank.forEach(item => { audioTitlesMap[item.id] = item.title; });
+            let audioTitlesMap = {}; globalAudioBank.forEach(item => { audioTitlesMap[item.id] = item.title; });
             let audioBase64Data = {}; for (let qId of Object.keys(rawAudioBlobs || {})) { if (rawAudioBlobs[qId]) { audioBase64Data[qId] = await blobToBase64(rawAudioBlobs[qId]); } }
 
             const payload = {
-                action: 'submitExam',
-                candidateName: formData.get("FirstName") + " " + formData.get("LastName"),
-                candidateEmail: formData.get("Email"),
-                qnaData: qnaData, audioFiles: audioBase64Data, audioTitles: audioTitlesMap, forcedSubmitReason: forcedSubmitReason 
+                action: 'submitExam', candidateName: formData.get("FirstName") + " " + formData.get("LastName"),
+                candidateEmail: formData.get("Email"), qnaData: qnaData, audioFiles: audioBase64Data, audioTitles: audioTitlesMap, forcedSubmitReason: forcedSubmitReason 
             };
 
             fetch(GAS_URL, { method: "POST", body: JSON.stringify(payload), headers: { "Content-Type": "text/plain;charset=utf-8" } })
