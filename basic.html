@@ -197,8 +197,7 @@
     </div>
 
     <script>
-        // ---- UPDATED GAS DEPLOYMENT URL ----
-        const GAS_URL = "https://script.google.com/macros/s/AKfycbyERI2bnZTExqDgn5uXoz9lsX4FvON3VrdxEQKgy4tmza8iKzDHmCkNauQtgS6SAQiThw/exec"; 
+        const GAS_URL = "https://script.google.com/macros/s/AKfycbwyqEg3vr_nm-6MpnNuBu2Aa7EVkC2-UBrG-wAckFEDojFrg63U0M3u4qG02mngy3OB/exec"; 
 
         let activeQuestions = [], isExamActive = false, examSubmitted = false, forcedSubmitReason = "", currentStep = 0, totalSteps = 20, examEndTime = 0, fullscreenSupported = false;
         let globalAudioBank = []; 
@@ -227,7 +226,7 @@
         }
 
         document.addEventListener('DOMContentLoaded', () => {
-            const draft = localStorage.getItem('exam_draft');
+            const draft = localStorage.getItem('exam_draft_junior');
             if (draft) {
                 try {
                     const parsed = JSON.parse(draft);
@@ -235,15 +234,15 @@
                         document.getElementById('start-btn-text').innerText = "Resume Saved Assessment";
                         document.getElementById('access-code-wrapper').style.display = "none";
                         document.getElementById('btn-start-fresh').style.display = "block";
-                    } else { localStorage.removeItem('exam_draft'); }
-                } catch(e) { localStorage.removeItem('exam_draft'); }
+                    } else { localStorage.removeItem('exam_draft_junior'); }
+                } catch(e) { localStorage.removeItem('exam_draft_junior'); }
             }
         });
 
         async function startFresh() {
             const confirmed = await showCustomConfirm("Are you sure you want to clear your saved progress? You will need a NEW valid access code to begin again.", "Clear Progress?", "Reset & Clear", true);
             if (confirmed) {
-                localStorage.removeItem('exam_draft');
+                localStorage.removeItem('exam_draft_junior');
                 document.getElementById('start-btn-text').innerText = "Validate Code & Start Assessment";
                 document.getElementById('access-code-wrapper').style.display = "block";
                 document.getElementById('access-code-input').value = "";
@@ -252,7 +251,7 @@
         }
 
         async function validateAndStart() {
-            const draft = localStorage.getItem('exam_draft');
+            const draft = localStorage.getItem('exam_draft_junior');
             if (draft) {
                 const parsed = JSON.parse(draft);
                 activeQuestions = parsed.questions;
@@ -274,7 +273,6 @@
             initiateBtn.disabled = true;
 
             try {
-                // Notice the examType: 'junior' tag here!
                 const response = await fetch(GAS_URL, {
                     method: "POST", body: JSON.stringify({ action: 'validateCode', code: codeInput, examType: 'junior' }), headers: { "Content-Type": "text/plain;charset=utf-8" }
                 });
@@ -330,7 +328,7 @@
             if (!isExamActive) return;
             const formData = new FormData(document.getElementById('assessmentForm'));
             const data = Object.fromEntries(formData.entries());
-            localStorage.setItem('exam_draft', JSON.stringify({ 
+            localStorage.setItem('exam_draft_junior', JSON.stringify({ 
                 questions: activeQuestions, answers: data, endTime: examEndTime, step: currentStep, audioBank: globalAudioBank 
             }));
         }
@@ -340,7 +338,7 @@
 
         function generateSteps() {
             const wrapper = document.getElementById('steps-wrapper');
-            const savedState = JSON.parse(localStorage.getItem('exam_draft'));
+            const savedState = JSON.parse(localStorage.getItem('exam_draft_junior'));
             let html = '';
 
             activeQuestions.forEach((item, index) => {
@@ -548,7 +546,7 @@
                     <button id="fc-close" style="font-size:28px; border:none; background:none; cursor:pointer; color:var(--text-muted); transition: color 0.2s;">&times;</button>
                 </div>
                 <textarea id="fc-txt" style="height:400px; font-size:16px; padding:20px; border: 2px solid var(--primary-accent); border-radius: 12px; font-family: inherit; resize: none; outline: none; box-shadow: var(--shadow-inner);"></textarea>
-                <div style="text-align: right; font-size: 13px; color: var(--text-muted); font-weight: 500;">Press Esc or click outside to save</div>`;
+                <div style="text-align: right; font-size: 13px; color: var(--text-muted); font-weight: 500;">Click outside the box or press &times; to save</div>`;
             bg.appendChild(box); document.body.appendChild(bg);
             const fcTxt = document.getElementById('fc-txt'); const closeBtn = document.getElementById('fc-close');
             fcTxt.value = textarea.value; fcTxt.addEventListener('input', () => { textarea.value = fcTxt.value; saveState(); });
@@ -556,7 +554,6 @@
             const closeFocus = () => { bg.style.opacity = '0'; box.style.transform = 'scale(0.95) translateY(20px)'; setTimeout(() => bg.remove(), 300); };
             closeBtn.onclick = closeFocus; closeBtn.onmouseover = () => closeBtn.style.color = 'var(--danger)'; closeBtn.onmouseout = () => closeBtn.style.color = 'var(--text-muted)';
             bg.addEventListener('mousedown', (e) => { if (e.target === bg) closeFocus(); });
-            document.addEventListener('keydown', function escHandler(e) { if (e.key === 'Escape') { closeFocus(); document.removeEventListener('keydown', escHandler); } });
         }
 
         function blobToBase64(blob) { return new Promise((resolve, _) => { const reader = new FileReader(); reader.onloadend = () => resolve(reader.result.split(',')[1]); reader.readAsDataURL(blob); }); }
@@ -566,7 +563,7 @@
             e.preventDefault(); if (!validateStep() && !forcedSubmitReason) return; 
             examSubmitted = true; isExamActive = false; clearInterval(mainTimerInterval); clearInterval(violationTimerInterval);
             document.getElementById('security-warning').style.display = 'none';
-            if (document.fullscreenElement) document.exitFullscreen(); localStorage.removeItem('exam_draft'); 
+            if (document.fullscreenElement) document.exitFullscreen(); localStorage.removeItem('exam_draft_junior'); 
             const submitBtn = document.getElementById('btn-submit');
             submitBtn.innerText = "⏳ Uploading Securely to Server..."; submitBtn.disabled = true; submitBtn.style.background = "#94a3b8";
 
