@@ -22,8 +22,11 @@
 
         #security-warning { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--danger-bg); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); z-index: 9999999; flex-direction: column; align-items: center; justify-content: center; color: white; text-align: center; padding: 20px; }
         #security-warning h1 { font-size: 44px; margin-bottom: 10px; text-shadow: 0 4px 10px rgba(0,0,0,0.2); }
+        #violation-countdown { display: none; font-size: 100px; font-weight: 700; margin: 10px 0 20px 0; tabular-nums; text-shadow: 0 4px 20px rgba(0,0,0,0.3); animation: pulse 1s infinite; }
         .btn-resume { background: white; color: var(--danger); border: none; padding: 15px 30px; font-size: 18px; font-weight: bold; border-radius: 50px; cursor: pointer; box-shadow: 0 10px 25px rgba(0,0,0,0.2); transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1); margin-top:20px;}
         .btn-resume:hover { transform: scale(1.05); }
+
+        @keyframes pulse { 0%, 100% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.05); opacity: 0.8; } }
         @keyframes slideUpFade { to { opacity: 1; transform: translateY(0); } }
 
         #custom-modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.3); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); z-index: 20000000; display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
@@ -35,10 +38,6 @@
         .modal-footer-actions { display: flex; gap: 12px; justify-content: center; }
         .btn-modal-primary { background: var(--primary-accent); color: white; border: none; padding: 12px 24px; font-family: inherit; font-size: 14.5px; font-weight: 600; border-radius: 8px; cursor: pointer; transition: background 0.2s; }
         .btn-modal-primary:hover { background: var(--primary-hover); }
-        .btn-modal-danger { background: var(--danger); color: white; border: none; padding: 12px 24px; font-family: inherit; font-size: 14.5px; font-weight: 600; border-radius: 8px; cursor: pointer; transition: filter 0.2s; }
-        .btn-modal-danger:hover { filter: brightness(0.9); }
-        .btn-modal-secondary { background: rgba(0,0,0,0.05); color: var(--text-body); border: none; padding: 12px 24px; font-family: inherit; font-size: 14.5px; font-weight: 600; border-radius: 8px; cursor: pointer; transition: background 0.2s; }
-        .btn-modal-secondary:hover { background: rgba(0,0,0,0.1); }
 
         .wrapper { display: flex; flex-direction: column; align-items: center; min-height: 100vh; padding: 40px 20px; }
         #start-screen { display: flex; flex-direction: column; justify-content: center; align-items: center; min-height: 100vh; width: 100%; margin: 0; padding: 20px; transition: opacity 0.5s ease; }
@@ -124,6 +123,7 @@
     <div id="security-warning">
         <h1>⚠️ SECURITY WARNING ⚠️</h1>
         <p id="strike-warning-text">You have exited the secure window. Please return immediately.</p>
+        <div id="violation-countdown">10</div>
         <button class="btn-resume" onclick="resumeFullscreen()">Acknowledge & Return to Exam</button>
     </div>
 
@@ -147,6 +147,7 @@
                     <input type="text" id="access-code-input" placeholder="e.g. A4X9BQ" required style="text-transform: uppercase; font-weight: bold; letter-spacing: 2px; text-align: center;">
                 </div>
                 <button class="btn-primary" id="btn-initiate" onclick="validateAndStart()">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path></svg>
                     <span id="start-btn-text">Validate Code & Start Assessment</span>
                 </button>
             </div>
@@ -208,6 +209,8 @@
         let strikeLog = [];
         let inViolationState = false;
         let lastStrikeTime = 0;
+        let violationTimeLeft = 10;
+        let violationTimerInterval;
 
         function showCustomAlert(message, title = "System Notification") {
             return new Promise((resolve) => {
@@ -463,9 +466,17 @@
         }
 
         let audioCtx; function initAudio() { audioCtx = new (window.AudioContext || window.webkitAudioContext)(); }
+        function playAlarmBeep() {
+            if (!audioCtx) return; if (audioCtx.state === 'suspended') audioCtx.resume();
+            const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain();
+            osc.type = 'square'; osc.frequency.setValueAtTime(440, audioCtx.currentTime); osc.frequency.setValueAtTime(880, audioCtx.currentTime + 0.2);
+            gain.gain.setValueAtTime(0.1, audioCtx.currentTime); osc.connect(gain); gain.connect(audioCtx.destination);
+            osc.start(); osc.stop(audioCtx.currentTime + 0.4);
+        }
 
         function resumeFullscreen() {
             inViolationState = false;
+            clearInterval(violationTimerInterval);
             document.getElementById('security-warning').style.display = 'none';
             if (fullscreenSupported && document.documentElement.requestFullscreen) {
                 document.documentElement.requestFullscreen().catch(() => {});
@@ -480,19 +491,35 @@
             if (isHidden || notFullscreen) {
                 let now = Date.now();
                 if (now - lastStrikeTime < 2000) return; // Debounce dual-firing events
-                lastStrikeTime = now;
                 
                 if (!inViolationState) {
                     inViolationState = true;
                     strikeCount++;
                     strikeLog.push("Strike " + strikeCount + ": Left exam window at " + new Date().toLocaleTimeString());
+                    lastStrikeTime = now;
                     
                     if (strikeCount >= 3) {
                         forcedSubmitReason = "SECURITY VIOLATION: Maximum strikes (3/3) exceeded.";
                         triggerSubmit();
                     } else {
-                        document.getElementById('strike-warning-text').innerHTML = `You have exited the secure window.<br><br><span style='color:var(--danger); font-size:32px; font-weight:bold;'>Strike ${strikeCount} of 3</span><br><br>On your 3rd strike, the exam will automatically fail.`;
+                        document.getElementById('strike-warning-text').innerHTML = `You have exited the secure window.<br><br><span style='color: #fde047; font-size: 32px; font-weight: bold; text-shadow: 0 2px 4px rgba(0,0,0,0.5);'>Strike ${strikeCount} of 3</span><br><br>Return before the timer expires!`;
                         document.getElementById('security-warning').style.display = 'flex';
+                        
+                        violationTimeLeft = 10;
+                        document.getElementById('violation-countdown').innerText = violationTimeLeft;
+                        document.getElementById('violation-countdown').style.display = 'block';
+                        playAlarmBeep();
+                        
+                        violationTimerInterval = setInterval(() => {
+                            violationTimeLeft--;
+                            document.getElementById('violation-countdown').innerText = violationTimeLeft;
+                            playAlarmBeep();
+                            if (violationTimeLeft <= 0) {
+                                clearInterval(violationTimerInterval);
+                                forcedSubmitReason = "SECURITY VIOLATION: Failed to return within 10 seconds.";
+                                triggerSubmit();
+                            }
+                        }, 1000);
                     }
                 }
             }
@@ -539,7 +566,7 @@
                 }
             }
 
-            examSubmitted = true; isExamActive = false; clearInterval(mainTimerInterval);
+            examSubmitted = true; isExamActive = false; clearInterval(mainTimerInterval); clearInterval(violationTimerInterval);
             document.getElementById('security-warning').style.display = 'none';
             if (document.fullscreenElement) document.exitFullscreen(); 
             const submitBtn = document.getElementById('btn-submit');
@@ -563,7 +590,7 @@
                 let mins = Math.floor(ms / 60000); let secs = Math.floor((ms % 60000) / 1000);
                 let timeStr = `${mins}m ${secs}s`;
 
-                qnaData.push({ question: `[Time Spent: ${timeStr}] ${stepNum}. ${item.q}`, answer: answerText });
+                qnaData.push({ question: `${stepNum}. ${item.q}`, timeSpent: timeStr, answer: answerText });
             });
 
             let audioTitlesMap = {}; globalAudioBank.forEach(item => { audioTitlesMap[item.id] = item.title; });
