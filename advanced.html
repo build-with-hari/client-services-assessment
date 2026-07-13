@@ -147,7 +147,6 @@
                     <input type="text" id="access-code-input" placeholder="e.g. A4X9BQ" required style="text-transform: uppercase; font-weight: bold; letter-spacing: 2px; text-align: center;">
                 </div>
                 <button class="btn-primary" id="btn-initiate" onclick="validateAndStart()">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path></svg>
                     <span id="start-btn-text">Validate Code & Start Assessment</span>
                 </button>
             </div>
@@ -202,9 +201,8 @@
         let globalAudioBank = []; 
         let mediaRecorders = {}, audioChunks = {}, finalAudioBlobs = {}, rawAudioBlobs = {}, audioTimers = {}, audioSeconds = {}; 
 
-        // Analytics Tracking
         let stepStartTime = 0;
-        let stepTimeSpent = {}; // Logs MS spent on each step index (1-20)
+        let stepTimeSpent = {}; 
         let strikeCount = 0;
         let strikeLog = [];
         let inViolationState = false;
@@ -516,8 +514,7 @@
                             playAlarmBeep();
                             if (violationTimeLeft <= 0) {
                                 clearInterval(violationTimerInterval);
-                                forcedSubmitReason = "SECURITY VIOLATION: Failed to return within 10 seconds.";
-                                triggerSubmit();
+                                resumeFullscreen(); // Auto-resume instead of auto-submit
                             }
                         }, 1000);
                     }
