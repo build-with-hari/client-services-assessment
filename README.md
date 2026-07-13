@@ -24,29 +24,9 @@ This is a secure testing environment. To ensure fairness for all candidates, the
 
 ### 🔗 Assessment Links
 Please select the link assigned to you by your recruiter:
-* **[Junior / Entry-Level Assessment](https://[YOUR-USERNAME].github.io/[REPOSITORY-NAME]/junior/)**
-* **[Senior / Advanced Assessment](https://[YOUR-USERNAME].github.io/[REPOSITORY-NAME]/senior/)**
+* **[Junior / Entry-Level Assessment](https://build-with-hari.github.io/client-services-assessment/basic)**
+* **[Senior / Advanced Assessment](https://build-with-hari.github.io/client-services-assessment/advanced)**
 
 *(Note: You must have a valid, unexpired Access Code to enter).*
 
 ---
-
-## 🛠️ For Administrators: System Guide
-
-This system is a decoupled web application. The frontend (UI and proctoring) is hosted here on GitHub Pages, while the backend (Database and File Storage) is powered securely by Google Apps Script and Google Workspace.
-
-### 1. Generating Access Codes
-Access codes are required for any candidate to begin an assessment. Codes expire 24 hours after generation and can only be used once.
-* Open the **Assessment Database** Google Sheet.
-* Click **Assessment Admin** in the top menu bar.
-* Select **Generate 10 New Access Codes**.
-* Distribute a code to the candidate along with the appropriate GitHub URL.
-* *To manually revoke a code, change its status in the Sheet to `REVOKED`.*
-
-### 2. Retrieving Results
-When a candidate finishes their exam (or if they trigger a security violation), the system automatically compiles their data.
-* **Google Sheet:** Logs the candidate's score, timestamps, and any security flags.
-* **Google Drive Folder:** Automatically receives the candidate's `.webm` audio recordings (labeled by question type) and a cleanly formatted `.pdf` document containing all of their written responses.
-
-### 3. Modifying the Assessment
-To update questions, modify the Javascript arrays located directly within the `Code.gs` file in the Google Apps Script backend. You do not need to modify the HTML files in this repository to change question text. Remember to click **Deploy > New Deployment** in Google Apps Script after making any changes.
