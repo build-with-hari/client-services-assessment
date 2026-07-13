@@ -122,7 +122,7 @@
 
     <div id="security-warning">
         <h1>⚠️ SECURITY WARNING ⚠️</h1>
-        <p id="strike-warning-text" style="font-size: 18px;">You have exited the secure window.</p>
+        <p id="strike-warning-text" style="font-size: 18px;">You have exited the secure window. Please return immediately.</p>
         <div id="violation-countdown">15</div>
         <button class="btn-resume" onclick="resumeFullscreen()">Acknowledge & Return to Exam</button>
     </div>
@@ -474,7 +474,7 @@
                 osc.type = 'square'; osc.frequency.setValueAtTime(440, audioCtx.currentTime); osc.frequency.setValueAtTime(880, audioCtx.currentTime + 0.2);
                 gain.gain.setValueAtTime(0.1, audioCtx.currentTime); osc.connect(gain); gain.connect(audioCtx.destination);
                 osc.start(); osc.stop(audioCtx.currentTime + 0.4);
-            } catch(e) { } // Silent catch for strict browser policies
+            } catch(e) { } 
         }
 
         function resumeFullscreen() {
@@ -493,32 +493,37 @@
 
             if (isHidden || notFullscreen) {
                 let now = Date.now();
-                if (now - lastExitTime < 2000) return; // Debounce dual-firing events
+                if (now - lastExitTime < 2000) return; 
                 
                 if (!inViolationState) {
                     inViolationState = true;
                     exitCount++;
-                    exitLog.push("Exited secure window at " + new Date().toLocaleTimeString());
+                    exitLog.push("Exit " + exitCount + ": Left secure window at " + new Date().toLocaleTimeString());
                     lastExitTime = now;
                     
-                    document.getElementById('strike-warning-text').innerHTML = `You have exited the secure window.<br><br>Return before the timer expires or your assessment will be automatically submitted!`;
-                    document.getElementById('security-warning').style.display = 'flex';
-                    
-                    violationTimeLeft = 15;
-                    document.getElementById('violation-countdown').innerText = violationTimeLeft;
-                    document.getElementById('violation-countdown').style.display = 'block';
-                    playAlarmBeep();
-                    
-                    violationTimerInterval = setInterval(() => {
-                        violationTimeLeft--;
+                    if (exitCount > 1) {
+                        forcedSubmitReason = "SECURITY VIOLATION: Exited secure window multiple times.";
+                        triggerSubmit();
+                    } else {
+                        document.getElementById('strike-warning-text').innerHTML = `You have exited the secure window.<br><br><span style='color: #fde047; font-size: 32px; font-weight: bold; text-shadow: 0 2px 4px rgba(0,0,0,0.5);'>FINAL WARNING</span><br><br>Return before the timer expires or your assessment will be automatically submitted!`;
+                        document.getElementById('security-warning').style.display = 'flex';
+                        
+                        violationTimeLeft = 15;
                         document.getElementById('violation-countdown').innerText = violationTimeLeft;
+                        document.getElementById('violation-countdown').style.display = 'block';
                         playAlarmBeep();
-                        if (violationTimeLeft <= 0) {
-                            clearInterval(violationTimerInterval);
-                            forcedSubmitReason = "SECURITY VIOLATION: Failed to return within 15 seconds.";
-                            triggerSubmit();
-                        }
-                    }, 1000);
+                        
+                        violationTimerInterval = setInterval(() => {
+                            violationTimeLeft--;
+                            document.getElementById('violation-countdown').innerText = violationTimeLeft;
+                            playAlarmBeep();
+                            if (violationTimeLeft <= 0) {
+                                clearInterval(violationTimerInterval);
+                                forcedSubmitReason = "SECURITY VIOLATION: Failed to return within 15 seconds.";
+                                triggerSubmit();
+                            }
+                        }, 1000);
+                    }
                 }
             }
         }
