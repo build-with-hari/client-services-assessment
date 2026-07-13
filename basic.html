@@ -52,7 +52,6 @@
         .progress-container { width: 100%; background: rgba(0,0,0,0.05); border-radius: 50px; height: 8px; margin-bottom: 20px; overflow: hidden; }
         .progress-bar { height: 100%; background: var(--primary-accent); width: 0%; transition: width 0.5s cubic-bezier(0.16, 1, 0.3, 1); }
         
-        /* Question Map */
         #question-map { display: none; gap: 8px; flex-wrap: wrap; margin-bottom: 25px; justify-content: center; }
         .q-dot { width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 600; color: var(--text-muted); background: rgba(0,0,0,0.05); cursor: pointer; transition: all 0.2s; border: 2px solid transparent; }
         .q-dot:hover { background: rgba(0,0,0,0.1); }
@@ -65,8 +64,6 @@
         .btn-primary { background: linear-gradient(135deg, var(--primary-accent) 0%, #1e40af 100%); color: #fff; border: none; padding: 18px 24px; font-family: inherit; font-size: 16px; font-weight: 600; letter-spacing: 0.5px; border-radius: 12px; cursor: pointer; width: 100%; box-shadow: 0 10px 20px -5px rgba(37, 99, 235, 0.4); transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1); display: flex; justify-content: center; align-items: center; gap: 10px;}
         .btn-primary:hover:not(:disabled) { transform: translateY(-3px); box-shadow: 0 15px 25px -5px rgba(37, 99, 235, 0.5); }
         .btn-primary:disabled { opacity: 0.7; cursor: not-allowed; }
-        .btn-ghost { background: transparent; color: var(--text-muted); border: 2px solid transparent; padding: 14px 24px; font-family: inherit; font-size: 15px; font-weight: 600; border-radius: 12px; cursor: pointer; width: 100%; transition: all 0.3s ease; }
-        .btn-ghost:hover { background: rgba(0,0,0,0.05); color: var(--text-heading); }
         .btn-submit { background: linear-gradient(135deg, var(--success) 0%, #047857 100%); color: #fff; border: none; padding: 18px 24px; font-family: inherit; font-size: 16px; font-weight: 600; border-radius: 12px; cursor: pointer; width: 100%; box-shadow: 0 10px 20px -5px rgba(16, 185, 129, 0.4); transition: all 0.3s; }
         .btn-submit:hover:not(:disabled) { transform: translateY(-3px); box-shadow: 0 15px 25px -5px rgba(16, 185, 129, 0.5); }
         .nav-actions { display: flex; justify-content: space-between; margin-top: 30px; gap: 15px; }
@@ -142,10 +139,10 @@
             
             <div class="ui-card" style="text-align: left; margin-bottom: 25px;">
                 <ul style="color: var(--text-body); line-height: 2; margin: 0; padding-left: 20px; font-size: 15px;">
-                    <li><strong>Duration:</strong> <span style="color:var(--primary-accent); font-weight:600;">60 Minutes</span> strict limit.</li>
+                    <li><strong>Duration:</strong> <span style="color:var(--primary-accent); font-weight:600;">45 Minutes</span> strict limit.</li>
                     <li><strong>Format:</strong> 20 scenarios (MCQ, Text, Essay, Audio).</li>
                     <li><strong>Navigation:</strong> You may skip questions and return to them later. All questions must be completed before final submission.</li>
-                    <li><strong style="color: var(--danger);">Strict Proctoring:</strong> The exam requires Fullscreen. Exiting fullscreen or switching tabs triggers an auto-failure.</li>
+                    <li><strong style="color: var(--danger);">Strict Proctoring:</strong> The exam requires Fullscreen. Exiting fullscreen or switching tabs triggers an auto-failure. Do not refresh the page or you will lose your session.</li>
                 </ul>
             </div>
             
@@ -159,9 +156,6 @@
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path></svg>
                     <span id="start-btn-text">Validate Code & Start Assessment</span>
                 </button>
-                <button class="btn-ghost" id="btn-start-fresh" onclick="startFresh()" style="display: none;">
-                    Clear Saved Progress & Start Over
-                </button>
             </div>
         </div>
     </div>
@@ -170,7 +164,7 @@
         <div class="main-container">
             <div id="timer-container">
                 <div class="step-indicator" id="step-counter">Registration</div>
-                <div class="timer-badge" id="display-timer">60:00</div>
+                <div class="timer-badge" id="display-timer">45:00</div>
             </div>
             <div class="progress-container"><div class="progress-bar" id="progress-bar"></div></div>
             <div id="question-map"></div>
@@ -197,15 +191,6 @@
         </div>
     </div>
 
-    <div class="wrapper" id="results-screen">
-        <div class="main-container">
-            <h1>Assessment Complete</h1>
-            <p class="subtitle">Your results have been securely recorded. You may close this window.</p>
-            <div id="violation-notice"></div>
-            <div class="ui-card" id="results-output" style="text-align: left;"></div>
-        </div>
-    </div>
-
     <script>
         const GAS_URL = "https://script.google.com/macros/s/AKfycbwyqEg3vr_nm-6MpnNuBu2Aa7EVkC2-UBrG-wAckFEDojFrg63U0M3u4qG02mngy3OB/exec"; 
 
@@ -223,56 +208,7 @@
             });
         }
 
-        function showCustomConfirm(message, title = "Confirm Action", confirmText = "Confirm", isDanger = false) {
-            return new Promise((resolve) => {
-                document.getElementById('custom-modal-title').innerText = title; document.getElementById('custom-modal-text').innerText = message;
-                const actionsContainer = document.getElementById('custom-modal-actions'); actionsContainer.innerHTML = '';
-                const cancelBtn = document.createElement('button'); cancelBtn.className = 'btn-modal-secondary'; cancelBtn.innerText = 'Cancel';
-                cancelBtn.addEventListener('click', () => { document.getElementById('custom-modal-overlay').classList.remove('active'); resolve(false); });
-                const actionBtn = document.createElement('button'); actionBtn.className = isDanger ? 'btn-modal-danger' : 'btn-modal-primary'; actionBtn.innerText = confirmText;
-                actionBtn.addEventListener('click', () => { document.getElementById('custom-modal-overlay').classList.remove('active'); resolve(true); });
-                actionsContainer.appendChild(cancelBtn); actionsContainer.appendChild(actionBtn); document.getElementById('custom-modal-overlay').classList.add('active');
-            });
-        }
-
-        document.addEventListener('DOMContentLoaded', () => {
-            const draft = localStorage.getItem('exam_draft_junior');
-            if (draft) {
-                try {
-                    const parsed = JSON.parse(draft);
-                    if (parsed.endTime > Date.now()) {
-                        document.getElementById('start-btn-text').innerText = "Resume Saved Assessment";
-                        document.getElementById('access-code-wrapper').style.display = "none";
-                        document.getElementById('btn-start-fresh').style.display = "block";
-                    } else { localStorage.removeItem('exam_draft_junior'); }
-                } catch(e) { localStorage.removeItem('exam_draft_junior'); }
-            }
-        });
-
-        async function startFresh() {
-            const confirmed = await showCustomConfirm("Are you sure you want to clear your saved progress? You will need a NEW valid access code to begin again.", "Clear Progress?", "Reset & Clear", true);
-            if (confirmed) {
-                localStorage.removeItem('exam_draft_junior');
-                document.getElementById('start-btn-text').innerText = "Validate Code & Start Assessment";
-                document.getElementById('access-code-wrapper').style.display = "block";
-                document.getElementById('access-code-input').value = "";
-                document.getElementById('btn-start-fresh').style.display = "none";
-            }
-        }
-
         async function validateAndStart() {
-            const draft = localStorage.getItem('exam_draft_junior');
-            if (draft) {
-                const parsed = JSON.parse(draft);
-                activeQuestions = parsed.questions;
-                globalAudioBank = parsed.audioBank || [];
-                examEndTime = parsed.endTime;
-                currentStep = parsed.step || 0;
-                totalSteps = activeQuestions.length;
-                enterFullscreenAndStart();
-                return;
-            }
-
             const codeInput = document.getElementById('access-code-input').value.trim();
             if (!codeInput) { showCustomAlert("Please enter your 6-digit Access Code to begin.", "Code Required"); return; }
 
@@ -292,7 +228,7 @@
                     const qs = data.questions;
                     globalAudioBank = qs.audio; 
                     activeQuestions = shuffleArray([...qs.mcq, ...qs.text, ...qs.essay, ...qs.audio]);
-                    examEndTime = Date.now() + (60 * 60 * 1000); 
+                    examEndTime = Date.now() + (45 * 60 * 1000); 
                     totalSteps = activeQuestions.length;
                     enterFullscreenAndStart();
                 } else {
@@ -334,18 +270,8 @@
             if (fcBtn) { e.preventDefault(); openFocusMode(document.getElementById(`txt_${fcBtn.getAttribute('data-qid')}`), fcBtn.getAttribute('data-qtext')); }
         });
 
-        function saveState() {
-            if (!isExamActive) return;
-            const formData = new FormData(document.getElementById('assessmentForm'));
-            const data = Object.fromEntries(formData.entries());
-            localStorage.setItem('exam_draft_junior', JSON.stringify({ 
-                questions: activeQuestions, answers: data, endTime: examEndTime, step: currentStep, audioBank: globalAudioBank 
-            }));
-            renderQuestionMap();
-        }
-
-        document.getElementById('assessmentForm').addEventListener('input', saveState);
-        document.getElementById('assessmentForm').addEventListener('change', saveState);
+        document.getElementById('assessmentForm').addEventListener('input', renderQuestionMap);
+        document.getElementById('assessmentForm').addEventListener('change', renderQuestionMap);
 
         function checkAnswered(stepNum) {
             const index = stepNum - 1;
@@ -381,12 +307,11 @@
         function goToStep(stepNum) {
             if (currentStep === 0 && !validateRegistration()) return;
             currentStep = stepNum;
-            saveState(); updateUI();
+            updateUI();
         }
 
         function generateSteps() {
             const wrapper = document.getElementById('steps-wrapper');
-            const savedState = JSON.parse(localStorage.getItem('exam_draft_junior'));
             let html = '';
 
             activeQuestions.forEach((item, index) => {
@@ -397,7 +322,6 @@
                 
                 if (item.options) {
                     html += `<div class="radio-options-wrapper">`;
-                    // Removed 'required' to allow skipping
                     item.options.forEach(opt => { html += `<label class="radio-label"><input type="radio" name="q_${item.id}" value="${opt}"> ${opt}</label>`; });
                     html += `</div>`;
                 } else if (item.id.startsWith('e')) {
@@ -429,24 +353,13 @@
                 html += `</div></div>`;
             });
             wrapper.innerHTML += html;
-
-            if (savedState && savedState.answers) {
-                for (const [key, value] of Object.entries(savedState.answers)) {
-                    const el = document.querySelector(`[name="${key}"]`);
-                    if (el) {
-                        if (el.type === 'radio') {
-                            const radio = document.querySelector(`input[name="${key}"][value="${value}"]`);
-                            if (radio) { radio.checked = true; radio.parentElement.classList.add('selected'); }
-                        } else { el.value = value; }
-                    }
-                }
-            }
             
             document.querySelectorAll('.radio-label input[type="radio"]').forEach(radio => {
                 radio.addEventListener('change', function() {
                     const groupName = this.getAttribute('name');
                     document.querySelectorAll(`input[name="${groupName}"]`).forEach(r => r.parentElement.classList.remove('selected'));
-                    if (this.checked) this.parentElement.classList.add('selected'); saveState();
+                    if (this.checked) this.parentElement.classList.add('selected'); 
+                    renderQuestionMap();
                 });
             });
             updateUI();
@@ -460,9 +373,8 @@
         }
 
         function changeStep(dir) {
-            // Only validate Step 0 strictly to ensure name/email is caught
             if (currentStep === 0 && dir === 1 && !validateRegistration()) return;
-            currentStep += dir; saveState(); updateUI();
+            currentStep += dir; updateUI();
         }
 
         function updateUI() {
@@ -503,7 +415,7 @@
                     const blob = new Blob(audioChunks[qId], { type: 'audio/webm' });
                     rawAudioBlobs[qId] = blob; finalAudioBlobs[qId] = URL.createObjectURL(blob); 
                     player.src = finalAudioBlobs[qId]; player.style.display = "block"; stream.getTracks().forEach(track => track.stop());
-                    saveState(); // Update map to turn green
+                    renderQuestionMap(); 
                 };
                 mediaRecorders[qId].start();
                 btn.innerHTML = "⏹️ Stop Recording"; btn.classList.add("recording"); statusText.style.display = "inline-flex"; player.style.display = "none";
@@ -601,7 +513,7 @@
                 <div style="text-align: right; font-size: 13px; color: var(--text-muted); font-weight: 500;">Click outside the box or press &times; to save</div>`;
             bg.appendChild(box); document.body.appendChild(bg);
             const fcTxt = document.getElementById('fc-txt'); const closeBtn = document.getElementById('fc-close');
-            fcTxt.value = textarea.value; fcTxt.addEventListener('input', () => { textarea.value = fcTxt.value; saveState(); });
+            fcTxt.value = textarea.value; fcTxt.addEventListener('input', () => { textarea.value = fcTxt.value; renderQuestionMap(); });
             requestAnimationFrame(() => { bg.style.opacity = '1'; box.style.transform = 'scale(1) translateY(0)'; fcTxt.focus(); });
             const closeFocus = () => { bg.style.opacity = '0'; box.style.transform = 'scale(0.95) translateY(20px)'; setTimeout(() => bg.remove(), 300); };
             closeBtn.onclick = closeFocus; closeBtn.onmouseover = () => closeBtn.style.color = 'var(--danger)'; closeBtn.onmouseout = () => closeBtn.style.color = 'var(--text-muted)';
@@ -615,7 +527,6 @@
             e.preventDefault(); 
             if (currentStep === 0 && !validateRegistration()) return;
 
-            // Final Validation: Check if all questions are answered before a clean submit
             if (!forcedSubmitReason) {
                 let missingQs = [];
                 for(let i=1; i<=totalSteps; i++) {
@@ -629,7 +540,7 @@
 
             examSubmitted = true; isExamActive = false; clearInterval(mainTimerInterval); clearInterval(violationTimerInterval);
             document.getElementById('security-warning').style.display = 'none';
-            if (document.fullscreenElement) document.exitFullscreen(); localStorage.removeItem('exam_draft_junior'); 
+            if (document.fullscreenElement) document.exitFullscreen(); 
             const submitBtn = document.getElementById('btn-submit');
             submitBtn.innerText = "⏳ Uploading Securely to Server..."; submitBtn.disabled = true; submitBtn.style.background = "#94a3b8";
 
