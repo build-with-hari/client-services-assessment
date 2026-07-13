@@ -49,8 +49,16 @@
         h1 { font-size: 32px; font-weight: 700; margin: 0 0 8px 0; color: var(--text-heading); text-align: center; letter-spacing: -0.5px; }
         p.subtitle { color: var(--text-muted); font-size: 16px; margin: 0 0 40px 0; text-align: center; }
         .section-header { font-size: 20px; color: var(--text-heading); display: flex; align-items: center; gap: 12px; margin: 0 0 24px 0; font-weight: 600; }
-        .progress-container { width: 100%; background: rgba(0,0,0,0.05); border-radius: 50px; height: 8px; margin-bottom: 30px; overflow: hidden; }
+        .progress-container { width: 100%; background: rgba(0,0,0,0.05); border-radius: 50px; height: 8px; margin-bottom: 20px; overflow: hidden; }
         .progress-bar { height: 100%; background: var(--primary-accent); width: 0%; transition: width 0.5s cubic-bezier(0.16, 1, 0.3, 1); }
+        
+        /* Question Map */
+        #question-map { display: none; gap: 8px; flex-wrap: wrap; margin-bottom: 25px; justify-content: center; }
+        .q-dot { width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 600; color: var(--text-muted); background: rgba(0,0,0,0.05); cursor: pointer; transition: all 0.2s; border: 2px solid transparent; }
+        .q-dot:hover { background: rgba(0,0,0,0.1); }
+        .q-dot.answered { background: rgba(16, 185, 129, 0.1); color: var(--success); border-color: rgba(16, 185, 129, 0.3); }
+        .q-dot.active { border-color: var(--primary-accent); color: var(--primary-accent); background: #fff; box-shadow: 0 4px 10px rgba(37,99,235,0.15);}
+
         .step-container { display: none; opacity: 0; transform: translateY(20px); transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1); }
         .step-container.active { display: block; opacity: 1; transform: translateY(0); }
 
@@ -136,7 +144,7 @@
                 <ul style="color: var(--text-body); line-height: 2; margin: 0; padding-left: 20px; font-size: 15px;">
                     <li><strong>Duration:</strong> <span style="color:var(--primary-accent); font-weight:600;">60 Minutes</span> strict limit.</li>
                     <li><strong>Format:</strong> 20 scenarios (MCQ, Text, Essay, Audio).</li>
-                    <li><strong>Access:</strong> A unique 6-digit access code is required to initiate.</li>
+                    <li><strong>Navigation:</strong> You may skip questions and return to them later. All questions must be completed before final submission.</li>
                     <li><strong style="color: var(--danger);">Strict Proctoring:</strong> The exam requires Fullscreen. Exiting fullscreen or switching tabs triggers an auto-failure.</li>
                 </ul>
             </div>
@@ -165,6 +173,8 @@
                 <div class="timer-badge" id="display-timer">60:00</div>
             </div>
             <div class="progress-container"><div class="progress-bar" id="progress-bar"></div></div>
+            <div id="question-map"></div>
+            
             <form id="assessmentForm">
                 <div id="steps-wrapper">
                     <div class="step-container active" id="step-0">
@@ -197,7 +207,7 @@
     </div>
 
     <script>
-        const GAS_URL = "https://script.google.com/macros/s/AKfycbwyqEg3vr_nm-6MpnNuBu2Aa7EVkC2-UBrG-wAckFEDojFrg63U0M3u4qG02mngy3OB/exec"; 
+        const GAS_URL = "https://script.google.com/macros/s/AKfycbyERI2bnZTExqDgn5uXoz9lsX4FvON3VrdxEQKgy4tmza8iKzDHmCkNauQtgS6SAQiThw/exec"; 
 
         let activeQuestions = [], isExamActive = false, examSubmitted = false, forcedSubmitReason = "", currentStep = 0, totalSteps = 20, examEndTime = 0, fullscreenSupported = false;
         let globalAudioBank = []; 
@@ -331,10 +341,48 @@
             localStorage.setItem('exam_draft_senior', JSON.stringify({ 
                 questions: activeQuestions, answers: data, endTime: examEndTime, step: currentStep, audioBank: globalAudioBank 
             }));
+            renderQuestionMap();
         }
 
         document.getElementById('assessmentForm').addEventListener('input', saveState);
         document.getElementById('assessmentForm').addEventListener('change', saveState);
+
+        function checkAnswered(stepNum) {
+            const index = stepNum - 1;
+            if(index < 0 || index >= activeQuestions.length) return false;
+            const item = activeQuestions[index];
+            if (item.id.startsWith('a')) return !!finalAudioBlobs[item.id];
+            if (item.options) return !!document.querySelector(`input[name="q_${item.id}"]:checked`);
+            if (item.id.startsWith('e')) {
+                const topic = document.querySelector(`select[name="q_${item.id}_topic"]`).value;
+                const txt = document.getElementById(`txt_${item.id}`).value.trim();
+                return topic !== "" && txt !== "";
+            }
+            return document.getElementById(`txt_${item.id}`).value.trim() !== "";
+        }
+
+        function renderQuestionMap() {
+            const mapContainer = document.getElementById('question-map');
+            if(!mapContainer) return;
+            if(currentStep === 0) { mapContainer.style.display = 'none'; return; }
+            
+            mapContainer.style.display = 'flex';
+            let html = '';
+            for(let i=1; i<=totalSteps; i++) {
+                let isAnswered = checkAnswered(i);
+                let classes = 'q-dot';
+                if(isAnswered) classes += ' answered';
+                if(i === currentStep) classes += ' active';
+                html += `<div class="${classes}" onclick="goToStep(${i})">${i}</div>`;
+            }
+            mapContainer.innerHTML = html;
+        }
+
+        function goToStep(stepNum) {
+            if (currentStep === 0 && !validateRegistration()) return;
+            currentStep = stepNum;
+            saveState(); updateUI();
+        }
 
         function generateSteps() {
             const wrapper = document.getElementById('steps-wrapper');
@@ -349,17 +397,18 @@
                 
                 if (item.options) {
                     html += `<div class="radio-options-wrapper">`;
-                    item.options.forEach(opt => { html += `<label class="radio-label"><input type="radio" name="q_${item.id}" value="${opt}" required> ${opt}</label>`; });
+                    // Removed 'required' to allow skipping
+                    item.options.forEach(opt => { html += `<label class="radio-label"><input type="radio" name="q_${item.id}" value="${opt}"> ${opt}</label>`; });
                     html += `</div>`;
                 } else if (item.id.startsWith('e')) {
                     html += `<div style="margin-bottom: 15px;">
-                                <select name="q_${item.id}_topic" required style="width: 100%; padding: 14px; border-radius: 10px; border: 2px solid #cbd5e1; font-family: inherit; font-size: 15px; background: var(--input-bg); cursor:pointer;">
+                                <select name="q_${item.id}_topic" style="width: 100%; padding: 14px; border-radius: 10px; border: 2px solid #cbd5e1; font-family: inherit; font-size: 15px; background: var(--input-bg); cursor:pointer;">
                                     <option value="">-- Select your Essay Topic --</option>`;
                     item.topics.forEach(topic => { html += `<option value="${topic}">${topic}</option>`; });
                     html += `   </select>
                              </div>
                              <div class="textarea-wrapper">
-                                <textarea name="q_${item.id}" id="txt_${item.id}" placeholder="Write your essay here..." required style="min-height: 250px;"></textarea>
+                                <textarea name="q_${item.id}" id="txt_${item.id}" placeholder="Write your essay here..." style="min-height: 250px;"></textarea>
                                 <button type="button" class="focus-btn fc-trigger-btn" data-qid="${item.id}" data-qtext="${item.q.replace(/"/g, '&quot;')}">⤢</button>
                              </div>`;
                 } else if (item.id.startsWith('a')) {
@@ -373,7 +422,7 @@
                             </div>`;
                 } else {
                     html += `<div class="textarea-wrapper">
-                                <textarea name="q_${item.id}" id="txt_${item.id}" placeholder="Type your detailed response here..." required></textarea>
+                                <textarea name="q_${item.id}" id="txt_${item.id}" placeholder="Type your detailed response here..."></textarea>
                                 <button type="button" class="focus-btn fc-trigger-btn" data-qid="${item.id}" data-qtext="${item.q.replace(/"/g, '&quot;')}">⤢</button>
                              </div>`;
                 }
@@ -403,15 +452,16 @@
             updateUI();
         }
 
-        function validateStep() {
-            const stepDiv = document.getElementById(`step-${currentStep}`);
-            const inputs = stepDiv.querySelectorAll('input[required], textarea[required], select[required]');
+        function validateRegistration() {
+            const stepDiv = document.getElementById('step-0');
+            const inputs = stepDiv.querySelectorAll('input[required]');
             for (let input of inputs) { if (!input.checkValidity()) { input.reportValidity(); return false; } }
             return true;
         }
 
         function changeStep(dir) {
-            if (dir === 1 && !validateStep()) return;
+            // Only validate Step 0 strictly to ensure name/email is caught
+            if (currentStep === 0 && dir === 1 && !validateRegistration()) return;
             currentStep += dir; saveState(); updateUI();
         }
 
@@ -430,6 +480,7 @@
             const progress = (currentStep / totalSteps) * 100;
             document.getElementById('progress-bar').style.width = `${progress}%`;
             document.getElementById('step-counter').innerText = currentStep === 0 ? "Registration" : `Question ${currentStep} of ${totalSteps}`;
+            renderQuestionMap();
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
@@ -452,6 +503,7 @@
                     const blob = new Blob(audioChunks[qId], { type: 'audio/webm' });
                     rawAudioBlobs[qId] = blob; finalAudioBlobs[qId] = URL.createObjectURL(blob); 
                     player.src = finalAudioBlobs[qId]; player.style.display = "block"; stream.getTracks().forEach(track => track.stop());
+                    saveState(); // Update map to turn green
                 };
                 mediaRecorders[qId].start();
                 btn.innerHTML = "⏹️ Stop Recording"; btn.classList.add("recording"); statusText.style.display = "inline-flex"; player.style.display = "none";
@@ -560,7 +612,21 @@
         function triggerSubmit() { document.getElementById('assessmentForm').dispatchEvent(new Event('submit', { cancelable: true, bubbles: true })); }
 
         document.getElementById('assessmentForm').addEventListener('submit', async function(e) {
-            e.preventDefault(); if (!validateStep() && !forcedSubmitReason) return; 
+            e.preventDefault(); 
+            if (currentStep === 0 && !validateRegistration()) return;
+
+            // Final Validation: Check if all questions are answered before a clean submit
+            if (!forcedSubmitReason) {
+                let missingQs = [];
+                for(let i=1; i<=totalSteps; i++) {
+                    if(!checkAnswered(i)) missingQs.push(i);
+                }
+                if (missingQs.length > 0) {
+                    showCustomAlert("Please answer all questions before submitting. Missing: Question " + missingQs.join(', '), "Incomplete Assessment");
+                    return;
+                }
+            }
+
             examSubmitted = true; isExamActive = false; clearInterval(mainTimerInterval); clearInterval(violationTimerInterval);
             document.getElementById('security-warning').style.display = 'none';
             if (document.fullscreenElement) document.exitFullscreen(); localStorage.removeItem('exam_draft_senior'); 
