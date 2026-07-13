@@ -122,8 +122,8 @@
 
     <div id="security-warning">
         <h1>⚠️ SECURITY WARNING ⚠️</h1>
-        <p id="strike-warning-text">You have exited the secure window. Please return immediately.</p>
-        <div id="violation-countdown">10</div>
+        <p id="strike-warning-text" style="font-size: 18px;">You have exited the secure window.</p>
+        <div id="violation-countdown">15</div>
         <button class="btn-resume" onclick="resumeFullscreen()">Acknowledge & Return to Exam</button>
     </div>
 
@@ -137,7 +137,7 @@
                     <li><strong>Duration:</strong> <span style="color:var(--primary-accent); font-weight:600;">45 Minutes</span> strict limit.</li>
                     <li><strong>Format:</strong> 20 scenarios (MCQ, Text, Essay, Audio).</li>
                     <li><strong>Navigation:</strong> You may skip questions via the map. All questions must be answered to submit.</li>
-                    <li><strong style="color: var(--danger);">Strict Proctoring:</strong> Exiting fullscreen or switching tabs results in a Strike. 3 Strikes = Auto-Failure. Do not refresh the page.</li>
+                    <li><strong style="color: var(--danger);">Strict Proctoring:</strong> Exiting fullscreen or switching tabs will trigger a 15-second lockdown timer. Failing to return in time will auto-submit the exam. All window exits are logged. Do not refresh the page.</li>
                 </ul>
             </div>
             
@@ -147,6 +147,7 @@
                     <input type="text" id="access-code-input" placeholder="e.g. A4X9BQ" required style="text-transform: uppercase; font-weight: bold; letter-spacing: 2px; text-align: center;">
                 </div>
                 <button class="btn-primary" id="btn-initiate" onclick="validateAndStart()">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path></svg>
                     <span id="start-btn-text">Validate Code & Start Assessment</span>
                 </button>
             </div>
@@ -201,13 +202,14 @@
         let globalAudioBank = []; 
         let mediaRecorders = {}, audioChunks = {}, finalAudioBlobs = {}, rawAudioBlobs = {}, audioTimers = {}, audioSeconds = {}; 
 
+        // Analytics & Exit Tracking
         let stepStartTime = 0;
         let stepTimeSpent = {}; 
-        let strikeCount = 0;
-        let strikeLog = [];
+        let exitCount = 0;
+        let exitLog = [];
         let inViolationState = false;
-        let lastStrikeTime = 0;
-        let violationTimeLeft = 10;
+        let lastExitTime = 0;
+        let violationTimeLeft = 15;
         let violationTimerInterval;
 
         function showCustomAlert(message, title = "System Notification") {
@@ -465,11 +467,14 @@
 
         let audioCtx; function initAudio() { audioCtx = new (window.AudioContext || window.webkitAudioContext)(); }
         function playAlarmBeep() {
-            if (!audioCtx) return; if (audioCtx.state === 'suspended') audioCtx.resume();
-            const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain();
-            osc.type = 'square'; osc.frequency.setValueAtTime(440, audioCtx.currentTime); osc.frequency.setValueAtTime(880, audioCtx.currentTime + 0.2);
-            gain.gain.setValueAtTime(0.1, audioCtx.currentTime); osc.connect(gain); gain.connect(audioCtx.destination);
-            osc.start(); osc.stop(audioCtx.currentTime + 0.4);
+            try {
+                if (!audioCtx) return; 
+                if (audioCtx.state === 'suspended') audioCtx.resume();
+                const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain();
+                osc.type = 'square'; osc.frequency.setValueAtTime(440, audioCtx.currentTime); osc.frequency.setValueAtTime(880, audioCtx.currentTime + 0.2);
+                gain.gain.setValueAtTime(0.1, audioCtx.currentTime); osc.connect(gain); gain.connect(audioCtx.destination);
+                osc.start(); osc.stop(audioCtx.currentTime + 0.4);
+            } catch(e) { } // Silent catch for strict browser policies
         }
 
         function resumeFullscreen() {
@@ -488,36 +493,32 @@
 
             if (isHidden || notFullscreen) {
                 let now = Date.now();
-                if (now - lastStrikeTime < 2000) return; // Debounce dual-firing events
+                if (now - lastExitTime < 2000) return; // Debounce dual-firing events
                 
                 if (!inViolationState) {
                     inViolationState = true;
-                    strikeCount++;
-                    strikeLog.push("Strike " + strikeCount + ": Left exam window at " + new Date().toLocaleTimeString());
-                    lastStrikeTime = now;
+                    exitCount++;
+                    exitLog.push("Exited secure window at " + new Date().toLocaleTimeString());
+                    lastExitTime = now;
                     
-                    if (strikeCount >= 3) {
-                        forcedSubmitReason = "SECURITY VIOLATION: Maximum strikes (3/3) exceeded.";
-                        triggerSubmit();
-                    } else {
-                        document.getElementById('strike-warning-text').innerHTML = `You have exited the secure window.<br><br><span style='color: #fde047; font-size: 32px; font-weight: bold; text-shadow: 0 2px 4px rgba(0,0,0,0.5);'>Strike ${strikeCount} of 3</span><br><br>Return before the timer expires!`;
-                        document.getElementById('security-warning').style.display = 'flex';
-                        
-                        violationTimeLeft = 10;
+                    document.getElementById('strike-warning-text').innerHTML = `You have exited the secure window.<br><br>Return before the timer expires or your assessment will be automatically submitted!`;
+                    document.getElementById('security-warning').style.display = 'flex';
+                    
+                    violationTimeLeft = 15;
+                    document.getElementById('violation-countdown').innerText = violationTimeLeft;
+                    document.getElementById('violation-countdown').style.display = 'block';
+                    playAlarmBeep();
+                    
+                    violationTimerInterval = setInterval(() => {
+                        violationTimeLeft--;
                         document.getElementById('violation-countdown').innerText = violationTimeLeft;
-                        document.getElementById('violation-countdown').style.display = 'block';
                         playAlarmBeep();
-                        
-                        violationTimerInterval = setInterval(() => {
-                            violationTimeLeft--;
-                            document.getElementById('violation-countdown').innerText = violationTimeLeft;
-                            playAlarmBeep();
-                            if (violationTimeLeft <= 0) {
-                                clearInterval(violationTimerInterval);
-                                resumeFullscreen(); // Auto-resume instead of auto-submit
-                            }
-                        }, 1000);
-                    }
+                        if (violationTimeLeft <= 0) {
+                            clearInterval(violationTimerInterval);
+                            forcedSubmitReason = "SECURITY VIOLATION: Failed to return within 15 seconds.";
+                            triggerSubmit();
+                        }
+                    }, 1000);
                 }
             }
         }
@@ -596,7 +597,7 @@
             const payload = {
                 action: 'submitExam', candidateName: formData.get("FirstName") + " " + formData.get("LastName"),
                 candidateEmail: formData.get("Email"), qnaData: qnaData, audioFiles: audioBase64Data, audioTitles: audioTitlesMap, 
-                forcedSubmitReason: forcedSubmitReason, strikeCount: strikeCount, strikeLog: strikeLog 
+                forcedSubmitReason: forcedSubmitReason, exitCount: exitCount, exitLog: exitLog 
             };
 
             fetch(GAS_URL, { method: "POST", body: JSON.stringify(payload), headers: { "Content-Type": "text/plain;charset=utf-8" } })
