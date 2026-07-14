@@ -227,6 +227,16 @@
             const codeInput = document.getElementById('access-code-input').value.trim();
             if (!codeInput) { showCustomAlert("Please enter your 6-digit Access Code to begin.", "Code Required"); return; }
 
+            // FIX 1: Request fullscreen IMMEDIATELY on click to preserve browser security permissions
+            if (document.documentElement.requestFullscreen && !document.fullscreenElement) {
+                try {
+                    await document.documentElement.requestFullscreen();
+                    fullscreenSupported = true;
+                } catch (err) {
+                    fullscreenSupported = false;
+                }
+            }
+
             const initiateBtn = document.getElementById('btn-initiate');
             const startBtnText = document.getElementById('start-btn-text');
             const originalText = startBtnText.innerText;
@@ -246,12 +256,14 @@
                     globalAudioBank = qs.audio;
                     examEndTime = Date.now() + (45 * 60 * 1000); 
                     totalSteps = activeQuestions.length;
-                    enterFullscreenAndStart();
+                    startSequence();
                 } else {
+                    if (document.fullscreenElement) document.exitFullscreen();
                     showCustomAlert(data.error, "Access Denied");
                     startBtnText.innerText = originalText; initiateBtn.disabled = false;
                 }
             } catch (err) {
+                if (document.fullscreenElement) document.exitFullscreen();
                 showCustomAlert("Network error while validating code. Check internet connection.", "Connection Error");
                 startBtnText.innerText = originalText; initiateBtn.disabled = false;
             }
@@ -279,6 +291,16 @@
 
         document.getElementById('assessmentForm').addEventListener('input', renderQuestionMap);
         document.getElementById('assessmentForm').addEventListener('change', renderQuestionMap);
+
+        // FIX 2: Prevent the 'Enter' key from prematurely submitting the exam form
+        document.getElementById('assessmentForm').addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && e.target.tagName === 'INPUT') {
+                e.preventDefault(); // Stop the form from submitting
+                if (currentStep < totalSteps) {
+                    changeStep(1); // Advance to the next step safely
+                }
+            }
+        });
 
         function checkAnswered(stepNum) {
             const index = stepNum - 1;
@@ -439,20 +461,14 @@
             } catch (err) { showCustomAlert("Microphone Error: " + err.message, "Permission Error"); }
         }
 
-        function enterFullscreenAndStart() {
-            const startSequence = () => {
-                document.getElementById('start-screen').style.opacity = '0';
-                setTimeout(() => {
-                    document.getElementById('start-screen').style.display = 'none';
-                    document.getElementById('exam-screen').style.display = 'flex';
-                    generateSteps(); startTimer(); initAudio(); isExamActive = true;
-                    stepStartTime = Date.now();
-                }, 500);
-            };
-            if (document.documentElement.requestFullscreen) {
-                document.documentElement.requestFullscreen().then(() => { fullscreenSupported = true; startSequence();
-                }).catch(err => { fullscreenSupported = false; startSequence(); });
-            } else { startSequence(); }
+        function startSequence() {
+            document.getElementById('start-screen').style.opacity = '0';
+            setTimeout(() => {
+                document.getElementById('start-screen').style.display = 'none';
+                document.getElementById('exam-screen').style.display = 'flex';
+                generateSteps(); startTimer(); initAudio(); isExamActive = true;
+                stepStartTime = Date.now();
+            }, 500);
         }
 
         let mainTimerInterval;
