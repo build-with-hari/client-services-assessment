@@ -1,4 +1,4 @@
-# 🏢 Secure Client Services Assessment Portal
+# 🏢 Client Services Assessment Portal
 
 Welcome to our official Client Services Assessment Portal. This repository hosts our secure, proctored evaluation environments for incoming candidates.
 
