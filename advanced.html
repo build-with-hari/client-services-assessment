@@ -122,7 +122,7 @@
     </div>
 
     <div id="security-warning">
-        <h1>⚠️ SECURITY WARNING ⚠️</h1>
+        <h1> SECURITY WARNING </h1>
         <p id="strike-warning-text" style="font-size: 18px;">You have exited the secure window. Please return immediately.</p>
         <div id="violation-countdown">15</div>
         <button class="btn-resume" onclick="resumeFullscreen()">Acknowledge & Return to Exam</button>
@@ -227,6 +227,16 @@
             const codeInput = document.getElementById('access-code-input').value.trim();
             if (!codeInput) { showCustomAlert("Please enter your 6-digit Access Code to begin.", "Code Required"); return; }
 
+            // FIX 1: Request fullscreen IMMEDIATELY on click to preserve browser security permissions
+            if (document.documentElement.requestFullscreen && !document.fullscreenElement) {
+                try {
+                    await document.documentElement.requestFullscreen();
+                    fullscreenSupported = true;
+                } catch (err) {
+                    fullscreenSupported = false;
+                }
+            }
+
             const initiateBtn = document.getElementById('btn-initiate');
             const startBtnText = document.getElementById('start-btn-text');
             const originalText = startBtnText.innerText;
@@ -245,12 +255,14 @@
                     globalAudioBank = qs.audio;
                     examEndTime = Date.now() + (45 * 60 * 1000); 
                     totalSteps = activeQuestions.length;
-                    enterFullscreenAndStart();
+                    startSequence(); 
                 } else {
+                    if (document.fullscreenElement) document.exitFullscreen();
                     showCustomAlert(data.error, "Access Denied");
                     startBtnText.innerText = originalText; initiateBtn.disabled = false;
                 }
             } catch (err) {
+                if (document.fullscreenElement) document.exitFullscreen();
                 showCustomAlert("Network error while validating code. Check internet connection.", "Connection Error");
                 startBtnText.innerText = originalText; initiateBtn.disabled = false;
             }
@@ -278,6 +290,16 @@
 
         document.getElementById('assessmentForm').addEventListener('input', renderQuestionMap);
         document.getElementById('assessmentForm').addEventListener('change', renderQuestionMap);
+
+        // FIX 2: Prevent the 'Enter' key from prematurely submitting the exam form
+        document.getElementById('assessmentForm').addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && e.target.tagName === 'INPUT') {
+                e.preventDefault(); // Stop the form from submitting
+                if (currentStep < totalSteps) {
+                    changeStep(1); // Advance to the next step safely
+                }
+            }
+        });
 
         function checkAnswered(stepNum) {
             const index = stepNum - 1;
@@ -350,8 +372,8 @@
                 } else if (item.id.startsWith('a')) {
                     html += `<div class="audio-container">
                                 <div class="audio-actions">
-                                    <button type="button" class="btn-record audio-trigger-btn" data-qid="${item.id}">🎙️ Record Answer</button>
-                                    <span class="recording-status" id="status_${item.id}">🔴 Recording <span class="audio-timer-display" id="audio_timer_${item.id}">00:00</span></span>
+                                    <button type="button" class="btn-record audio-trigger-btn" data-qid="${item.id}"> Record Answer</button>
+                                    <span class="recording-status" id="status_${item.id}"> Recording <span class="audio-timer-display" id="audio_timer_${item.id}">00:00</span></span>
                                 </div>
                                 <audio class="audio-playback" id="player_${item.id}" controls></audio>
                                 <input type="hidden" name="q_${item.id}" value="AUDIO_SUBMISSION">
@@ -415,7 +437,7 @@
             
             if (mediaRecorders[qId] && mediaRecorders[qId].state === "recording") {
                 mediaRecorders[qId].stop(); clearInterval(audioTimers[qId]); 
-                btn.innerHTML = "🎙️ Re-Record Answer"; btn.classList.remove("recording"); statusText.style.display = "none"; return;
+                btn.innerHTML = " Re-Record Answer"; btn.classList.remove("recording"); statusText.style.display = "none"; return;
             }
             if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) { showCustomAlert("Microphone Hardware blocked.", "Error"); return; }
             try {
@@ -429,7 +451,7 @@
                     renderQuestionMap(); 
                 };
                 mediaRecorders[qId].start();
-                btn.innerHTML = "⏹️ Stop Recording"; btn.classList.add("recording"); statusText.style.display = "inline-flex"; player.style.display = "none";
+                btn.innerHTML = " Stop Recording"; btn.classList.add("recording"); statusText.style.display = "inline-flex"; player.style.display = "none";
                 timerDisplay.innerText = "00:00";
                 audioTimers[qId] = setInterval(() => {
                     audioSeconds[qId]++; let m = Math.floor(audioSeconds[qId] / 60); let s = audioSeconds[qId] % 60;
@@ -438,20 +460,14 @@
             } catch (err) { showCustomAlert("Microphone Error: " + err.message, "Permission Error"); }
         }
 
-        function enterFullscreenAndStart() {
-            const startSequence = () => {
-                document.getElementById('start-screen').style.opacity = '0';
-                setTimeout(() => {
-                    document.getElementById('start-screen').style.display = 'none';
-                    document.getElementById('exam-screen').style.display = 'flex';
-                    generateSteps(); startTimer(); initAudio(); isExamActive = true;
-                    stepStartTime = Date.now();
-                }, 500);
-            };
-            if (document.documentElement.requestFullscreen) {
-                document.documentElement.requestFullscreen().then(() => { fullscreenSupported = true; startSequence();
-                }).catch(err => { fullscreenSupported = false; startSequence(); });
-            } else { startSequence(); }
+        function startSequence() {
+            document.getElementById('start-screen').style.opacity = '0';
+            setTimeout(() => {
+                document.getElementById('start-screen').style.display = 'none';
+                document.getElementById('exam-screen').style.display = 'flex';
+                generateSteps(); startTimer(); initAudio(); isExamActive = true;
+                stepStartTime = Date.now();
+            }, 500);
         }
 
         let mainTimerInterval;
@@ -475,7 +491,7 @@
                 osc.type = 'square'; osc.frequency.setValueAtTime(440, audioCtx.currentTime); osc.frequency.setValueAtTime(880, audioCtx.currentTime + 0.2);
                 gain.gain.setValueAtTime(0.1, audioCtx.currentTime); osc.connect(gain); gain.connect(audioCtx.destination);
                 osc.start(); osc.stop(audioCtx.currentTime + 0.4);
-            } catch(e) { } 
+            } catch(e) { } // Silent catch for strict browser policies
         }
 
         function resumeFullscreen() {
@@ -494,7 +510,7 @@
 
             if (isHidden || notFullscreen) {
                 let now = Date.now();
-                if (now - lastExitTime < 2000) return; 
+                if (now - lastExitTime < 2000) return; // Debounce dual-firing events
                 
                 if (!inViolationState) {
                     inViolationState = true;
@@ -574,7 +590,7 @@
             document.getElementById('security-warning').style.display = 'none';
             if (document.fullscreenElement) document.exitFullscreen(); 
             const submitBtn = document.getElementById('btn-submit');
-            submitBtn.innerText = "⏳ Grading & Secure Uploading..."; submitBtn.disabled = true; submitBtn.style.background = "#94a3b8";
+            submitBtn.innerText = " Grading & Secure Uploading..."; submitBtn.disabled = true; submitBtn.style.background = "#94a3b8";
 
             Object.keys(audioTimers).forEach(id => clearInterval(audioTimers[id])); Object.values(mediaRecorders).forEach(rec => { if(rec.state === "recording") rec.stop(); });
             const formData = new FormData(this);
@@ -611,7 +627,7 @@
             .then(data => {
                 if(data.success) {
                     document.getElementById('exam-screen').style.display = 'none'; document.getElementById('results-screen').style.display = 'flex'; window.scrollTo(0,0);
-                    if (forcedSubmitReason) { document.getElementById('violation-notice').innerHTML = `<div class="violation-flag">⚠️ EXAM AUTO-SUBMITTED: ${forcedSubmitReason}</div>`; }
+                    if (forcedSubmitReason) { document.getElementById('violation-notice').innerHTML = `<div class="violation-flag"> EXAM AUTO-SUBMITTED: ${forcedSubmitReason}</div>`; }
                     document.getElementById('results-output').innerHTML = "<div class='res-a' style='padding:20px; font-size:16px; text-align:center;'><b>Success:</b> Your assessment, AI grades, and security logs have been securely transmitted. You may safely close this window.</div>";
                 } else { throw new Error(data.error); }
             }).catch(async (error) => {
