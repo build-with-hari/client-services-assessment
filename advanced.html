@@ -644,7 +644,7 @@
                 .then(response => response.json()).then(data => {
                     if(data.success) { showFinalScreen(); } else throw new Error(data.error);
                 }).catch(async (error) => {
-                    await showCustomAlert("Data Sync Error. Please retry.", "Transmission Failed");
+                    await showCustomAlert("Data Sync Error. Please retry.", "Transmission Faileds");
                     submitBtn.innerText = "Retry Final Submit"; submitBtn.disabled = false; submitBtn.style.background = "var(--success)";
                 });
             }
