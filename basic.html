@@ -49,7 +49,7 @@
         .progress-bar { height: 100%; background: var(--primary-accent); width: 0%; transition: width 0.5s cubic-bezier(0.16, 1, 0.3, 1); }
         
         #question-map { display: none; gap: 8px; flex-wrap: wrap; margin-bottom: 25px; justify-content: center; }
-        .q-dot { width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 600; color: var(--text-muted); background: rgba(0,0,0,0.05); cursor: pointer; transition: all 0.2s; border: 2px solid transparent; }
+        .q-dot { min-width: 32px; padding: 0 10px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 600; color: var(--text-muted); background: rgba(0,0,0,0.05); cursor: pointer; transition: all 0.2s; border: 2px solid transparent; }
         .q-dot:hover { background: rgba(0,0,0,0.1); }
         .q-dot.answered { background: rgba(16, 185, 129, 0.1); color: var(--success); border-color: rgba(16, 185, 129, 0.3); }
         .q-dot.active { border-color: var(--primary-accent); color: var(--primary-accent); background: #fff; box-shadow: 0 4px 10px rgba(37,99,235,0.15);}
@@ -159,11 +159,11 @@
         <div class="main-container">
             <div id="timer-container">
                 <div class="step-indicator" id="step-counter">Registration</div>
-                <div style="display: flex; gap: 15px; align-items: center;">
-                    <div id="live-clock" style="font-size: 16px; font-weight: 600; color: var(--text-muted); font-variant-numeric: tabular-nums;"></div>
-                    <div class="timer-badge" id="display-timer">45:00</div>
-                </div>
+                <div class="timer-badge" id="display-timer">45:00</div>
             </div>
+            
+            <!-- Live Clock moved to bottom right corner -->
+            <div id="live-clock" style="position: fixed; bottom: 20px; right: 20px; font-size: 14px; font-weight: 600; color: var(--text-muted); font-variant-numeric: tabular-nums; background: rgba(255, 255, 255, 0.9); padding: 8px 16px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); border: 1px solid var(--glass-border); z-index: 1000;"></div>
             <div class="progress-container"><div class="progress-bar" id="progress-bar"></div></div>
             <div id="question-map"></div>
             
