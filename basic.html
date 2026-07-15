@@ -116,14 +116,14 @@
     <div id="custom-modal-overlay">
         <div class="modal-card">
             <h2 class="modal-title" id="custom-modal-title">Notification</h2>
-            <p class="modal-body-text" id="custom-modal-text">Message contents go here...</p>
+            <p class="modal-body-text" id="custom-modal-text"></p>
             <div class="modal-footer-actions" id="custom-modal-actions"></div>
         </div>
     </div>
 
     <div id="security-warning">
         <h1> SECURITY WARNING </h1>
-        <p id="strike-warning-text" style="font-size: 18px;">You have exited the secure window.</p>
+        <p id="strike-warning-text" style="font-size: 18px;">You have exited the secure window. Return immediately.</p>
         <div id="violation-countdown">15</div>
         <button class="btn-resume" onclick="resumeFullscreen()">Acknowledge & Return to Exam</button>
     </div>
@@ -135,10 +135,10 @@
             
             <div class="ui-card" style="text-align: left; margin-bottom: 25px;">
                 <ul style="color: var(--text-body); line-height: 2; margin: 0; padding-left: 20px; font-size: 15px;">
-                    <li><strong>Duration:</strong> <span style="color:var(--primary-accent); font-weight:600;">45 Minutes</span> strict limit.</li>
-                    <li><strong>Format:</strong> 20 scenarios (MCQ, Text, Essay, Audio).</li>
+                    <li><strong>Phase 1:</strong> <span style="color:var(--primary-accent); font-weight:600;">45 Minutes</span> for 20 Scenarios.</li>
+                    <li><strong>Phase 2:</strong> <span style="color:var(--primary-accent); font-weight:600;">15 Minutes</span> for the Essay Assessment.</li>
                     <li><strong>Navigation:</strong> You may skip questions via the map. All questions must be answered to submit.</li>
-                    <li><strong style="color: var(--danger);">Strict Proctoring:</strong> Exiting fullscreen or switching tabs will trigger a 15-second lockdown timer. Failing to return in time will auto-submit the exam. All window exits are logged. Do not refresh the page.</li>
+                    <li><strong style="color: var(--danger);">Strict Proctoring:</strong> Exiting fullscreen or switching tabs will trigger a 15-second lockdown timer. Failing to return in time will auto-submit the exam. All window exits are logged.</li>
                 </ul>
             </div>
             
@@ -159,7 +159,10 @@
         <div class="main-container">
             <div id="timer-container">
                 <div class="step-indicator" id="step-counter">Registration</div>
-                <div class="timer-badge" id="display-timer">45:00</div>
+                <div style="display: flex; gap: 15px; align-items: center;">
+                    <div id="live-clock" style="font-size: 16px; font-weight: 600; color: var(--text-muted); font-variant-numeric: tabular-nums;"></div>
+                    <div class="timer-badge" id="display-timer">45:00</div>
+                </div>
             </div>
             <div class="progress-container"><div class="progress-bar" id="progress-bar"></div></div>
             <div id="question-map"></div>
@@ -170,9 +173,9 @@
                         <div class="ui-card">
                             <h3 class="section-header">Candidate Registration</h3>
                             <div class="info-grid">
-                                <div><label class="input-label">First Name *</label><input type="text" name="FirstName" required></div>
-                                <div><label class="input-label">Last Name *</label><input type="text" name="LastName" required></div>
-                                <div><label class="input-label">Email Address *</label><input type="email" name="Email" required></div>
+                                <div><label class="input-label">First Name *</label><input type="text" name="FirstName" id="fNameInput" required></div>
+                                <div><label class="input-label">Last Name *</label><input type="text" name="LastName" id="lNameInput" required></div>
+                                <div><label class="input-label">Email Address *</label><input type="email" name="Email" id="emailInput" required></div>
                             </div>
                         </div>
                     </div>
@@ -196,27 +199,43 @@
     </div>
 
     <script>
-        const GAS_URL = "https://script.google.com/macros/s/AKfycbwyqEg3vr_nm-6MpnNuBu2Aa7EVkC2-UBrG-wAckFEDojFrg63U0M3u4qG02mngy3OB/exec";
+        const GAS_URL = "https://script.google.com/macros/s/AKfycbwyqEg3vr_nm-6MpnNuBu2Aa7EVkC2-UBrG-wAckFEDojFrg63U0M3u4qG02mngy3OB/exec"; 
 
+        // ==========================================
+        // 🚨 IMPORTANT: CHANGE THIS PER FILE!
+        // options: 'junior', 'intermediate', or 'senior'
+        // ==========================================
+        const EXAM_TIER = 'junior'; 
+        
         let activeQuestions = [], isExamActive = false, examSubmitted = false, forcedSubmitReason = "";
         let currentStep = 0, totalSteps = 20, examEndTime = 0, fullscreenSupported = false;
-        let globalAudioBank = [];
-        let mediaRecorders = {}, audioChunks = {}, finalAudioBlobs = {}, rawAudioBlobs = {}, audioTimers = {}, audioSeconds = {};
+        let globalAudioBank = []; 
+        let mediaRecorders = {}, audioChunks = {}, finalAudioBlobs = {}, rawAudioBlobs = {}, audioTimers = {}, audioSeconds = {}; 
 
-        // Analytics & Exit Tracking
-        let stepStartTime = 0;
-        let stepTimeSpent = {};
-        let exitCount = 0;
-        let exitLog = [];
-        let inViolationState = false;
-        let lastExitTime = 0;
-        let violationTimeLeft = 15;
-        let violationTimerInterval;
+        let phase = 'MAIN';
+        let essayQuestionData = null;
+        let mainExamStartTime, mainExamEndTime;
+        let essayStartTime, essayEndTime;
+        let folderId = null, rowNumber = null;
+        let globalCandidateName = "", globalCandidateEmail = "";
 
-        function showCustomAlert(message, title = "System Notification") {
+        let stepStartTime = 0, stepTimeSpent = {}, exitCount = 0, exitLog = [];
+        let inViolationState = false, lastExitTime = 0, violationTimeLeft = 15, violationTimerInterval;
+
+        setInterval(() => {
+            const clockEl = document.getElementById('live-clock');
+            if (clockEl) clockEl.innerText = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit', second:'2-digit'});
+        }, 1000);
+
+        function formatDuration(ms) {
+            let mins = Math.floor(ms / 60000); let secs = Math.floor((ms % 60000) / 1000);
+            return `${mins}m ${secs}s`;
+        }
+
+        function showCustomAlert(message, title = "Notification") {
             return new Promise((resolve) => {
                 document.getElementById('custom-modal-title').innerText = title; document.getElementById('custom-modal-text').innerText = message;
-                const actionsContainer = document.getElementById('custom-modal-actions'); actionsContainer.innerHTML = '';
+                const actionsContainer = document.getElementById('custom-modal-actions'); actionsContainer.innerHTML = ''; 
                 const okBtn = document.createElement('button'); okBtn.className = 'btn-modal-primary'; okBtn.innerText = 'OK';
                 okBtn.addEventListener('click', () => { document.getElementById('custom-modal-overlay').classList.remove('active'); resolve(true); });
                 actionsContainer.appendChild(okBtn); document.getElementById('custom-modal-overlay').classList.add('active');
@@ -225,35 +244,39 @@
 
         async function validateAndStart() {
             const codeInput = document.getElementById('access-code-input').value.trim();
-            if (!codeInput) { showCustomAlert("Please enter your 6-digit Access Code to begin.", "Code Required"); return; }
-
-            // FIX 1: Request fullscreen IMMEDIATELY on click to preserve browser security permissions
-            if (document.documentElement.requestFullscreen && !document.fullscreenElement) {
-                try {
-                    await document.documentElement.requestFullscreen();
-                    fullscreenSupported = true;
-                } catch (err) {
-                    fullscreenSupported = false;
-                }
-            }
-
-            const initiateBtn = document.getElementById('btn-initiate');
+            if (!codeInput) { showCustomAlert("Please enter your 6-digit Access Code.", "Code Required"); return; }
+            
             const startBtnText = document.getElementById('start-btn-text');
+            const initiateBtn = document.getElementById('btn-initiate');
             const originalText = startBtnText.innerText;
-            startBtnText.innerText = "Authenticating & Downloading Files...";
+
+            startBtnText.innerText = "Requesting Microphone...";
             initiateBtn.disabled = true;
 
             try {
-                const response = await fetch(GAS_URL, {
-                    method: "POST", body: JSON.stringify({ action: 'validateCode', code: codeInput, examType: 'junior' }), headers: { "Content-Type": "text/plain;charset=utf-8" }
-                });
+                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                stream.getTracks().forEach(track => track.stop());
+            } catch (err) {
+                showCustomAlert("Microphone access is required for the audio portion of this assessment.", "Microphone Required");
+                startBtnText.innerText = originalText; initiateBtn.disabled = false; return;
+            }
+
+            if (document.documentElement.requestFullscreen && !document.fullscreenElement) {
+                try { await document.documentElement.requestFullscreen(); fullscreenSupported = true; } catch (err) { fullscreenSupported = false; }
+            }
+
+            startBtnText.innerText = "Authenticating Code...";
+
+            try {
+                const response = await fetch(GAS_URL, { method: "POST", body: JSON.stringify({ action: 'validateCode', code: codeInput, examType: EXAM_TIER }), headers: { "Content-Type": "text/plain;charset=utf-8" } });
                 const data = await response.json();
                 
                 if (data.success) {
                     const qs = data.questions;
-                    activeQuestions = [...qs.mcq, ...qs.text, ...qs.essay, ...qs.audio];
+                    activeQuestions = [...qs.mcq, ...qs.text, ...qs.audio]; 
+                    essayQuestionData = qs.essay[0];
                     globalAudioBank = qs.audio;
-                    examEndTime = Date.now() + (45 * 60 * 1000);
+                    examEndTime = Date.now() + (45 * 60 * 1000); 
                     totalSteps = activeQuestions.length;
                     startSequence(); 
                 } else {
@@ -263,7 +286,7 @@
                 }
             } catch (err) {
                 if (document.fullscreenElement) document.exitFullscreen();
-                showCustomAlert("Network error while validating code. Check internet connection.", "Connection Error");
+                showCustomAlert("Network error validating code.", "Connection Error");
                 startBtnText.innerText = originalText; initiateBtn.disabled = false;
             }
         }
@@ -271,14 +294,16 @@
         document.addEventListener('contextmenu', e => e.preventDefault());
         document.addEventListener('copy', e => e.preventDefault());
         document.addEventListener('cut', e => e.preventDefault());
-        document.addEventListener('paste', e => {
-            if (e.target && e.target.id === 'access-code-input') return;
-            e.preventDefault(); showCustomAlert("Pasting is strictly disabled for the exam.", "Lockdown Warning");
+        document.addEventListener('paste', e => { 
+            if (e.target && e.target.id === 'access-code-input') return; e.preventDefault(); showCustomAlert("Pasting is disabled.", "Warning"); 
         });
         document.addEventListener('keydown', function(e) {
             if (e.keyCode === 123) { e.preventDefault(); return false; }
             if (e.ctrlKey && e.shiftKey && (e.keyCode === 73 || e.keyCode === 74)) { e.preventDefault(); return false; }
             if (e.ctrlKey && (e.keyCode === 85 || e.keyCode === 83 || e.keyCode === 67)) { e.preventDefault(); return false; }
+        });
+        document.getElementById('assessmentForm').addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && e.target.tagName === 'INPUT') { e.preventDefault(); if (currentStep < totalSteps) changeStep(1); }
         });
 
         document.addEventListener('click', function(e) {
@@ -291,27 +316,17 @@
         document.getElementById('assessmentForm').addEventListener('input', renderQuestionMap);
         document.getElementById('assessmentForm').addEventListener('change', renderQuestionMap);
 
-        // FIX 2: Prevent the 'Enter' key from prematurely submitting the exam form
-        document.getElementById('assessmentForm').addEventListener('keydown', function(e) {
-            if (e.key === 'Enter' && e.target.tagName === 'INPUT') {
-                e.preventDefault(); // Stop the form from submitting
-                if (currentStep < totalSteps) {
-                    changeStep(1); // Advance to the next step safely
-                }
-            }
-        });
-
         function checkAnswered(stepNum) {
+            if (phase === 'ESSAY') {
+                const topic = document.querySelector(`select[name="q_${essayQuestionData.id}_topic"]`).value;
+                const txt = document.getElementById(`txt_${essayQuestionData.id}`).value.trim();
+                return topic !== "" && txt !== "";
+            }
             const index = stepNum - 1;
             if(index < 0 || index >= activeQuestions.length) return false;
             const item = activeQuestions[index];
             if (item.id.startsWith('a')) return !!finalAudioBlobs[item.id];
             if (item.options) return !!document.querySelector(`input[name="q_${item.id}"]:checked`);
-            if (item.id.startsWith('e')) {
-                const topic = document.querySelector(`select[name="q_${item.id}_topic"]`).value;
-                const txt = document.getElementById(`txt_${item.id}`).value.trim();
-                return topic !== "" && txt !== "";
-            }
             return document.getElementById(`txt_${item.id}`).value.trim() !== "";
         }
 
@@ -322,77 +337,57 @@
             mapContainer.style.display = 'flex';
             let html = '';
             for(let i=1; i<=totalSteps; i++) {
-                let isAnswered = checkAnswered(i);
-                let classes = 'q-dot';
-                if(isAnswered) classes += ' answered';
-                if(i === currentStep) classes += ' active';
-                html += `<div class="${classes}" onclick="goToStep(${i})">${i}</div>`;
+                let classes = 'q-dot' + (checkAnswered(i) ? ' answered' : '') + (i === currentStep ? ' active' : '');
+                html += `<div class="${classes}" onclick="goToStep(${i})">${phase === 'ESSAY' ? 'Essay' : i}</div>`;
             }
             mapContainer.innerHTML = html;
         }
 
         function trackTime() {
-            if (currentStep > 0 && stepStartTime > 0) {
-                let elapsed = Date.now() - stepStartTime;
-                stepTimeSpent[currentStep] = (stepTimeSpent[currentStep] || 0) + elapsed;
-            }
+            if (currentStep > 0 && stepStartTime > 0) stepTimeSpent[currentStep] = (stepTimeSpent[currentStep] || 0) + (Date.now() - stepStartTime);
             stepStartTime = Date.now();
         }
 
         function goToStep(stepNum) {
-            if (currentStep === 0 && !validateRegistration()) return;
-            trackTime();
-            currentStep = stepNum;
-            updateUI();
+            if (currentStep === 0 && !validateRegistration()) return; trackTime(); currentStep = stepNum; updateUI();
         }
 
         function generateSteps() {
             const wrapper = document.getElementById('steps-wrapper');
             let html = '';
-            activeQuestions.forEach((item, index) => {
-                const stepNum = index + 1;
-                html += `<div class="step-container" id="step-${stepNum}">
-                            <div class="ui-card">
-                                <label class="input-label" style="font-size: 18px; margin-bottom: 20px;">${item.q}</label>`;
-                
-                if (item.options) {
-                    html += `<div class="radio-options-wrapper">`;
-                    item.options.forEach(opt => { html += `<label class="radio-label"><input type="radio" name="q_${item.id}" value="${opt}"> ${opt}</label>`; });
-                    html += `</div>`;
-                } else if (item.id.startsWith('e')) {
-                    html += `<div style="margin-bottom: 15px;">
-                                <select name="q_${item.id}_topic" style="width: 100%; padding: 14px; border-radius: 10px; border: 2px solid #cbd5e1; font-family: inherit; font-size: 15px; background: var(--input-bg); cursor:pointer;">
+            if (phase === 'ESSAY') {
+                let item = essayQuestionData;
+                html += `<div class="step-container" id="step-1"><div class="ui-card"><label class="input-label" style="font-size: 18px; margin-bottom: 20px;">${item.q}</label>
+                                <div style="margin-bottom: 15px;"><select name="q_${item.id}_topic" style="width: 100%; padding: 14px; border-radius: 10px; border: 2px solid #cbd5e1; font-family: inherit; font-size: 15px; background: var(--input-bg); cursor:pointer;">
                                     <option value="">-- Select your Essay Topic --</option>`;
-                    item.topics.forEach(topic => { html += `<option value="${topic}">${topic}</option>`; });
-                    html += `   </select></div>
-                             <div class="textarea-wrapper">
-                                <textarea name="q_${item.id}" id="txt_${item.id}" placeholder="Write your essay here..." style="min-height: 250px;"></textarea>
-                                <button type="button" class="focus-btn fc-trigger-btn" data-qid="${item.id}" data-qtext="${item.q.replace(/"/g, '&quot;')}">⤢</button>
-                             </div>`;
-                } else if (item.id.startsWith('a')) {
-                    html += `<div class="audio-container">
-                                <div class="audio-actions">
-                                    <button type="button" class="btn-record audio-trigger-btn" data-qid="${item.id}"> Record Answer</button>
-                                    <span class="recording-status" id="status_${item.id}"> Recording <span class="audio-timer-display" id="audio_timer_${item.id}">00:00</span></span>
-                                </div>
-                                <audio class="audio-playback" id="player_${item.id}" controls></audio>
-                                <input type="hidden" name="q_${item.id}" value="AUDIO_SUBMISSION">
-                            </div>`;
-                } else {
-                    html += `<div class="textarea-wrapper">
-                                <textarea name="q_${item.id}" id="txt_${item.id}" placeholder="Type your detailed response here..."></textarea>
-                                <button type="button" class="focus-btn fc-trigger-btn" data-qid="${item.id}" data-qtext="${item.q.replace(/"/g, '&quot;')}">⤢</button>
-                             </div>`;
-                }
-                html += `</div></div>`;
-            });
+                item.topics.forEach(topic => { html += `<option value="${topic}">${topic}</option>`; });
+                html += `       </select></div><div class="textarea-wrapper"><textarea name="q_${item.id}" id="txt_${item.id}" placeholder="Write your essay here..." style="min-height: 250px;"></textarea>
+                                <button type="button" class="focus-btn fc-trigger-btn" data-qid="${item.id}" data-qtext="${item.q.replace(/"/g, '&quot;')}">⤢</button></div></div></div>`;
+            } else {
+                activeQuestions.forEach((item, index) => {
+                    const stepNum = index + 1;
+                    html += `<div class="step-container" id="step-${stepNum}"><div class="ui-card"><label class="input-label" style="font-size: 18px; margin-bottom: 20px;">${item.q}</label>`;
+                    if (item.options) {
+                        html += `<div class="radio-options-wrapper">`;
+                        item.options.forEach(opt => { html += `<label class="radio-label"><input type="radio" name="q_${item.id}" value="${opt}"> ${opt}</label>`; });
+                        html += `</div>`;
+                    } else if (item.id.startsWith('a')) {
+                        html += `<div class="audio-container"><div class="audio-actions"><button type="button" class="btn-record audio-trigger-btn" data-qid="${item.id}"> Record Answer</button>
+                                        <span class="recording-status" id="status_${item.id}"> Recording <span class="audio-timer-display" id="audio_timer_${item.id}">00:00</span></span></div>
+                                    <audio class="audio-playback" id="player_${item.id}" controls></audio><input type="hidden" name="q_${item.id}" value="AUDIO_SUBMISSION"></div>`;
+                    } else {
+                        html += `<div class="textarea-wrapper"><textarea name="q_${item.id}" id="txt_${item.id}" placeholder="Type your detailed response here..."></textarea>
+                                    <button type="button" class="focus-btn fc-trigger-btn" data-qid="${item.id}" data-qtext="${item.q.replace(/"/g, '&quot;')}">⤢</button></div>`;
+                    }
+                    html += `</div></div>`;
+                });
+            }
             wrapper.innerHTML += html;
             document.querySelectorAll('.radio-label input[type="radio"]').forEach(radio => {
                 radio.addEventListener('change', function() {
                     const groupName = this.getAttribute('name');
                     document.querySelectorAll(`input[name="${groupName}"]`).forEach(r => r.parentElement.classList.remove('selected'));
-                    if (this.checked) this.parentElement.classList.add('selected');
-                    renderQuestionMap();
+                    if (this.checked) this.parentElement.classList.add('selected'); renderQuestionMap();
                 });
             });
             updateUI();
@@ -400,74 +395,72 @@
 
         function validateRegistration() {
             const stepDiv = document.getElementById('step-0');
+            if(!stepDiv) return true; 
             const inputs = stepDiv.querySelectorAll('input[required]');
             for (let input of inputs) { if (!input.checkValidity()) { input.reportValidity(); return false; } }
+            globalCandidateName = document.getElementById("fNameInput").value + " " + document.getElementById("lNameInput").value;
+            globalCandidateEmail = document.getElementById("emailInput").value;
             return true;
         }
 
         function changeStep(dir) {
             if (currentStep === 0 && dir === 1 && !validateRegistration()) return;
-            trackTime();
-            currentStep += dir; updateUI();
+            let minStep = (phase === 'MAIN') ? 0 : 1;
+            if (currentStep === minStep && dir === -1) return;
+            trackTime(); currentStep += dir; updateUI();
         }
 
         function updateUI() {
+            let minStep = (phase === 'MAIN') ? 0 : 1;
             document.querySelectorAll('.step-container').forEach(el => el.classList.remove('active'));
-            setTimeout(() => document.getElementById(`step-${currentStep}`).classList.add('active'), 10);
+            setTimeout(() => { const stepEl = document.getElementById(`step-${currentStep}`); if(stepEl) stepEl.classList.add('active'); }, 10);
             
-            document.getElementById('btn-prev').style.display = currentStep === 0 ? 'none' : 'block';
+            document.getElementById('btn-prev').style.display = currentStep <= minStep ? 'none' : 'block';
+            const submitBtn = document.getElementById('btn-submit');
             if (currentStep === totalSteps) {
-                document.getElementById('btn-next').style.display = 'none';
-                document.getElementById('btn-submit').style.display = 'block';
-            } else {
-                document.getElementById('btn-next').style.display = 'block';
-                document.getElementById('btn-submit').style.display = 'none';
-            }
-            const progress = (currentStep / totalSteps) * 100;
-            document.getElementById('progress-bar').style.width = `${progress}%`;
-            document.getElementById('step-counter').innerText = currentStep === 0 ? "Registration" : `Question ${currentStep} of ${totalSteps}`;
-            renderQuestionMap();
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+                document.getElementById('btn-next').style.display = 'none'; submitBtn.style.display = 'block';
+                submitBtn.innerText = (phase === 'MAIN') ? "Submit Phase 1 & Begin Essay" : "Submit Final Essay";
+            } else { document.getElementById('btn-next').style.display = 'block'; submitBtn.style.display = 'none'; }
+            
+            document.getElementById('progress-bar').style.width = `${(currentStep / totalSteps) * 100}%`;
+            document.getElementById('step-counter').innerText = currentStep === 0 ? "Registration" : (phase === 'ESSAY' ? "Phase 2: Essay" : `Phase 1: Question ${currentStep} of ${totalSteps}`);
+            renderQuestionMap(); window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
         async function toggleAudio(btn, qId) {
-            const statusText = document.getElementById(`status_${qId}`);
-            const player = document.getElementById(`player_${qId}`);
-            const timerDisplay = document.getElementById(`audio_timer_${qId}`);
-            
+            const statusText = document.getElementById(`status_${qId}`); const player = document.getElementById(`player_${qId}`); const timerDisplay = document.getElementById(`audio_timer_${qId}`);
             if (mediaRecorders[qId] && mediaRecorders[qId].state === "recording") {
-                mediaRecorders[qId].stop(); clearInterval(audioTimers[qId]);
-                btn.innerHTML = " Re-Record Answer"; btn.classList.remove("recording"); statusText.style.display = "none"; return;
+                mediaRecorders[qId].stop(); clearInterval(audioTimers[qId]); btn.innerHTML = " Re-Record Answer"; btn.classList.remove("recording"); statusText.style.display = "none"; return;
             }
-            if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) { showCustomAlert("Microphone Hardware blocked.", "Error"); return; }
+            if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) { showCustomAlert("Microphone blocked.", "Error"); return; }
             try {
                 const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-                mediaRecorders[qId] = new MediaRecorder(stream); audioChunks[qId] = []; audioSeconds[qId] = 0;
+                mediaRecorders[qId] = new MediaRecorder(stream); audioChunks[qId] = []; audioSeconds[qId] = 0; 
                 mediaRecorders[qId].ondataavailable = e => { if (e.data.size > 0) audioChunks[qId].push(e.data); };
                 mediaRecorders[qId].onstop = () => {
-                    const blob = new Blob(audioChunks[qId], { type: 'audio/webm' });
-                    rawAudioBlobs[qId] = blob; finalAudioBlobs[qId] = URL.createObjectURL(blob);
-                    player.src = finalAudioBlobs[qId]; player.style.display = "block"; stream.getTracks().forEach(track => track.stop());
-                    renderQuestionMap();
+                    const blob = new Blob(audioChunks[qId], { type: 'audio/webm' }); rawAudioBlobs[qId] = blob; finalAudioBlobs[qId] = URL.createObjectURL(blob); 
+                    player.src = finalAudioBlobs[qId]; player.style.display = "block"; stream.getTracks().forEach(track => track.stop()); renderQuestionMap(); 
                 };
-                mediaRecorders[qId].start();
-                btn.innerHTML = " Stop Recording"; btn.classList.add("recording"); statusText.style.display = "inline-flex"; player.style.display = "none";
-                timerDisplay.innerText = "00:00";
-                audioTimers[qId] = setInterval(() => {
-                    audioSeconds[qId]++; let m = Math.floor(audioSeconds[qId] / 60); let s = audioSeconds[qId] % 60;
-                    timerDisplay.innerText = (m < 10 ? "0" + m : m) + ":" + (s < 10 ? "0" + s : s);
-                }, 1000);
+                mediaRecorders[qId].start(); btn.innerHTML = " Stop Recording"; btn.classList.add("recording"); statusText.style.display = "inline-flex"; player.style.display = "none"; timerDisplay.innerText = "00:00";
+                audioTimers[qId] = setInterval(() => { audioSeconds[qId]++; let m = Math.floor(audioSeconds[qId] / 60); let s = audioSeconds[qId] % 60; timerDisplay.innerText = (m < 10 ? "0" + m : m) + ":" + (s < 10 ? "0" + s : s); }, 1000);
             } catch (err) { showCustomAlert("Microphone Error: " + err.message, "Permission Error"); }
         }
 
         function startSequence() {
-            document.getElementById('start-screen').style.opacity = '0';
+            mainExamStartTime = new Date(); document.getElementById('start-screen').style.opacity = '0';
             setTimeout(() => {
-                document.getElementById('start-screen').style.display = 'none';
-                document.getElementById('exam-screen').style.display = 'flex';
-                generateSteps(); startTimer(); initAudio(); isExamActive = true;
-                stepStartTime = Date.now();
+                document.getElementById('start-screen').style.display = 'none'; document.getElementById('exam-screen').style.display = 'flex';
+                generateSteps(); startTimer(); initAudio(); isExamActive = true; stepStartTime = Date.now();
             }, 500);
+        }
+
+        function initiateEssayPhase() {
+            phase = 'ESSAY'; essayStartTime = new Date(); currentStep = 1; totalSteps = 1; stepTimeSpent = {};
+            document.getElementById('steps-wrapper').innerHTML = '';
+            examEndTime = Date.now() + (15 * 60 * 1000); clearInterval(mainTimerInterval);
+            generateSteps(); startTimer(); stepStartTime = Date.now();
+            const submitBtn = document.getElementById('btn-submit'); submitBtn.innerText = "Submit Final Essay"; submitBtn.disabled = false; submitBtn.style.background = "linear-gradient(135deg, var(--success) 0%, #047857 100%)";
+            isExamActive = true;
         }
 
         let mainTimerInterval;
@@ -475,8 +468,7 @@
             mainTimerInterval = setInterval(function () {
                 let timeLeft = Math.floor((examEndTime - Date.now()) / 1000);
                 if (timeLeft <= 0) { clearInterval(mainTimerInterval); forcedSubmitReason = "TIME EXPIRED"; triggerSubmit(); return; }
-                let m = Math.floor(timeLeft / 60); let s = timeLeft % 60;
-                let display = document.getElementById('display-timer');
+                let m = Math.floor(timeLeft / 60); let s = timeLeft % 60; let display = document.getElementById('display-timer');
                 display.textContent = (m < 10 ? "0" + m : m) + ":" + (s < 10 ? "0" + s : s);
                 if (timeLeft < 300) { display.style.color = "var(--danger)"; display.style.borderColor = "var(--danger)"; display.style.boxShadow = "0 0 15px rgba(239, 68, 68, 0.4)"; }
             }, 1000);
@@ -485,8 +477,7 @@
         let audioCtx; function initAudio() { audioCtx = new (window.AudioContext || window.webkitAudioContext)(); }
         function playAlarmBeep() {
             try {
-                if (!audioCtx) return;
-                if (audioCtx.state === 'suspended') audioCtx.resume();
+                if (!audioCtx) return; if (audioCtx.state === 'suspended') audioCtx.resume();
                 const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain();
                 osc.type = 'square'; osc.frequency.setValueAtTime(440, audioCtx.currentTime); osc.frequency.setValueAtTime(880, audioCtx.currentTime + 0.2);
                 gain.gain.setValueAtTime(0.1, audioCtx.currentTime); osc.connect(gain); gain.connect(audioCtx.destination);
@@ -495,46 +486,22 @@
         }
 
         function resumeFullscreen() {
-            inViolationState = false;
-            clearInterval(violationTimerInterval);
-            document.getElementById('security-warning').style.display = 'none';
-            if (fullscreenSupported && document.documentElement.requestFullscreen) {
-                document.documentElement.requestFullscreen().catch(() => {});
-            }
+            inViolationState = false; clearInterval(violationTimerInterval); document.getElementById('security-warning').style.display = 'none';
+            if (fullscreenSupported && document.documentElement.requestFullscreen) document.documentElement.requestFullscreen().catch(() => {});
         }
 
         function checkViolations() {
             if (!isExamActive || examSubmitted) return;
-            const isHidden = document.hidden || !document.hasFocus();
-            const notFullscreen = fullscreenSupported && !document.fullscreenElement;
-
-            if (isHidden || notFullscreen) {
-                let now = Date.now();
-                if (now - lastExitTime < 2000) return; 
-                
+            if ((document.hidden || !document.hasFocus()) || (fullscreenSupported && !document.fullscreenElement)) {
+                let now = Date.now(); if (now - lastExitTime < 2000) return; 
                 if (!inViolationState) {
-                    inViolationState = true;
-                    exitCount++;
-                    exitLog.push("Exited secure window at " + new Date().toLocaleTimeString());
-                    lastExitTime = now;
-                    
-                    document.getElementById('strike-warning-text').innerHTML = `You have exited the secure window.<br><br>Return before the timer expires or your assessment will be automatically submitted!`;
-                    document.getElementById('security-warning').style.display = 'flex';
-                    
-                    violationTimeLeft = 15;
-                    document.getElementById('violation-countdown').innerText = violationTimeLeft;
-                    document.getElementById('violation-countdown').style.display = 'block';
+                    inViolationState = true; exitCount++; exitLog.push(`[${phase}] Exited window at ${new Date().toLocaleTimeString()}`); lastExitTime = now;
+                    document.getElementById('security-warning').style.display = 'flex'; violationTimeLeft = 15;
+                    document.getElementById('violation-countdown').innerText = violationTimeLeft; document.getElementById('violation-countdown').style.display = 'block';
                     playAlarmBeep();
-                    
                     violationTimerInterval = setInterval(() => {
-                        violationTimeLeft--;
-                        document.getElementById('violation-countdown').innerText = violationTimeLeft;
-                        playAlarmBeep();
-                        if (violationTimeLeft <= 0) {
-                            clearInterval(violationTimerInterval);
-                            forcedSubmitReason = "SECURITY VIOLATION: Failed to return within 15 seconds.";
-                            triggerSubmit();
-                        }
+                        violationTimeLeft--; document.getElementById('violation-countdown').innerText = violationTimeLeft; playAlarmBeep();
+                        if (violationTimeLeft <= 0) { clearInterval(violationTimerInterval); forcedSubmitReason = `SECURITY VIOLATION: Failed to return in ${phase}.`; triggerSubmit(); }
                     }, 1000);
                 }
             }
@@ -549,12 +516,9 @@
             const box = document.createElement('div');
             box.style.cssText = 'background: #fff; padding: 30px; border-radius: 16px; width: 90%; max-width: 700px; display: flex; flex-direction: column; gap: 15px; transform: scale(0.95) translateY(20px); transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1); box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);';
             box.innerHTML = `
-                <div style="display:flex; justify-content:space-between; align-items:center;">
-                    <h3 style="margin:0; font-size:18px; color:var(--text-heading);">${qText}</h3>
-                    <button id="fc-close" style="font-size:28px; border:none; background:none; cursor:pointer; color:var(--text-muted); transition: color 0.2s;">&times;</button>
-                </div>
+                <div style="display:flex; justify-content:space-between; align-items:center;"><h3 style="margin:0; font-size:18px; color:var(--text-heading);">${qText}</h3><button id="fc-close" style="font-size:28px; border:none; background:none; cursor:pointer; color:var(--text-muted); transition: color 0.2s;">&times;</button></div>
                 <textarea id="fc-txt" style="height:400px; font-size:16px; padding:20px; border: 2px solid var(--primary-accent); border-radius: 12px; font-family: inherit; resize: none; outline: none; box-shadow: var(--shadow-inner);"></textarea>
-                <div style="text-align: right; font-size: 13px; color: var(--text-muted); font-weight: 500;">Click outside the box or press &times; to save</div>`;
+                <div style="text-align: right; font-size: 13px; color: var(--text-muted); font-weight: 500;">Click outside box to save</div>`;
             bg.appendChild(box); document.body.appendChild(bg);
             const fcTxt = document.getElementById('fc-txt'); const closeBtn = document.getElementById('fc-close');
             fcTxt.value = textarea.value; fcTxt.addEventListener('input', () => { textarea.value = fcTxt.value; renderQuestionMap(); });
@@ -567,68 +531,82 @@
         function blobToBase64(blob) { return new Promise((resolve, _) => { const reader = new FileReader(); reader.onloadend = () => resolve(reader.result.split(',')[1]); reader.readAsDataURL(blob); }); }
         function triggerSubmit() { document.getElementById('assessmentForm').dispatchEvent(new Event('submit', { cancelable: true, bubbles: true })); }
 
+        function showFinalScreen() {
+            examSubmitted = true; isExamActive = false; clearInterval(mainTimerInterval); clearInterval(violationTimerInterval);
+            document.getElementById('security-warning').style.display = 'none'; if (document.fullscreenElement) document.exitFullscreen(); 
+            document.getElementById('exam-screen').style.display = 'none'; document.getElementById('results-screen').style.display = 'flex'; window.scrollTo(0,0);
+            if (forcedSubmitReason) { document.getElementById('violation-notice').innerHTML = `<div class="violation-flag"> EXAM AUTO-SUBMITTED: ${forcedSubmitReason}</div>`; }
+            document.getElementById('results-output').innerHTML = "<div class='res-a' style='padding:20px; font-size:16px; text-align:center;'><b>Success:</b> Your assessment, AI grades, and security logs have been securely transmitted. You may safely close this window.</div>";
+        }
+
         document.getElementById('assessmentForm').addEventListener('submit', async function(e) {
-            e.preventDefault();
-            if (currentStep === 0 && !validateRegistration()) return;
-            trackTime(); 
+            e.preventDefault(); if (currentStep === 0 && !validateRegistration()) return; trackTime(); 
 
             if (!forcedSubmitReason) {
-                let missingQs = [];
-                for(let i=1; i<=totalSteps; i++) { if(!checkAnswered(i)) missingQs.push(i); }
-                if (missingQs.length > 0) {
-                    showCustomAlert("Please answer all questions before submitting. Missing: Question " + missingQs.join(', '), "Incomplete Assessment");
-                    return;
-                }
+                let missingQs = []; for(let i=1; i<=totalSteps; i++) { if(!checkAnswered(i)) missingQs.push(i); }
+                if (missingQs.length > 0) { showCustomAlert("Please answer all questions before submitting. Missing: Question " + missingQs.join(', '), "Incomplete Assessment"); return; }
             }
 
-            examSubmitted = true; isExamActive = false; clearInterval(mainTimerInterval); clearInterval(violationTimerInterval);
+            isExamActive = false; clearInterval(mainTimerInterval); clearInterval(violationTimerInterval);
             document.getElementById('security-warning').style.display = 'none';
-            if (document.fullscreenElement) document.exitFullscreen();
             const submitBtn = document.getElementById('btn-submit');
-            submitBtn.innerText = " Grading & Secure Uploading..."; submitBtn.disabled = true; submitBtn.style.background = "#94a3b8";
+            submitBtn.innerText = " Saving to Server..."; submitBtn.disabled = true; submitBtn.style.background = "#94a3b8";
 
             Object.keys(audioTimers).forEach(id => clearInterval(audioTimers[id])); Object.values(mediaRecorders).forEach(rec => { if(rec.state === "recording") rec.stop(); });
-            const formData = new FormData(this);
-            let qnaData = [];
             
-            activeQuestions.forEach((item, index) => {
-                let stepNum = index + 1;
-                let answerText = "";
-                if (item.id.startsWith('a')) { answerText = finalAudioBlobs[item.id] ? "[Audio recorded and saved to Google Drive]" : "[No audio recorded]"; }
-                else if (item.id.startsWith('e')) {
-                    let topic = formData.get(`q_${item.id}_topic`); let text = formData.get(`q_${item.id}`);
-                    answerText = `[Topic Selected: ${topic}]\n\n${text}`;
-                } else { answerText = formData.get(`q_${item.id}`) || "No answer provided."; }
+            const formData = new FormData(this);
+            if (phase === 'MAIN') {
+                mainExamEndTime = new Date(); let qnaData = [];
+                activeQuestions.forEach((item, index) => {
+                    let stepNum = index + 1; let answerText = "";
+                    if (item.id.startsWith('a')) { answerText = finalAudioBlobs[item.id] ? "[Audio recorded and saved to Google Drive]" : "[No audio recorded]"; } 
+                    else { answerText = formData.get(`q_${item.id}`) || "No answer provided."; }
+                    qnaData.push({ question: `${stepNum}. ${item.q}`, timeSpent: formatDuration(stepTimeSpent[stepNum] || 0), answer: answerText });
+                });
+
+                let audioTitlesMap = {}; globalAudioBank.forEach(item => { audioTitlesMap[item.id] = item.title; });
+                let audioBase64Data = {}; for (let qId of Object.keys(rawAudioBlobs || {})) { if (rawAudioBlobs[qId]) { audioBase64Data[qId] = await blobToBase64(rawAudioBlobs[qId]); } }
+
+                const payload = {
+                    action: 'submitMainExam', candidateName: globalCandidateName, candidateEmail: globalCandidateEmail, 
+                    qnaData: qnaData, audioFiles: audioBase64Data, audioTitles: audioTitlesMap, 
+                    forcedSubmitReason: forcedSubmitReason, exitCount: exitCount, exitLog: exitLog,
+                    startTime: mainExamStartTime.toLocaleTimeString(), endTime: mainExamEndTime.toLocaleTimeString(), totalTimeStr: formatDuration(mainExamEndTime - mainExamStartTime)
+                };
+
+                fetch(GAS_URL, { method: "POST", body: JSON.stringify(payload), headers: { "Content-Type": "text/plain;charset=utf-8" } })
+                .then(response => response.json()).then(data => {
+                    if(data.success) {
+                        folderId = data.folderId; rowNumber = data.rowNum;
+                        if (forcedSubmitReason) { showFinalScreen(); return; } 
+                        initiateEssayPhase(); 
+                    } else throw new Error(data.error);
+                }).catch(async (error) => {
+                    await showCustomAlert("Data Sync Error. Please retry.", "Transmission Failed");
+                    submitBtn.innerText = "Retry Phase 1 Submit"; submitBtn.disabled = false; submitBtn.style.background = "var(--success)";
+                });
+            } 
+            else if (phase === 'ESSAY') {
+                essayEndTime = new Date();
+                let topic = formData.get(`q_${essayQuestionData.id}_topic`) || "N/A"; 
+                let text = formData.get(`q_${essayQuestionData.id}`) || "No answer.";
+                let answerText = `[Topic Selected: ${topic}]\n\n${text}`;
                 
-                // Format Analytics Time String
-                let ms = stepTimeSpent[stepNum] || 0;
-                let mins = Math.floor(ms / 60000); let secs = Math.floor((ms % 60000) / 1000);
-                let timeStr = `${mins}m ${secs}s`;
+                const essayPayload = {
+                    action: 'submitEssayExam', candidateName: globalCandidateName, candidateEmail: globalCandidateEmail, folderId: folderId, rowNum: rowNumber,
+                    essayData: { question: essayQuestionData.q, answer: answerText, timeSpent: formatDuration(stepTimeSpent[1] || 0) },
+                    forcedSubmitReason: forcedSubmitReason, exitCount: exitCount, exitLog: exitLog,
+                    startTime: essayStartTime.toLocaleTimeString(), endTime: essayEndTime.toLocaleTimeString(), totalTimeStr: formatDuration(essayEndTime - essayStartTime)
+                };
 
-                qnaData.push({ question: `${stepNum}. ${item.q}`, timeSpent: timeStr, answer: answerText });
-            });
-
-            let audioTitlesMap = {}; globalAudioBank.forEach(item => { audioTitlesMap[item.id] = item.title; });
-            let audioBase64Data = {}; for (let qId of Object.keys(rawAudioBlobs || {})) { if (rawAudioBlobs[qId]) { audioBase64Data[qId] = await blobToBase64(rawAudioBlobs[qId]); } }
-
-            const payload = {
-                action: 'submitExam', candidateName: formData.get("FirstName") + " " + formData.get("LastName"),
-                candidateEmail: formData.get("Email"), qnaData: qnaData, audioFiles: audioBase64Data, audioTitles: audioTitlesMap,
-                forcedSubmitReason: forcedSubmitReason, exitCount: exitCount, exitLog: exitLog
-            };
-
-            fetch(GAS_URL, { method: "POST", body: JSON.stringify(payload), headers: { "Content-Type": "text/plain;charset=utf-8" } })
-            .then(response => response.json())
-            .then(data => {
-                if(data.success) {
-                    document.getElementById('exam-screen').style.display = 'none'; document.getElementById('results-screen').style.display = 'flex'; window.scrollTo(0,0);
-                    if (forcedSubmitReason) { document.getElementById('violation-notice').innerHTML = `<div class="violation-flag"> EXAM AUTO-SUBMITTED: ${forcedSubmitReason}</div>`; }
-                    document.getElementById('results-output').innerHTML = "<div class='res-a' style='padding:20px; font-size:16px; text-align:center;'><b>Success:</b> Your assessment, AI grades, and security logs have been securely transmitted. You may safely close this window.</div>";
-                } else { throw new Error(data.error); }
-            }).catch(async (error) => {
-                await showCustomAlert("Data Sync Error: Failed to commit responses securely to server pipeline. Please confirm active networking status and retry.", "Transmission Failed");
-                submitBtn.innerText = "Retry Submission"; submitBtn.disabled = false; submitBtn.style.background = "var(--success)";
-            });
+                fetch(GAS_URL, { method: "POST", body: JSON.stringify(essayPayload), headers: { "Content-Type": "text/plain;charset=utf-8" } })
+                .then(response => response.json()).then(data => {
+                    if(data.success) { showFinalScreen(); } else throw new Error(data.error);
+                }).catch(async (error) => {
+                    await showCustomAlert("Data Sync Error. Please retry.", "Transmission Failed");
+                    submitBtn.innerText = "Retry Final Submit"; submitBtn.disabled = false; submitBtn.style.background = "var(--success)";
+                });
+            }
         });
     </script>
 </body>
