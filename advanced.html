@@ -34,7 +34,7 @@
         .modal-card { background: var(--glass-bg); padding: 30px; border-radius: 16px; width: 90%; max-width: 480px; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.2); text-align: center; transform: scale(0.95) translateY(15px); transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
         #custom-modal-overlay.active .modal-card { transform: scale(1) translateY(0); }
         .modal-title { font-size: 20px; font-weight: 700; color: var(--text-heading); margin: 0 0 12px 0; }
-        .modal-body-text { font-size: 15px; color: var(--text-body); margin: 0 0 24px 0; line-height: 1.5; }
+        .modal-body-text { font-size: 15px; color: var(--text-body); margin: 0 0 24px 0; line-height: 1.5; white-space: pre-wrap; }
         .modal-footer-actions { display: flex; gap: 12px; justify-content: center; }
         .btn-modal-primary { background: var(--primary-accent); color: white; border: none; padding: 12px 24px; font-family: inherit; font-size: 14.5px; font-weight: 600; border-radius: 8px; cursor: pointer; transition: background 0.2s; }
         .btn-modal-primary:hover { background: var(--primary-hover); }
@@ -49,7 +49,13 @@
         .progress-bar { height: 100%; background: var(--primary-accent); width: 0%; transition: width 0.5s cubic-bezier(0.16, 1, 0.3, 1); }
         
         #question-map { display: none; gap: 8px; flex-wrap: wrap; margin-bottom: 25px; justify-content: center; }
-        .q-dot { min-width: 32px; padding: 0 10px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 600; color: var(--text-muted); background: rgba(0,0,0,0.05); cursor: pointer; transition: all 0.2s; border: 2px solid transparent; }
+        
+        /* 🚨 CSS FIX: Reverted to strict 32px to keep numbers on one line */
+        .q-dot { width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 600; color: var(--text-muted); background: rgba(0,0,0,0.05); cursor: pointer; transition: all 0.2s; border: 2px solid transparent; }
+        
+        /* 🚨 CSS FIX: Added special class just for the essay dot so it fits the word "Essay" */
+        .q-dot.essay-dot { width: auto; padding: 0 16px; }
+
         .q-dot:hover { background: rgba(0,0,0,0.1); }
         .q-dot.answered { background: rgba(16, 185, 129, 0.1); color: var(--success); border-color: rgba(16, 185, 129, 0.3); }
         .q-dot.active { border-color: var(--primary-accent); color: var(--primary-accent); background: #fff; box-shadow: 0 4px 10px rgba(37,99,235,0.15);}
@@ -164,6 +170,7 @@
             
             <!-- Live Clock moved to bottom right corner -->
             <div id="live-clock" style="position: fixed; bottom: 20px; right: 20px; font-size: 14px; font-weight: 600; color: var(--text-muted); font-variant-numeric: tabular-nums; background: rgba(255, 255, 255, 0.9); padding: 8px 16px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); border: 1px solid var(--glass-border); z-index: 1000;"></div>
+            
             <div class="progress-container"><div class="progress-bar" id="progress-bar"></div></div>
             <div id="question-map"></div>
             
@@ -232,13 +239,36 @@
             return `${mins}m ${secs}s`;
         }
 
-        function showCustomAlert(message, title = "Notification") {
+        function showCustomAlert(message, title = "Notification", showForceSubmit = false) {
             return new Promise((resolve) => {
-                document.getElementById('custom-modal-title').innerText = title; document.getElementById('custom-modal-text').innerText = message;
-                const actionsContainer = document.getElementById('custom-modal-actions'); actionsContainer.innerHTML = ''; 
-                const okBtn = document.createElement('button'); okBtn.className = 'btn-modal-primary'; okBtn.innerText = 'OK';
-                okBtn.addEventListener('click', () => { document.getElementById('custom-modal-overlay').classList.remove('active'); resolve(true); });
-                actionsContainer.appendChild(okBtn); document.getElementById('custom-modal-overlay').classList.add('active');
+                document.getElementById('custom-modal-title').innerText = title; 
+                document.getElementById('custom-modal-text').innerText = message;
+                const actionsContainer = document.getElementById('custom-modal-actions'); 
+                actionsContainer.innerHTML = ''; 
+                
+                const okBtn = document.createElement('button'); 
+                okBtn.className = 'btn-modal-primary'; 
+                okBtn.innerText = showForceSubmit ? 'Go Back & Answer' : 'OK';
+                okBtn.addEventListener('click', () => { 
+                    document.getElementById('custom-modal-overlay').classList.remove('active'); 
+                    resolve(false); 
+                });
+                actionsContainer.appendChild(okBtn); 
+
+                // Inject Force Submit Option
+                if (showForceSubmit) {
+                    const forceBtn = document.createElement('button');
+                    forceBtn.className = 'btn-modal-primary';
+                    forceBtn.style.background = 'var(--danger)';
+                    forceBtn.innerText = 'Force Submit Anyway';
+                    forceBtn.addEventListener('click', () => {
+                        document.getElementById('custom-modal-overlay').classList.remove('active');
+                        resolve(true); 
+                    });
+                    actionsContainer.appendChild(forceBtn);
+                }
+                
+                document.getElementById('custom-modal-overlay').classList.add('active');
             });
         }
 
@@ -337,8 +367,9 @@
             mapContainer.style.display = 'flex';
             let html = '';
             for(let i=1; i<=totalSteps; i++) {
-                let classes = 'q-dot' + (checkAnswered(i) ? ' answered' : '') + (i === currentStep ? ' active' : '');
-                html += `<div class="${classes}" onclick="goToStep(${i})">${phase === 'ESSAY' ? 'Essay' : i}</div>`;
+                let isEssay = (phase === 'ESSAY');
+                let classes = 'q-dot' + (checkAnswered(i) ? ' answered' : '') + (i === currentStep ? ' active' : '') + (isEssay ? ' essay-dot' : '');
+                html += `<div class="${classes}" onclick="goToStep(${i})">${isEssay ? 'Essay' : i}</div>`;
             }
             mapContainer.innerHTML = html;
         }
@@ -456,6 +487,7 @@
 
         function initiateEssayPhase() {
             phase = 'ESSAY'; essayStartTime = new Date(); currentStep = 1; totalSteps = 1; stepTimeSpent = {};
+            forcedSubmitReason = ""; // Reset forced submit reason for the new phase
             document.getElementById('steps-wrapper').innerHTML = '';
             examEndTime = Date.now() + (15 * 60 * 1000); clearInterval(mainTimerInterval);
             generateSteps(); startTimer(); stepStartTime = Date.now();
@@ -542,9 +574,18 @@
         document.getElementById('assessmentForm').addEventListener('submit', async function(e) {
             e.preventDefault(); if (currentStep === 0 && !validateRegistration()) return; trackTime(); 
 
+            // Force Submit Logic Check
             if (!forcedSubmitReason) {
-                let missingQs = []; for(let i=1; i<=totalSteps; i++) { if(!checkAnswered(i)) missingQs.push(i); }
-                if (missingQs.length > 0) { showCustomAlert("Please answer all questions before submitting. Missing: Question " + missingQs.join(', '), "Incomplete Assessment"); return; }
+                let missingQs = []; 
+                for(let i=1; i<=totalSteps; i++) { 
+                    if(!checkAnswered(i)) missingQs.push(phase === 'ESSAY' ? 'Essay' : i); 
+                }
+                
+                if (missingQs.length > 0) { 
+                    let force = await showCustomAlert("You have unanswered questions. Missing: " + missingQs.join(', ') + "\n\nAre you sure you want to submit anyway?", "Incomplete Assessment", true);
+                    if (!force) return; 
+                    forcedSubmitReason = `Candidate opted to Force Submit with missing answers: ${missingQs.join(', ')}`;
+                }
             }
 
             isExamActive = false; clearInterval(mainTimerInterval); clearInterval(violationTimerInterval);
