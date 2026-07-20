@@ -619,8 +619,16 @@
                 .then(response => response.json()).then(data => {
                     if(data.success) {
                         folderId = data.folderId; rowNumber = data.rowNum;
-                        if (forcedSubmitReason) { showFinalScreen(); return; } 
+                        
+                        // 🚨 FIX: Only end the exam entirely if it was a security violation
+                        if (forcedSubmitReason && forcedSubmitReason.includes("SECURITY VIOLATION")) { 
+                            showFinalScreen(); 
+                            return; 
+                        } 
+                        
+                        // Otherwise (skipped questions or time expired), smoothly proceed to Phase 2
                         initiateEssayPhase(); 
+                        
                     } else throw new Error(data.error);
                 }).catch(async (error) => {
                     await showCustomAlert("Data Sync Error. Please retry.", "Transmission Failed");
