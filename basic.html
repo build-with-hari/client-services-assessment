@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Client Services Assessment | Entry-Level Profile</title>
+    <title>Client Services Assessment</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -15,109 +15,117 @@
             --shadow-soft: 0 10px 40px -10px rgba(0, 0, 0, 0.08); --shadow-inner: inset 0 2px 4px 0 rgba(0, 0, 0, 0.03);
         }
 
+        /* DARK MODE VARS */
+        body.dark-mode {
+            --bg-gradient: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            --text-heading: #f8fafc; --text-body: #cbd5e1; --text-muted: #94a3b8;
+            --glass-bg: rgba(30, 41, 59, 0.75); --glass-border: rgba(255, 255, 255, 0.1);
+            --input-bg: rgba(15, 23, 42, 0.6);
+        }
+
         * { box-sizing: border-box; }
-        body { margin: 0; padding: 0; font-family: 'Inter', sans-serif; background: var(--bg-gradient); color: var(--text-body); line-height: 1.6; -webkit-font-smoothing: antialiased; min-height: 100vh; overflow-x: hidden; background-attachment: fixed; user-select: none; -webkit-user-select: none; }
+        body { margin: 0; padding: 0; font-family: 'Inter', sans-serif; background: var(--bg-gradient); color: var(--text-body); line-height: 1.6; -webkit-font-smoothing: antialiased; min-height: 100vh; overflow-x: hidden; background-attachment: fixed; transition: background 0.3s; user-select: none; -webkit-user-select: none; }
         input, textarea, select { user-select: auto; -webkit-user-select: auto; }
         ::-webkit-scrollbar { width: 8px; } ::-webkit-scrollbar-track { background: transparent; } ::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.15); border-radius: 10px; }
 
-        #security-warning { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--danger-bg); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); z-index: 9999999; flex-direction: column; align-items: center; justify-content: center; color: white; text-align: center; padding: 20px; }
+        #theme-toggle { position: fixed; top: 20px; right: 20px; background: var(--glass-bg); border: 1px solid var(--glass-border); font-size: 20px; padding: 10px; border-radius: 50%; cursor: pointer; box-shadow: var(--shadow-soft); z-index: 9999; backdrop-filter: blur(10px); transition: transform 0.2s; }
+        #theme-toggle:hover { transform: scale(1.1); }
+
+        #security-warning { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--danger-bg); backdrop-filter: blur(16px); z-index: 9999999; flex-direction: column; align-items: center; justify-content: center; color: white; text-align: center; padding: 20px; }
         #security-warning h1 { font-size: 44px; margin-bottom: 10px; text-shadow: 0 4px 10px rgba(0,0,0,0.2); }
         #violation-countdown { display: none; font-size: 100px; font-weight: 700; margin: 10px 0 20px 0; tabular-nums; text-shadow: 0 4px 20px rgba(0,0,0,0.3); animation: pulse 1s infinite; }
-        .btn-resume { background: white; color: var(--danger); border: none; padding: 15px 30px; font-size: 18px; font-weight: bold; border-radius: 50px; cursor: pointer; box-shadow: 0 10px 25px rgba(0,0,0,0.2); transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1); margin-top:20px;}
-        .btn-resume:hover { transform: scale(1.05); }
+        .btn-resume { background: white; color: var(--danger); border: none; padding: 15px 30px; font-size: 18px; font-weight: bold; border-radius: 50px; cursor: pointer; box-shadow: 0 10px 25px rgba(0,0,0,0.2); margin-top:20px; }
 
         @keyframes pulse { 0%, 100% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.05); opacity: 0.8; } }
         @keyframes slideUpFade { to { opacity: 1; transform: translateY(0); } }
 
-        #custom-modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.3); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); z-index: 20000000; display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
+        #custom-modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.5); backdrop-filter: blur(8px); z-index: 20000000; display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity 0.3s; }
         #custom-modal-overlay.active { opacity: 1; pointer-events: auto; }
-        .modal-card { background: var(--glass-bg); padding: 30px; border-radius: 16px; width: 90%; max-width: 480px; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.2); text-align: center; transform: scale(0.95) translateY(15px); transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
-        #custom-modal-overlay.active .modal-card { transform: scale(1) translateY(0); }
+        .modal-card { background: var(--glass-bg); padding: 30px; border-radius: 16px; width: 90%; max-width: 480px; text-align: center; transform: scale(0.95); transition: all 0.4s; }
+        #custom-modal-overlay.active .modal-card { transform: scale(1); }
         .modal-title { font-size: 20px; font-weight: 700; color: var(--text-heading); margin: 0 0 12px 0; }
-        .modal-body-text { font-size: 15px; color: var(--text-body); margin: 0 0 24px 0; line-height: 1.5; white-space: pre-wrap; }
+        .modal-body-text { font-size: 15px; color: var(--text-body); margin: 0 0 24px 0; white-space: pre-wrap; }
         .modal-footer-actions { display: flex; gap: 12px; justify-content: center; }
-        .btn-modal-primary { background: var(--primary-accent); color: white; border: none; padding: 12px 24px; font-family: inherit; font-size: 14.5px; font-weight: 600; border-radius: 8px; cursor: pointer; transition: background 0.2s; }
-        .btn-modal-primary:hover { background: var(--primary-hover); }
+        .btn-modal-primary { background: var(--primary-accent); color: white; border: none; padding: 12px 24px; border-radius: 8px; cursor: pointer; font-weight: 600; }
 
         .wrapper { display: flex; flex-direction: column; align-items: center; min-height: 100vh; padding: 40px 20px; }
-        #start-screen { display: flex; flex-direction: column; justify-content: center; align-items: center; min-height: 100vh; width: 100%; margin: 0; padding: 20px; transition: opacity 0.5s ease; }
+        #start-screen { display: flex; flex-direction: column; justify-content: center; align-items: center; min-height: 100vh; width: 100%; padding: 20px; transition: opacity 0.5s ease; }
         .main-container { width: 100%; max-width: 800px; position: relative; }
-        h1 { font-size: 32px; font-weight: 700; margin: 0 0 8px 0; color: var(--text-heading); text-align: center; letter-spacing: -0.5px; }
+        h1 { font-size: 32px; font-weight: 700; margin: 0 0 8px 0; color: var(--text-heading); text-align: center; }
         p.subtitle { color: var(--text-muted); font-size: 16px; margin: 0 0 40px 0; text-align: center; }
-        .section-header { font-size: 20px; color: var(--text-heading); display: flex; align-items: center; gap: 12px; margin: 0 0 24px 0; font-weight: 600; }
-        .progress-container { width: 100%; background: rgba(0,0,0,0.05); border-radius: 50px; height: 8px; margin-bottom: 20px; overflow: hidden; }
-        .progress-bar { height: 100%; background: var(--primary-accent); width: 0%; transition: width 0.5s cubic-bezier(0.16, 1, 0.3, 1); }
+        .section-header { font-size: 20px; color: var(--text-heading); margin: 0 0 24px 0; font-weight: 600; }
+        .progress-container { width: 100%; background: rgba(0,0,0,0.05); border-radius: 50px; height: 8px; margin-bottom: 20px; }
+        body.dark-mode .progress-container { background: rgba(255,255,255,0.1); }
+        .progress-bar { height: 100%; background: var(--primary-accent); width: 0%; transition: width 0.5s; }
         
         #question-map { display: none; gap: 8px; flex-wrap: wrap; margin-bottom: 25px; justify-content: center; }
-        
-        /* 🚨 CSS FIX: Reverted to strict 32px to keep numbers on one line */
         .q-dot { width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 600; color: var(--text-muted); background: rgba(0,0,0,0.05); cursor: pointer; transition: all 0.2s; border: 2px solid transparent; }
-        
-        /* 🚨 CSS FIX: Added special class just for the essay dot so it fits the word "Essay" */
+        body.dark-mode .q-dot { background: rgba(255,255,255,0.05); }
         .q-dot.essay-dot { width: auto; padding: 0 16px; }
-
-        .q-dot:hover { background: rgba(0,0,0,0.1); }
         .q-dot.answered { background: rgba(16, 185, 129, 0.1); color: var(--success); border-color: rgba(16, 185, 129, 0.3); }
-        .q-dot.active { border-color: var(--primary-accent); color: var(--primary-accent); background: #fff; box-shadow: 0 4px 10px rgba(37,99,235,0.15);}
+        .q-dot.active { border-color: var(--primary-accent); color: var(--primary-accent); background: #fff; }
+        body.dark-mode .q-dot.active { background: #1e293b; }
 
-        .step-container { display: none; opacity: 0; transform: translateY(20px); transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1); }
+        .step-container { display: none; opacity: 0; transform: translateY(20px); transition: all 0.5s; }
         .step-container.active { display: block; opacity: 1; transform: translateY(0); }
 
-        .btn-primary { background: linear-gradient(135deg, var(--primary-accent) 0%, #1e40af 100%); color: #fff; border: none; padding: 18px 24px; font-family: inherit; font-size: 16px; font-weight: 600; letter-spacing: 0.5px; border-radius: 12px; cursor: pointer; width: 100%; box-shadow: 0 10px 20px -5px rgba(37, 99, 235, 0.4); transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1); display: flex; justify-content: center; align-items: center; gap: 10px;}
-        .btn-primary:hover:not(:disabled) { transform: translateY(-3px); box-shadow: 0 15px 25px -5px rgba(37, 99, 235, 0.5); }
+        .btn-primary { background: linear-gradient(135deg, var(--primary-accent) 0%, #1e40af 100%); color: #fff; border: none; padding: 18px 24px; font-size: 16px; font-weight: 600; border-radius: 12px; cursor: pointer; width: 100%; display: flex; justify-content: center; align-items: center; gap: 10px; }
         .btn-primary:disabled { opacity: 0.7; cursor: not-allowed; }
-        .btn-submit { background: linear-gradient(135deg, var(--success) 0%, #047857 100%); color: #fff; border: none; padding: 18px 24px; font-family: inherit; font-size: 16px; font-weight: 600; border-radius: 12px; cursor: pointer; width: 100%; box-shadow: 0 10px 20px -5px rgba(16, 185, 129, 0.4); transition: all 0.3s; }
-        .btn-submit:hover:not(:disabled) { transform: translateY(-3px); box-shadow: 0 15px 25px -5px rgba(16, 185, 129, 0.5); }
+        .btn-submit { background: linear-gradient(135deg, var(--success) 0%, #047857 100%); color: #fff; border: none; padding: 18px 24px; font-size: 16px; font-weight: 600; border-radius: 12px; cursor: pointer; width: 100%; }
+        
         .nav-actions { display: flex; justify-content: space-between; margin-top: 30px; gap: 15px; }
-        .btn-nav { padding: 15px 25px; border-radius: 10px; font-weight: 600; font-size: 15px; cursor: pointer; transition: all 0.2s; border: none; font-family: inherit; }
+        .btn-nav { padding: 15px 25px; border-radius: 10px; font-weight: 600; font-size: 15px; cursor: pointer; border: none; font-family: inherit; }
         .btn-prev { background: rgba(0,0,0,0.05); color: var(--text-body); }
-        .btn-prev:hover { background: rgba(0,0,0,0.1); transform: translateX(-2px); }
-        .btn-next { background: var(--primary-accent); color: white; flex: 1; text-align: center; box-shadow: 0 4px 15px rgba(37,99,235,0.2); }
-        .btn-next:hover { background: var(--primary-hover); transform: translateY(-2px); }
+        body.dark-mode .btn-prev { background: rgba(255,255,255,0.1); color: white; }
+        .btn-next { background: var(--primary-accent); color: white; flex: 1; }
 
-        .ui-card { background: var(--glass-bg); backdrop-filter: blur(20px); border-radius: 16px; padding: 35px; border: 1px solid var(--glass-border); box-shadow: var(--shadow-soft); transition: box-shadow 0.3s ease; }
-        .ui-card:hover { box-shadow: 0 15px 40px -10px rgba(0, 0, 0, 0.12); }
-        .info-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; align-items: start; }
-        label.input-label { display: block; font-weight: 600; margin-bottom: 10px; color: var(--text-heading); font-size: 16px; line-height: 1.5; }
-        input[type="text"], input[type="email"], textarea, select { width: 100%; padding: 14px 18px; border-radius: 10px; background: var(--input-bg); border: 2px solid #cbd5e1; color: var(--text-heading); font-size: 15px; font-family: inherit; transition: all 0.3s; box-shadow: var(--shadow-inner); }
-        input[type="text"]:focus, input[type="email"]:focus, textarea:focus, select:focus { outline: none; border-color: var(--primary-accent); background: #fff; box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1); }
+        .ui-card { background: var(--glass-bg); backdrop-filter: blur(20px); border-radius: 16px; padding: 35px; border: 1px solid var(--glass-border); box-shadow: var(--shadow-soft); }
+        .info-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; }
+        label.input-label { display: block; font-weight: 600; margin-bottom: 10px; color: var(--text-heading); font-size: 16px; }
+        input[type="text"], input[type="email"], textarea, select { width: 100%; padding: 14px 18px; border-radius: 10px; background: var(--input-bg); border: 2px solid #cbd5e1; color: var(--text-heading); font-size: 15px; font-family: inherit; }
+        body.dark-mode input, body.dark-mode textarea, body.dark-mode select { border-color: #334155; }
         .textarea-wrapper { position: relative; margin-top: 15px; }
-        textarea { resize: vertical; min-height: 150px; padding-right: 40px; }
-        .focus-btn { position: absolute; top: 12px; right: 12px; background: #e2e8f0; border: none; border-radius: 6px; color: var(--text-muted); font-size: 16px; cursor: pointer; padding: 6px 10px; transition: all 0.2s; font-weight: bold; z-index: 10;}
-        .focus-btn:hover { background: #cbd5e1; color: var(--text-heading); transform: scale(1.05); }
+        textarea { resize: vertical; min-height: 150px; }
+        .focus-btn { position: absolute; top: 12px; right: 12px; background: #e2e8f0; border: none; border-radius: 6px; color: var(--text-muted); cursor: pointer; padding: 6px 10px; font-weight: bold; }
 
-        .audio-container { background: var(--input-bg); border: 2px solid #cbd5e1; padding: 20px; border-radius: 12px; display: flex; flex-direction: column; gap: 15px; box-shadow: var(--shadow-inner); margin-top: 15px;}
-        .audio-actions { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
-        .btn-record { background: #fff; border: 2px solid #cbd5e1; color: var(--text-heading); font-weight: 600; padding: 10px 20px; border-radius: 8px; cursor: pointer; transition: all 0.2s; display: inline-flex; align-items: center; gap: 8px; font-size: 14.5px; z-index: 10; pointer-events: auto;}
-        .btn-record:hover { border-color: var(--text-muted); background: #f8fafc; transform: translateY(-1px); }
-        .btn-record.recording { background: #fee2e2; border-color: var(--danger); color: var(--danger); animation: recordPulse 1.5s infinite; transform: none; }
+        .audio-container { background: var(--input-bg); border: 2px solid #cbd5e1; padding: 20px; border-radius: 12px; display: flex; flex-direction: column; gap: 15px; margin-top: 15px;}
+        body.dark-mode .audio-container { border-color: #334155; }
+        .btn-record { background: #fff; border: 2px solid #cbd5e1; color: var(--text-heading); font-weight: 600; padding: 10px 20px; border-radius: 8px; cursor: pointer; display: inline-flex; align-items: center; gap: 8px;}
+        body.dark-mode .btn-record { background: #1e293b; border-color: #475569; }
+        .btn-record.recording { background: #fee2e2; border-color: var(--danger); color: var(--danger); animation: recordPulse 1.5s infinite; }
         .recording-status { font-size: 13.5px; color: var(--danger); font-weight: 600; display: none; align-items: center; gap: 6px; }
-        .audio-timer-display { font-variant-numeric: tabular-nums; background: rgba(239, 68, 68, 0.1); padding: 4px 8px; border-radius: 4px; border: 1px solid rgba(239, 68, 68, 0.2); }
-        .audio-playback { width: 100%; height: 40px; border-radius: 8px; display: none; margin-top: 10px; }
 
         .radio-options-wrapper { margin-top: 20px; }
-        .radio-label { display: flex; align-items: center; background: var(--input-bg); padding: 18px 20px; margin-bottom: 12px; border-radius: 12px; cursor: pointer; border: 2px solid #cbd5e1; transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1); font-size: 15px; color: var(--text-body); box-shadow: var(--shadow-inner); }
-        .radio-label:hover { background: rgba(255,255,255,0.9); border-color: #94a3b8; transform: translateX(4px); }
-        .radio-label input[type="radio"] { appearance: none; -webkit-appearance: none; margin: 0 16px 0 0; width: 22px; height: 22px; border: 2px solid #94a3b8; border-radius: 50%; display: grid; place-content: center; cursor: pointer; flex-shrink: 0; transition: all 0.2s; }
-        .radio-label input[type="radio"]::before { content: ""; width: 10px; height: 10px; border-radius: 50%; transform: scale(0); transition: transform 0.2s; background: var(--primary-accent); }
-        .radio-label input[type="radio"]:checked::before { transform: scale(1); }
-        .radio-label input[type="radio"]:checked { border-color: var(--primary-accent); }
-        .radio-label.selected { background: #fff; border-color: var(--primary-accent); box-shadow: 0 4px 15px rgba(37,99,235,0.1); transform: translateX(6px); }
+        .radio-label { display: flex; align-items: center; background: var(--input-bg); padding: 18px 20px; margin-bottom: 12px; border-radius: 12px; cursor: pointer; border: 2px solid #cbd5e1; font-size: 15px; color: var(--text-body); }
+        body.dark-mode .radio-label { border-color: #334155; }
+        .radio-label input[type="radio"] { margin: 0 16px 0 0; width: 22px; height: 22px; }
+        .radio-label.selected { background: #fff; border-color: var(--primary-accent); }
+        body.dark-mode .radio-label.selected { background: #0f172a; border-color: var(--primary-accent); }
 
         #timer-container { position: sticky; top: 20px; z-index: 100; display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
-        .timer-badge { background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(12px); padding: 10px 25px; border-radius: 50px; font-size: 18px; font-weight: 700; border: 1px solid var(--glass-border); box-shadow: 0 10px 30px -5px rgba(0,0,0,0.12); color: var(--text-heading); font-variant-numeric: tabular-nums; transition: all 0.3s; }
+        .timer-badge { background: rgba(255, 255, 255, 0.9); padding: 10px 25px; border-radius: 50px; font-size: 18px; font-weight: 700; border: 1px solid var(--glass-border); color: var(--text-heading); }
+        body.dark-mode .timer-badge { background: rgba(15,23,42,0.9); border-color: #334155; }
         .step-indicator { font-weight: 600; color: var(--text-muted); font-size: 15px; }
 
         #exam-screen, #results-screen { display: none; width: 100%; animation: slideUpFade 0.5s ease forwards; }
-        .result-item { padding: 20px 0; border-bottom: 1px solid rgba(0,0,0,0.08); }
-        .result-item:last-child { border-bottom: none; }
-        .res-q { font-weight: 600; margin-bottom: 8px; color: var(--text-heading); font-size: 15px;}
-        .res-a { color: var(--text-body); font-size: 15px; white-space: pre-wrap; background: var(--input-bg); padding: 16px; border-radius: 10px; border: 1px solid #cbd5e1; margin-top: 10px;}
-        .violation-flag { background: var(--danger); color: white; padding: 20px; border-radius: 12px; text-align: center; font-weight: 600; margin-bottom: 25px; font-size: 16px; box-shadow: 0 10px 20px rgba(239, 68, 68, 0.2); }
+        .res-a { color: var(--text-body); font-size: 15px; background: var(--input-bg); padding: 16px; border-radius: 10px; border: 1px solid #cbd5e1; margin-top: 10px;}
+        
+        /* Chat Sim UI */
+        .chat-sim-wrapper { margin-top: 15px; }
+        .chat-sim-window { display:none; border: 2px solid #cbd5e1; border-radius: 12px; overflow: hidden; background: var(--glass-bg); }
+        body.dark-mode .chat-sim-window { border-color: #334155; }
+        .chat-sim-header { background: var(--primary-accent); color: white; padding: 10px 15px; font-weight: bold; display: flex; justify-content: space-between; }
+        .chat-sim-body { height: 250px; padding: 15px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; background: #f8fafc; }
+        body.dark-mode .chat-sim-body { background: #0f172a; }
+        .msg-customer { align-self: flex-start; background: #e2e8f0; color: #333; padding: 10px 15px; border-radius: 15px 15px 15px 0; max-width: 80%; }
+        .msg-agent { align-self: flex-end; background: var(--primary-accent); color: white; padding: 10px 15px; border-radius: 15px 15px 0 15px; max-width: 80%; }
     </style>
     <link rel="icon" type="image/x-icon" href="https://www.google.com/s2/favicons?sz=64&domain=mindmatrix.net">
 </head>
 <body>
+
+    <!-- DARK MODE TOGGLE -->
+    <div id="theme-toggle" onclick="toggleTheme()">🌙</div>
 
     <div id="custom-modal-overlay">
         <div class="modal-card">
@@ -137,7 +145,7 @@
     <div id="start-screen">
         <div class="main-container" style="max-width: 650px;">
             <h1>Client Services Assessment</h1>
-            <p class="subtitle" style="color: var(--primary-accent); font-weight: 600;">Junior / Entry-Level Support Profile</p>
+            <p class="subtitle" style="color: var(--primary-accent); font-weight: 600;">Assessment Profile</p>
             
             <div class="ui-card" style="text-align: left; margin-bottom: 25px;">
                 <ul style="color: var(--text-body); line-height: 2; margin: 0; padding-left: 20px; font-size: 15px;">
@@ -154,7 +162,6 @@
                     <input type="text" id="access-code-input" placeholder="e.g. A4X9BQ" required style="text-transform: uppercase; font-weight: bold; letter-spacing: 2px; text-align: center;">
                 </div>
                 <button class="btn-primary" id="btn-initiate" onclick="validateAndStart()">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path></svg>
                     <span id="start-btn-text">Validate Code & Start Assessment</span>
                 </button>
             </div>
@@ -168,8 +175,7 @@
                 <div class="timer-badge" id="display-timer">45:00</div>
             </div>
             
-            <!-- Live Clock moved to bottom right corner -->
-            <div id="live-clock" style="position: fixed; bottom: 20px; right: 20px; font-size: 14px; font-weight: 600; color: var(--text-muted); font-variant-numeric: tabular-nums; background: rgba(255, 255, 255, 0.9); padding: 8px 16px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); border: 1px solid var(--glass-border); z-index: 1000;"></div>
+            <div id="live-clock" style="position: fixed; bottom: 20px; right: 20px; font-size: 14px; font-weight: 600; color: var(--text-muted); font-variant-numeric: tabular-nums; background: rgba(255, 255, 255, 0.9); padding: 8px 16px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); z-index: 1000;"></div>
             
             <div class="progress-container"><div class="progress-bar" id="progress-bar"></div></div>
             <div id="question-map"></div>
@@ -225,9 +231,16 @@
         let essayStartTime, essayEndTime;
         let folderId = null, rowNumber = null;
         let globalCandidateName = "", globalCandidateEmail = "";
+        let globalDynamicTopic = ""; // Captures the AI generated topic from Phase 1 return
 
         let stepStartTime = 0, stepTimeSpent = {}, exitCount = 0, exitLog = [];
         let inViolationState = false, lastExitTime = 0, violationTimeLeft = 15, violationTimerInterval;
+
+        function toggleTheme() {
+            document.body.classList.toggle('dark-mode');
+            const btn = document.getElementById('theme-toggle');
+            btn.innerText = document.body.classList.contains('dark-mode') ? '☀️' : '🌙';
+        }
 
         setInterval(() => {
             const clockEl = document.getElementById('live-clock');
@@ -255,7 +268,6 @@
                 });
                 actionsContainer.appendChild(okBtn); 
 
-                // Inject Force Submit Option
                 if (showForceSubmit) {
                     const forceBtn = document.createElement('button');
                     forceBtn.className = 'btn-modal-primary';
@@ -391,13 +403,23 @@
                 html += `<div class="step-container" id="step-1"><div class="ui-card"><label class="input-label" style="font-size: 18px; margin-bottom: 20px;">${item.q}</label>
                                 <div style="margin-bottom: 15px;"><select name="q_${item.id}_topic" style="width: 100%; padding: 14px; border-radius: 10px; border: 2px solid #cbd5e1; font-family: inherit; font-size: 15px; background: var(--input-bg); cursor:pointer;">
                                     <option value="">-- Select your Essay Topic --</option>`;
+                
+                // Add Dynamic Option if provided by backend
+                if (globalDynamicTopic) {
+                    html += `<optgroup label="✨ AI Custom Topic (Based on Phase 1 Performance)">`;
+                    html += `<option value="${globalDynamicTopic.replace(/"/g, '&quot;')}">${globalDynamicTopic}</option>`;
+                    html += `</optgroup>`;
+                }
+                
+                html += `<optgroup label="Standard Topics">`;
                 item.topics.forEach(topic => { html += `<option value="${topic}">${topic}</option>`; });
-                html += `       </select></div><div class="textarea-wrapper"><textarea name="q_${item.id}" id="txt_${item.id}" placeholder="Write your essay here..." style="min-height: 250px;"></textarea>
+                html += `</optgroup></select></div><div class="textarea-wrapper"><textarea name="q_${item.id}" id="txt_${item.id}" placeholder="Write your essay here..." style="min-height: 250px;"></textarea>
                                 <button type="button" class="focus-btn fc-trigger-btn" data-qid="${item.id}" data-qtext="${item.q.replace(/"/g, '&quot;')}">⤢</button></div></div></div>`;
             } else {
                 activeQuestions.forEach((item, index) => {
                     const stepNum = index + 1;
                     html += `<div class="step-container" id="step-${stepNum}"><div class="ui-card"><label class="input-label" style="font-size: 18px; margin-bottom: 20px;">${item.q}</label>`;
+                    
                     if (item.options) {
                         html += `<div class="radio-options-wrapper">`;
                         item.options.forEach(opt => { html += `<label class="radio-label"><input type="radio" name="q_${item.id}" value="${opt}"> ${opt}</label>`; });
@@ -406,6 +428,20 @@
                         html += `<div class="audio-container"><div class="audio-actions"><button type="button" class="btn-record audio-trigger-btn" data-qid="${item.id}"> Record Answer</button>
                                         <span class="recording-status" id="status_${item.id}"> Recording <span class="audio-timer-display" id="audio_timer_${item.id}">00:00</span></span></div>
                                     <audio class="audio-playback" id="player_${item.id}" controls></audio><input type="hidden" name="q_${item.id}" value="AUDIO_SUBMISSION"></div>`;
+                    } else if (item.isChat) {
+                        html += `<div class="chat-sim-wrapper">
+                                   <div style="background: rgba(37,99,235,0.1); padding: 10px; border-radius: 8px; font-size: 14px; margin-bottom: 15px;">⏱️ <strong>Live Chat Simulation:</strong> Clicking start begins a 60-second timer. Think fast!</div>
+                                   <button type="button" class="btn-primary" id="start-chat-${item.id}" onclick="startChatSim('${item.id}', '${item.q.replace(/"/g, '&quot;')}')">Start Live Chat Simulation</button>
+                                   <div class="chat-sim-window" id="chat-ui-${item.id}">
+                                       <div class="chat-sim-header"><span>💬 Live Support Chat</span><span id="chat-timer-${item.id}">60s</span></div>
+                                       <div class="chat-sim-body" id="chat-history-${item.id}"></div>
+                                       <div style="display:flex; padding: 15px; border-top: 1px solid var(--glass-border);">
+                                           <input type="text" id="chat-input-${item.id}" style="flex:1; border-radius: 8px 0 0 8px; border-right: none;" disabled placeholder="Waiting for customer...">
+                                           <button type="button" id="chat-send-${item.id}" style="background: var(--primary-accent); color: white; border: none; padding: 0 20px; border-radius: 0 8px 8px 0; font-weight: bold; cursor: pointer;" disabled onclick="submitChatSim('${item.id}')">Send</button>
+                                       </div>
+                                   </div>
+                                   <input type="hidden" name="q_${item.id}" id="txt_${item.id}">
+                                </div>`;
                     } else {
                         html += `<div class="textarea-wrapper"><textarea name="q_${item.id}" id="txt_${item.id}" placeholder="Type your detailed response here..."></textarea>
                                     <button type="button" class="focus-btn fc-trigger-btn" data-qid="${item.id}" data-qtext="${item.q.replace(/"/g, '&quot;')}">⤢</button></div>`;
@@ -422,6 +458,58 @@
                 });
             });
             updateUI();
+        }
+
+        // Live Chat Logic
+        let chatTimers = {};
+        function startChatSim(qId, customerMsg) {
+            document.getElementById(`start-chat-${qId}`).style.display = 'none';
+            document.getElementById(`chat-ui-${qId}`).style.display = 'block';
+            const history = document.getElementById(`chat-history-${qId}`);
+            const input = document.getElementById(`chat-input-${qId}`);
+            const sendBtn = document.getElementById(`chat-send-${qId}`);
+            const timerDisplay = document.getElementById(`chat-timer-${qId}`);
+
+            history.innerHTML = `<div class="msg-customer"><em>Customer is typing...</em></div>`;
+
+            setTimeout(() => {
+                history.innerHTML = `<div class="msg-customer">${customerMsg}</div>`;
+                input.disabled = false;
+                sendBtn.disabled = false;
+                input.placeholder = "Type your de-escalation response here...";
+                input.focus();
+
+                input.addEventListener("keypress", function(event) {
+                    if (event.key === "Enter") {
+                        event.preventDefault();
+                        submitChatSim(qId);
+                    }
+                });
+
+                let timeLeft = 60;
+                chatTimers[qId] = setInterval(() => {
+                    timeLeft--;
+                    timerDisplay.innerText = timeLeft + 's';
+                    if (timeLeft <= 10) timerDisplay.style.color = '#ef4444';
+                    if (timeLeft <= 0) {
+                        submitChatSim(qId, true);
+                    }
+                }, 1000);
+            }, 2000);
+        }
+
+        function submitChatSim(qId, autoSubmit = false) {
+            clearInterval(chatTimers[qId]);
+            const input = document.getElementById(`chat-input-${qId}`);
+            const history = document.getElementById(`chat-history-${qId}`);
+            const val = input.value.trim() || (autoSubmit ? "[Time Expired - No Response]" : "");
+
+            history.innerHTML += `<div class="msg-agent">${val}</div>`;
+
+            document.getElementById(`txt_${qId}`).value = val;
+            input.disabled = true;
+            document.getElementById(`chat-send-${qId}`).disabled = true;
+            renderQuestionMap();
         }
 
         function validateRegistration() {
@@ -487,7 +575,7 @@
 
         function initiateEssayPhase() {
             phase = 'ESSAY'; essayStartTime = new Date(); currentStep = 1; totalSteps = 1; stepTimeSpent = {};
-            forcedSubmitReason = ""; // Reset forced submit reason for the new phase
+            forcedSubmitReason = ""; 
             document.getElementById('steps-wrapper').innerHTML = '';
             examEndTime = Date.now() + (15 * 60 * 1000); clearInterval(mainTimerInterval);
             generateSteps(); startTimer(); stepStartTime = Date.now();
@@ -549,7 +637,7 @@
             box.style.cssText = 'background: #fff; padding: 30px; border-radius: 16px; width: 90%; max-width: 700px; display: flex; flex-direction: column; gap: 15px; transform: scale(0.95) translateY(20px); transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1); box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);';
             box.innerHTML = `
                 <div style="display:flex; justify-content:space-between; align-items:center;"><h3 style="margin:0; font-size:18px; color:var(--text-heading);">${qText}</h3><button id="fc-close" style="font-size:28px; border:none; background:none; cursor:pointer; color:var(--text-muted); transition: color 0.2s;">&times;</button></div>
-                <textarea id="fc-txt" style="height:400px; font-size:16px; padding:20px; border: 2px solid var(--primary-accent); border-radius: 12px; font-family: inherit; resize: none; outline: none; box-shadow: var(--shadow-inner);"></textarea>
+                <textarea id="fc-txt" style="height:400px; font-size:16px; padding:20px; border: 2px solid var(--primary-accent); border-radius: 12px; font-family: inherit; resize: none; outline: none;"></textarea>
                 <div style="text-align: right; font-size: 13px; color: var(--text-muted); font-weight: 500;">Click outside box to save</div>`;
             bg.appendChild(box); document.body.appendChild(bg);
             const fcTxt = document.getElementById('fc-txt'); const closeBtn = document.getElementById('fc-close');
@@ -567,14 +655,13 @@
             examSubmitted = true; isExamActive = false; clearInterval(mainTimerInterval); clearInterval(violationTimerInterval);
             document.getElementById('security-warning').style.display = 'none'; if (document.fullscreenElement) document.exitFullscreen(); 
             document.getElementById('exam-screen').style.display = 'none'; document.getElementById('results-screen').style.display = 'flex'; window.scrollTo(0,0);
-            if (forcedSubmitReason) { document.getElementById('violation-notice').innerHTML = `<div class="violation-flag"> EXAM AUTO-SUBMITTED: ${forcedSubmitReason}</div>`; }
+            if (forcedSubmitReason) { document.getElementById('violation-notice').innerHTML = `<div style="background: var(--danger); color: white; padding: 20px; border-radius: 12px; text-align: center; font-weight: 600; margin-bottom: 25px;"> EXAM AUTO-SUBMITTED: ${forcedSubmitReason}</div>`; }
             document.getElementById('results-output').innerHTML = "<div class='res-a' style='padding:20px; font-size:16px; text-align:center;'><b>Success:</b> Your assessment, AI grades, and security logs have been securely transmitted. You may safely close this window.</div>";
         }
 
         document.getElementById('assessmentForm').addEventListener('submit', async function(e) {
             e.preventDefault(); if (currentStep === 0 && !validateRegistration()) return; trackTime(); 
 
-            // Force Submit Logic Check
             if (!forcedSubmitReason) {
                 let missingQs = []; 
                 for(let i=1; i<=totalSteps; i++) { 
@@ -618,17 +705,11 @@
                 fetch(GAS_URL, { method: "POST", body: JSON.stringify(payload), headers: { "Content-Type": "text/plain;charset=utf-8" } })
                 .then(response => response.json()).then(data => {
                     if(data.success) {
-                        folderId = data.folderId; rowNumber = data.rowNum;
-                        
-                        // 🚨 FIX: Only end the exam entirely if it was a security violation
+                        folderId = data.folderId; rowNumber = data.rowNum; globalDynamicTopic = data.dynamicTopic; // Save generated topic
                         if (forcedSubmitReason && forcedSubmitReason.includes("SECURITY VIOLATION")) { 
-                            showFinalScreen(); 
-                            return; 
+                            showFinalScreen(); return; 
                         } 
-                        
-                        // Otherwise (skipped questions or time expired), smoothly proceed to Phase 2
                         initiateEssayPhase(); 
-                        
                     } else throw new Error(data.error);
                 }).catch(async (error) => {
                     await showCustomAlert("Data Sync Error. Please retry.", "Transmission Failed");
