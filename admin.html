@@ -155,7 +155,16 @@
         .score-btn.pending { background: rgba(100, 116, 139, 0.1); color: var(--text-muted); border-color: transparent; cursor: default; }
         .score-btn.pending:hover { transform: none; box-shadow: none; background: rgba(100, 116, 139, 0.1); color: var(--text-muted); }
         
-        .status-flag { display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 50px; font-size: 12.5px; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase; }
+        /* Upgraded Status Flag */
+        .status-flag { 
+            display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; 
+            border-radius: 50px; font-size: 12.5px; font-weight: 700; letter-spacing: 0.5px; 
+            text-transform: uppercase; border: none; font-family: inherit; cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .status-flag:hover { transform: translateY(-2px); box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        .status-flag:active { transform: scale(0.95); }
+        
         .flag-clean { background: var(--success-bg); color: var(--success-text); }
         .flag-warn { background: var(--danger-bg); color: var(--danger-text); animation: pulseGlow 2s infinite; }
         .flag-yellow { background: rgba(234, 179, 8, 0.1); color: #ca8a04; }
@@ -233,11 +242,11 @@
         </div>
     </div>
 
-    <!-- AI Summary Modal -->
+    <!-- AI Summary / Details Modal -->
     <div id="modal-overlay" class="overlay" onclick="if(event.target === this) closeModal()">
         <div class="modal-card">
             <div class="modal-header">
-                <h3 id="modal-title">AI Grading Summary</h3>
+                <h3 id="modal-title">Details</h3>
                 <button class="modal-close" onclick="closeModal()">&times;</button>
             </div>
             <div class="modal-body" id="modal-body-text"></div>
@@ -431,8 +440,8 @@
         // --- MODAL SYSTEM ---
         function openModal(title, dataKey) {
             document.getElementById('modal-title').innerText = title;
-            const text = summaryDataStore[dataKey] || "No summary available.";
-            document.getElementById('modal-body-text').innerHTML = text.replace(/\n/g, '<br><br>');
+            const text = summaryDataStore[dataKey] || "No data available.";
+            document.getElementById('modal-body-text').innerHTML = text.replace(/\n/g, '<br>');
             document.getElementById('modal-overlay').classList.add('active');
         }
 
@@ -511,7 +520,7 @@
         }
 
         function renderCandidates(data) {
-            cachedCandidatesData = data; // Cache for hide/unhide toggling
+            cachedCandidatesData = data; 
             const tbody = document.getElementById('candidates-body');
             tbody.innerHTML = '';
             
@@ -527,29 +536,38 @@
                 const row = data[i];
                 if (!row[1]) continue; 
 
-                // Create Unique ID (Email + Timestamp)
                 const uid = row[2] + "_" + new Date(row[0]).getTime();
                 const isHidden = hiddenList.includes(uid);
                 
-                // Skip rendering if it's hidden and the toggle is off
                 if (isHidden && !showHiddenCandidates) continue;
 
                 const dateObj = new Date(row[0]);
                 const dateStr = dateObj.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' });
                 const timeStr = dateObj.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' });
                 
-                const name = row[1], email = row[2];
+                const name = row[1];
+                const safeName = name.replace(/'/g, "\\'"); // Prevent JS string breaking in onclick
+                const email = row[2];
+
+                // Grades mapping
                 const p1Data = parseScoreData(row[3]), p2Data = parseScoreData(row[9]);
                 summaryDataStore[`p1_${i}`] = row[3]; summaryDataStore[`p2_${i}`] = row[9];
                 
-                const p1Html = p1Data.isPending ? `<span class="score-btn pending">${p1Data.badge}</span>` : `<button class="score-btn" onclick="openModal('${name} - Phase 1 Assessment', 'p1_${i}')">🧠 ${p1Data.badge}</button>`;
-                const p2Html = p2Data.isPending ? `<span class="score-btn pending">${p2Data.badge}</span>` : `<button class="score-btn purple" onclick="openModal('${name} - Phase 2 Essay', 'p2_${i}')">📝 ${p2Data.badge}</button>`;
+                const p1Html = p1Data.isPending ? `<span class="score-btn pending">${p1Data.badge}</span>` : `<button class="score-btn" onclick="openModal('${safeName} - Phase 1 Assessment', 'p1_${i}')">🧠 ${p1Data.badge}</button>`;
+                const p2Html = p2Data.isPending ? `<span class="score-btn pending">${p2Data.badge}</span>` : `<button class="score-btn purple" onclick="openModal('${safeName} - Phase 2 Essay', 'p2_${i}')">📝 ${p2Data.badge}</button>`;
 
+                // Proctoring & Violations Mapping
                 const exits = parseInt(row[4]) || 0;
-                const isClean = exits === 0;
+                const flagsInfo = row[7] || "Clean Submission"; // Column 8 has the Flags/Forced Submit Reason
+                
+                // Determine if completely clean
+                const isClean = exits === 0 && (flagsInfo.toLowerCase().includes("clean") || flagsInfo === "");
                 const flagClass = isClean ? "flag-clean" : "flag-warn";
                 const flagIcon = isClean ? "✓" : "⚠️";
-                const flagText = isClean ? "Clean" : `${exits} Violations`;
+                const flagText = isClean ? "Clean" : (exits > 0 ? `${exits} Violations` : "Flagged");
+
+                // Store formatted violation string for the modal
+                summaryDataStore[`proctor_${i}`] = `🕵️‍♂️ <strong>Proctoring & Integrity Report</strong>\n\n🔴 <strong>Tab/Window Exits:</strong> ${exits} time(s)\n\n🛑 <strong>System Notes:</strong>\n${flagsInfo}\n\n<span style="font-size: 13px; color: var(--text-muted);">*(Note: To see the exact timestamps of when the candidate exited the window, please open the Phase 1 PDF generated in their Google Drive folder).*</span>`;
 
                 const rowClass = isHidden ? "animated-row row-hidden" : "animated-row";
 
@@ -558,7 +576,11 @@
                         <td class="td-muted"><div style="font-weight: 600; color: var(--text-heading);">${dateStr}</div><div style="font-size: 12px; margin-top: 4px;">${timeStr}</div></td>
                         <td><div style="font-weight: 600;">${name}</div><div class="td-muted" style="margin-top: 4px;">${email}</div></td>
                         <td>${p1Html}</td><td>${p2Html}</td>
-                        <td><span class="status-flag ${flagClass}"><span>${flagIcon}</span> ${flagText}</span></td>
+                        <td>
+                            <button class="status-flag ${flagClass}" onclick="openModal('Proctoring Report: ${safeName}', 'proctor_${i}')" title="Click to view violation details">
+                                <span>${flagIcon}</span> ${flagText}
+                            </button>
+                        </td>
                         <td>
                             <div class="action-group">
                                 <a href="${row[5]}" target="_blank" class="btn-view">View Folder <span>↗</span></a>
@@ -617,10 +639,9 @@
                 if (!row[0]) continue; 
 
                 const code = row[0];
-                const uid = code; // Code itself is unique
+                const uid = code;
                 const isHidden = hiddenList.includes(uid);
                 
-                // Skip rendering if it's hidden and toggle is off
                 if (isHidden && !showHiddenCodes) continue;
 
                 const status = row[1];
@@ -643,7 +664,7 @@
                     <tr class="${rowClass}" style="--i: ${animationDelayIndex++}">
                         <td class="td-muted"><div style="font-weight: 600; color: var(--text-heading);">${dateStr}</div><div style="font-size: 12px; margin-top: 4px;">${timeStr}</div></td>
                         <td><span class="code-display" style="color: ${status === 'VALID' ? 'var(--primary-accent)' : 'var(--text-muted)'}">${code}</span></td>
-                        <td><span class="status-flag ${flagClass}"><span>${flagIcon}</span> ${status}</span></td>
+                        <td><span class="status-flag ${flagClass}" style="cursor:default; pointer-events:none;"><span>${flagIcon}</span> ${status}</span></td>
                         <td>
                             <div class="action-group">
                                 ${copyBtn}
