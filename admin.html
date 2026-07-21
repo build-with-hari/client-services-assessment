@@ -15,6 +15,7 @@
             --success-bg: rgba(16, 185, 129, 0.1); --success-text: #059669;
             --danger-bg: rgba(239, 68, 68, 0.1); --danger-text: #dc2626;
             --shadow-soft: 0 10px 40px -10px rgba(0, 0, 0, 0.08);
+            --shadow-hover: 0 20px 40px -10px rgba(0, 0, 0, 0.12);
         }
 
         /* DARK MODE VARS */
@@ -25,32 +26,32 @@
             --input-bg: rgba(15, 23, 42, 0.6);
             --success-bg: rgba(16, 185, 129, 0.15); --success-text: #34d399;
             --danger-bg: rgba(239, 68, 68, 0.15); --danger-text: #f87171;
+            --shadow-soft: 0 10px 40px -10px rgba(0, 0, 0, 0.5);
+            --shadow-hover: 0 20px 40px -10px rgba(0, 0, 0, 0.7);
         }
 
         * { box-sizing: border-box; }
         body { 
             font-family: 'Inter', sans-serif; background: var(--bg-gradient); 
             color: var(--text-body); margin: 0; padding: 20px; min-height: 100vh;
-            background-attachment: fixed; transition: background 0.4s ease;
+            background-attachment: fixed; transition: background 0.4s ease, color 0.4s ease;
             -webkit-font-smoothing: antialiased;
         }
 
         /* Animations */
-        @keyframes slideUpFade { 
-            from { opacity: 0; transform: translateY(20px); } 
-            to { opacity: 1; transform: translateY(0); } 
-        }
+        @keyframes slideUpFade { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
         @keyframes pulseGlow { 
-            0% { box-shadow: 0 0 0 0 rgba(37, 99, 235, 0.4); } 
-            70% { box-shadow: 0 0 0 10px rgba(37, 99, 235, 0); } 
-            100% { box-shadow: 0 0 0 0 rgba(37, 99, 235, 0); } 
+            0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); } 
+            70% { box-shadow: 0 0 0 8px rgba(239, 68, 68, 0); } 
+            100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); } 
         }
 
         #theme-toggle { 
             position: fixed; top: 20px; right: 20px; background: var(--glass-bg); 
             border: 1px solid var(--glass-border); font-size: 20px; padding: 10px; 
             border-radius: 50%; cursor: pointer; box-shadow: var(--shadow-soft); 
-            z-index: 1000; backdrop-filter: blur(10px); transition: transform 0.2s; 
+            z-index: 1000; backdrop-filter: blur(10px); transition: transform 0.2s, background 0.3s; 
         }
         #theme-toggle:hover { transform: scale(1.1); }
 
@@ -61,28 +62,32 @@
         }
         .lock-box { 
             background: var(--glass-bg); backdrop-filter: blur(20px); 
-            padding: 50px 40px; border-radius: 20px; border: 1px solid var(--glass-border); 
-            box-shadow: var(--shadow-soft); text-align: center; width: 100%; max-width: 400px; 
+            padding: 50px 40px; border-radius: 24px; border: 1px solid var(--glass-border); 
+            box-shadow: var(--shadow-soft); text-align: center; width: 100%; max-width: 420px; 
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
         }
-        .lock-box h2 { margin: 0 0 10px 0; color: var(--text-heading); font-size: 24px; }
+        .lock-box:hover { transform: translateY(-5px); box-shadow: var(--shadow-hover); }
+        .lock-box h2 { margin: 0 0 10px 0; color: var(--text-heading); font-size: 26px; }
         .lock-box p { color: var(--text-muted); margin-bottom: 30px; font-size: 15px; }
         
         input[type="password"] { 
-            padding: 15px; border: 2px solid #cbd5e1; border-radius: 12px; 
+            padding: 16px; border: 2px solid #cbd5e1; border-radius: 14px; 
             background: var(--input-bg); color: var(--text-heading);
-            font-size: 24px; letter-spacing: 8px; text-align: center; width: 220px; 
+            font-size: 24px; letter-spacing: 12px; text-align: center; width: 240px; 
             margin-bottom: 25px; transition: all 0.3s ease; outline: none; font-family: monospace;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);
         }
         body.dark-mode input[type="password"] { border-color: #334155; }
-        input[type="password"]:focus { border-color: var(--primary-accent); box-shadow: 0 0 0 4px rgba(37,99,235,0.1); }
+        input[type="password"]:focus { border-color: var(--primary-accent); box-shadow: 0 0 0 4px rgba(37,99,235,0.15); }
         
         .btn-primary { 
             background: linear-gradient(135deg, var(--primary-accent) 0%, #1e40af 100%); 
             color: white; border: none; padding: 16px 30px; border-radius: 12px; 
             font-weight: 600; font-size: 16px; cursor: pointer; width: 100%;
             transition: all 0.3s ease; display: flex; justify-content: center; align-items: center; gap: 8px;
+            box-shadow: 0 4px 15px rgba(37, 99, 235, 0.3);
         }
-        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 10px 20px -10px var(--primary-accent); }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(37, 99, 235, 0.4); }
         .btn-primary:active { transform: translateY(0); }
 
         /* Dashboard */
@@ -96,12 +101,12 @@
             cursor: pointer; backdrop-filter: blur(10px); transition: all 0.2s ease;
             display: flex; align-items: center; gap: 8px; box-shadow: var(--shadow-soft);
         }
-        .btn-refresh:hover { background: var(--primary-accent); color: #ffffff; border-color: var(--primary-accent); }
+        .btn-refresh:hover { background: var(--primary-accent); color: #ffffff; border-color: var(--primary-accent); transform: translateY(-2px); box-shadow: 0 8px 20px rgba(37, 99, 235, 0.2); }
 
         .table-container {
             background: var(--glass-bg); backdrop-filter: blur(20px);
             border-radius: 16px; border: 1px solid var(--glass-border);
-            box-shadow: var(--shadow-soft); overflow-x: auto;
+            box-shadow: var(--shadow-soft); overflow-x: auto; transition: box-shadow 0.3s;
         }
         
         table { width: 100%; border-collapse: collapse; text-align: left; }
@@ -113,25 +118,30 @@
         }
         body.dark-mode th { background: rgba(255,255,255,0.02); }
         
-        tbody tr { transition: background 0.2s; }
+        tbody tr { transition: background 0.2s, transform 0.2s; }
         tbody tr:hover { background: rgba(0,0,0,0.02); }
-        body.dark-mode tbody tr:hover { background: rgba(255,255,255,0.02); }
+        body.dark-mode tbody tr:hover { background: rgba(255,255,255,0.03); }
         tbody tr:last-child td { border-bottom: none; }
         
         td { font-size: 15px; color: var(--text-heading); vertical-align: middle; }
         .td-muted { color: var(--text-muted); font-size: 14px; }
         
-        /* Summary Tooltip Styles */
-        .score-wrapper { display: inline-flex; align-items: center; gap: 8px; }
-        .score-pill { font-weight: 700; font-size: 15px; }
-        .info-icon { 
-            display: inline-flex; align-items: center; justify-content: center;
-            width: 22px; height: 22px; border-radius: 50%; font-size: 12px;
-            background: rgba(0,0,0,0.05); color: var(--text-muted); cursor: help;
+        /* Clickable Score Buttons */
+        .score-btn {
+            background: rgba(37, 99, 235, 0.1); color: var(--primary-accent);
+            border: 1px solid rgba(37, 99, 235, 0.2); padding: 8px 16px;
+            border-radius: 8px; font-weight: 700; font-size: 14px; cursor: pointer;
+            transition: all 0.2s; display: inline-flex; align-items: center; gap: 6px; font-family: inherit;
         }
-        body.dark-mode .info-icon { background: rgba(255,255,255,0.1); }
-        .info-icon:hover { background: var(--primary-accent); color: white; }
+        .score-btn:hover { background: var(--primary-accent); color: white; transform: translateY(-2px); box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2); }
         
+        .score-btn.purple { background: rgba(139, 92, 246, 0.1); color: #8b5cf6; border-color: rgba(139, 92, 246, 0.2); }
+        .score-btn.purple:hover { background: #8b5cf6; color: white; box-shadow: 0 4px 12px rgba(139, 92, 246, 0.2); }
+
+        .score-btn.pending { background: rgba(100, 116, 139, 0.1); color: var(--text-muted); border-color: transparent; cursor: default; }
+        .score-btn.pending:hover { transform: none; box-shadow: none; background: rgba(100, 116, 139, 0.1); color: var(--text-muted); }
+        
+        /* Status Flags */
         .status-flag { 
             display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; 
             border-radius: 50px; font-size: 12.5px; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase;
@@ -140,24 +150,67 @@
         .flag-warn { background: var(--danger-bg); color: var(--danger-text); animation: pulseGlow 2s infinite; }
         
         .btn-view { 
-            display: inline-flex; align-items: center; gap: 6px; background: rgba(37, 99, 235, 0.1); 
-            color: var(--primary-accent); padding: 8px 16px; border-radius: 8px; 
+            display: inline-flex; align-items: center; gap: 6px; background: rgba(0,0,0,0.05); 
+            color: var(--text-heading); padding: 8px 16px; border-radius: 8px; 
             text-decoration: none; font-weight: 600; font-size: 13px; transition: all 0.2s;
         }
-        .btn-view:hover { background: var(--primary-accent); color: white; }
+        body.dark-mode .btn-view { background: rgba(255,255,255,0.1); }
+        .btn-view:hover { background: var(--text-heading); color: var(--bg-gradient); transform: translateY(-2px); }
 
-        .spinner {
-            border: 3px solid rgba(255,255,255,0.3); border-radius: 50%;
-            border-top: 3px solid white; width: 18px; height: 18px;
-            animation: spin 1s linear infinite; display: none;
-        }
+        .spinner { border: 3px solid rgba(255,255,255,0.3); border-radius: 50%; border-top: 3px solid white; width: 18px; height: 18px; animation: spin 1s linear infinite; display: none; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        /* Toast Notifications */
+        #toast-container { position: fixed; bottom: 24px; right: 24px; z-index: 9999; display: flex; flex-direction: column; gap: 12px; }
+        .toast { 
+            padding: 14px 24px; border-radius: 12px; font-weight: 600; font-size: 14px; color: white;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15); display: flex; align-items: center; gap: 10px;
+            animation: slideInRight 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; 
+        }
+        .toast.error { background: #ef4444; }
+        .toast.success { background: #10b981; }
+        .toast.fade-out { animation: fadeOutRight 0.4s ease forwards; }
+        @keyframes slideInRight { from { transform: translateX(120%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        @keyframes fadeOutRight { to { transform: translateX(120%); opacity: 0; } }
+
+        /* Summary Modal */
+        #modal-overlay { 
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+            background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(6px); z-index: 2000; 
+            display: none; align-items: center; justify-content: center; 
+            opacity: 0; transition: opacity 0.3s ease; 
+        }
+        #modal-overlay.active { display: flex; opacity: 1; }
+        .modal-card { 
+            background: var(--glass-bg); padding: 30px; border-radius: 20px; 
+            max-width: 550px; width: 90%; box-shadow: var(--shadow-hover); border: 1px solid var(--glass-border); 
+            transform: scale(0.95); transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        #modal-overlay.active .modal-card { transform: scale(1); }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .modal-header h3 { margin: 0; color: var(--text-heading); font-size: 20px; }
+        .modal-close { background: none; border: none; font-size: 28px; color: var(--text-muted); cursor: pointer; transition: color 0.2s; line-height: 1; }
+        .modal-close:hover { color: var(--danger-text); }
+        .modal-body { color: var(--text-body); font-size: 15px; line-height: 1.6; max-height: 60vh; overflow-y: auto; padding-right: 10px; }
     </style>
 </head>
 <body>
 
-    <!-- DARK MODE TOGGLE -->
     <div id="theme-toggle" onclick="toggleTheme()">🌙</div>
+
+    <!-- Toast Container -->
+    <div id="toast-container"></div>
+
+    <!-- AI Summary Modal -->
+    <div id="modal-overlay" onclick="if(event.target === this) closeModal()">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h3 id="modal-title">AI Grading Summary</h3>
+                <button class="modal-close" onclick="closeModal()">&times;</button>
+            </div>
+            <div class="modal-body" id="modal-body-text"></div>
+        </div>
+    </div>
 
     <!-- LOCK SCREEN -->
     <div id="lock-screen">
@@ -170,7 +223,6 @@
                 <span id="auth-text">Unlock Dashboard</span>
                 <div class="spinner" id="auth-spinner"></div>
             </button>
-            <div id="auth-error" style="color: var(--danger-text); margin-top: 20px; font-weight: 600; font-size: 14px; display: none; background: var(--danger-bg); padding: 10px; border-radius: 8px;">Invalid PIN provided.</div>
         </div>
     </div>
 
@@ -208,10 +260,40 @@
         // ==========================================
         const GAS_URL = "https://script.google.com/macros/s/AKfycbwyqEg3vr_nm-6MpnNuBu2Aa7EVkC2-UBrG-wAckFEDojFrg63U0M3u4qG02mngy3OB/exec"; 
 
+        // Global store to hold AI summaries securely
+        const summaryDataStore = {};
+
         function toggleTheme() {
             document.body.classList.toggle('dark-mode');
             const btn = document.getElementById('theme-toggle');
             btn.innerText = document.body.classList.contains('dark-mode') ? '☀️' : '🌙';
+        }
+
+        // Toast Notification Function
+        function showToast(message, type = 'error') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.innerHTML = type === 'error' ? `⚠️ ${message}` : `✅ ${message}`;
+            container.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.classList.add('fade-out');
+                setTimeout(() => toast.remove(), 400); // Wait for exit animation
+            }, 3500);
+        }
+
+        // Modal Functions
+        function openModal(title, dataKey) {
+            document.getElementById('modal-title').innerText = title;
+            const text = summaryDataStore[dataKey] || "No summary available.";
+            // Format text (convert line breaks to HTML breaks)
+            document.getElementById('modal-body-text').innerHTML = text.replace(/\n/g, '<br><br>');
+            document.getElementById('modal-overlay').classList.add('active');
+        }
+
+        function closeModal() {
+            document.getElementById('modal-overlay').classList.remove('active');
         }
 
         // Allow pressing "Enter" on the PIN input
@@ -221,13 +303,16 @@
 
         async function authenticate() {
             const pin = document.getElementById('pin-input').value;
-            if (!pin) return;
+            if (!pin) {
+                showToast("Please enter a PIN to continue.", "error");
+                document.getElementById('pin-input').focus();
+                return;
+            }
             
             // Loading State
             document.getElementById('auth-text').innerText = "Authenticating...";
             document.getElementById('auth-spinner').style.display = "block";
             document.getElementById('btn-auth').disabled = true;
-            document.getElementById('auth-error').style.display = 'none';
             
             try {
                 const response = await fetch(GAS_URL, {
@@ -238,25 +323,26 @@
                 const result = await response.json();
                 
                 if (result.success) {
+                    showToast("Authentication successful.", "success");
                     document.getElementById('lock-screen').style.display = 'none';
                     document.getElementById('dashboard').style.display = 'block';
                     renderTable(result.data);
                 } else {
-                    showAuthError();
+                    handleAuthFail();
                 }
             } catch (err) {
-                alert("Network error establishing secure connection.");
-                showAuthError();
+                showToast("Network error establishing secure connection.", "error");
+                handleAuthFail(false);
             }
         }
 
-        function showAuthError() {
+        function handleAuthFail(showDefaultToast = true) {
             document.getElementById('auth-text').innerText = "Unlock Dashboard";
             document.getElementById('auth-spinner').style.display = "none";
             document.getElementById('btn-auth').disabled = false;
-            document.getElementById('auth-error').style.display = 'block';
             document.getElementById('pin-input').value = '';
             document.getElementById('pin-input').focus();
+            if(showDefaultToast) showToast("Invalid PIN provided.", "error");
         }
 
         async function fetchData() {
@@ -271,26 +357,28 @@
                     headers: { 'Content-Type': 'text/plain;charset=utf-8' }
                 });
                 const result = await response.json();
-                if (result.success) renderTable(result.data);
+                if (result.success) {
+                    showToast("Data refreshed.", "success");
+                    renderTable(result.data);
+                } else {
+                    showToast("Session expired. Please reload.", "error");
+                }
             } catch (err) {
                 tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; padding: 60px; color: var(--danger-text); font-weight: 500;">Failed to fetch records.</td></tr>';
+                showToast("Failed to fetch data.", "error");
             }
         }
 
-        // Helper function to extract just the numeric score and clean up the tooltip text
+        // Helper function to extract just the numeric score
         function parseScoreData(rawString) {
             if (!rawString || rawString === "Pending..." || rawString.includes("Pending Phase 2")) {
-                return { badge: "Pending", tooltip: "Awaiting candidate submission." };
+                return { isPending: true, badge: "Pending Phase 2" };
             }
-            
-            // Regex to find "Score: [numbers]" no matter where it is in the string
+            // Regex to find "Score: [numbers]"
             const scoreMatch = rawString.match(/Score:\s*(\d+)/i);
-            const badgeValue = scoreMatch ? `${scoreMatch[1]}/100` : "View PDF";
+            const badgeValue = scoreMatch ? `${scoreMatch[1]}/100` : "View Details";
             
-            // Format tooltip text (remove line breaks for native HTML tooltip compliance, escape quotes)
-            const tooltipText = rawString.replace(/\n/g, '  |  ').replace(/"/g, '&quot;');
-            
-            return { badge: badgeValue, tooltip: tooltipText };
+            return { isPending: false, badge: badgeValue };
         }
 
         function renderTable(data) {
@@ -305,7 +393,7 @@
             // Skip the header row (index 0) and map data in reverse chronological order
             for (let i = data.length - 1; i > 0; i--) { 
                 const row = data[i];
-                if (!row[1]) continue; // Skip empty rows
+                if (!row[1]) continue; 
 
                 const dateObj = new Date(row[0]);
                 const dateStr = dateObj.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' });
@@ -314,13 +402,24 @@
                 const name = row[1];
                 const email = row[2];
                 
-                // Parse scores using the new helper
+                // Parse scores & store raw data safely
                 const p1Data = parseScoreData(row[3]);
                 const p2Data = parseScoreData(row[9]);
                 
+                summaryDataStore[`p1_${i}`] = row[3];
+                summaryDataStore[`p2_${i}`] = row[9];
+                
+                // Construct HTML for Buttons
+                const p1Html = p1Data.isPending 
+                    ? `<span class="score-btn pending">${p1Data.badge}</span>`
+                    : `<button class="score-btn" onclick="openModal('${name} - Phase 1 Assessment', 'p1_${i}')">🧠 ${p1Data.badge}</button>`;
+                    
+                const p2Html = p2Data.isPending 
+                    ? `<span class="score-btn pending">${p2Data.badge}</span>`
+                    : `<button class="score-btn purple" onclick="openModal('${name} - Phase 2 Essay', 'p2_${i}')">📝 ${p2Data.badge}</button>`;
+
                 const exits = parseInt(row[4]) || 0;
                 const isClean = exits === 0;
-                
                 const flagClass = isClean ? "flag-clean" : "flag-warn";
                 const flagIcon = isClean ? "✓" : "⚠️";
                 const flagText = isClean ? "Clean" : `${exits} Violations`;
@@ -337,18 +436,8 @@
                             <div style="font-weight: 600;">${name}</div>
                             <div class="td-muted" style="margin-top: 4px;">${email}</div>
                         </td>
-                        <td>
-                            <div class="score-wrapper" title="${p1Data.tooltip}">
-                                <span class="score-pill" style="color: #2563eb;">${p1Data.badge}</span>
-                                <span class="info-icon">ℹ️</span>
-                            </div>
-                        </td>
-                        <td>
-                            <div class="score-wrapper" title="${p2Data.tooltip}">
-                                <span class="score-pill" style="color: #8b5cf6;">${p2Data.badge}</span>
-                                <span class="info-icon">ℹ️</span>
-                            </div>
-                        </td>
+                        <td>${p1Html}</td>
+                        <td>${p2Html}</td>
                         <td>
                             <span class="status-flag ${flagClass}">
                                 <span>${flagIcon}</span> ${flagText}
