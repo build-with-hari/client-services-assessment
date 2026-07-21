@@ -149,60 +149,72 @@
         .flag-clean { background: var(--success-bg); color: var(--success-text); }
         .flag-warn { background: var(--danger-bg); color: var(--danger-text); animation: pulseGlow 2s infinite; }
         
+        /* View Folder Button */
         .btn-view { 
             display: inline-flex; align-items: center; gap: 6px; background: rgba(0,0,0,0.05); 
             color: var(--text-heading); padding: 8px 16px; border-radius: 8px; 
             text-decoration: none; font-weight: 600; font-size: 13px; transition: all 0.2s;
         }
-        body.dark-mode .btn-view { background: rgba(255,255,255,0.1); }
-        .btn-view:hover { background: var(--text-heading); color: var(--bg-gradient); transform: translateY(-2px); }
+        body.dark-mode .btn-view { background: rgba(255,255,255,0.1); color: var(--text-heading); }
+        .btn-view:hover { 
+            background: var(--primary-accent); color: #ffffff; 
+            transform: translateY(-2px); box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2); 
+        }
 
         .spinner { border: 3px solid rgba(255,255,255,0.3); border-radius: 50%; border-top: 3px solid white; width: 18px; height: 18px; animation: spin 1s linear infinite; display: none; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
-        /* Toast Notifications */
-        #toast-container { position: fixed; bottom: 24px; right: 24px; z-index: 9999; display: flex; flex-direction: column; gap: 12px; }
-        .toast { 
-            padding: 14px 24px; border-radius: 12px; font-weight: 600; font-size: 14px; color: white;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.15); display: flex; align-items: center; gap: 10px;
-            animation: slideInRight 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; 
-        }
-        .toast.error { background: #ef4444; }
-        .toast.success { background: #10b981; }
-        .toast.fade-out { animation: fadeOutRight 0.4s ease forwards; }
-        @keyframes slideInRight { from { transform: translateX(120%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
-        @keyframes fadeOutRight { to { transform: translateX(120%); opacity: 0; } }
-
-        /* Summary Modal */
-        #modal-overlay { 
+        /* Generic Overlay Styles */
+        .overlay { 
             position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
             background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(6px); z-index: 2000; 
             display: none; align-items: center; justify-content: center; 
             opacity: 0; transition: opacity 0.3s ease; 
         }
-        #modal-overlay.active { display: flex; opacity: 1; }
+        .overlay.active { display: flex; opacity: 1; }
         .modal-card { 
             background: var(--glass-bg); padding: 30px; border-radius: 20px; 
             max-width: 550px; width: 90%; box-shadow: var(--shadow-hover); border: 1px solid var(--glass-border); 
             transform: scale(0.95); transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
         }
-        #modal-overlay.active .modal-card { transform: scale(1); }
+        .overlay.active .modal-card { transform: scale(1); }
+        
+        /* Summary Modal Specific */
         .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
         .modal-header h3 { margin: 0; color: var(--text-heading); font-size: 20px; }
         .modal-close { background: none; border: none; font-size: 28px; color: var(--text-muted); cursor: pointer; transition: color 0.2s; line-height: 1; }
         .modal-close:hover { color: var(--danger-text); }
         .modal-body { color: var(--text-body); font-size: 15px; line-height: 1.6; max-height: 60vh; overflow-y: auto; padding-right: 10px; }
+
+        /* Popup Alert Specific */
+        .alert-card { text-align: center; max-width: 400px; padding: 40px 30px; }
+        .alert-icon { font-size: 45px; margin-bottom: 15px; }
+        .alert-title { margin: 0 0 10px 0; color: var(--text-heading); font-size: 22px; font-weight: 700; }
+        .alert-message { color: var(--text-muted); font-size: 15px; margin-bottom: 25px; line-height: 1.5; }
+        .alert-btn {
+            background: var(--primary-accent); color: white; border: none; padding: 12px 30px;
+            border-radius: 10px; font-weight: 600; font-size: 15px; cursor: pointer; transition: all 0.2s;
+        }
+        .alert-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(37, 99, 235, 0.3); }
+
     </style>
 </head>
 <body>
 
     <div id="theme-toggle" onclick="toggleTheme()">🌙</div>
 
-    <!-- Toast Container -->
-    <div id="toast-container"></div>
+    <!-- Popup Alert Modal -->
+    <div id="alert-overlay" class="overlay" onclick="if(event.target === this) closeAlert()">
+        <div class="modal-card alert-card">
+            <div class="alert-icon" id="alert-icon">⚠️</div>
+            <h3 class="alert-title" id="alert-title">Error</h3>
+            <p class="alert-message" id="alert-message">Invalid PIN provided.</p>
+            <button class="alert-btn" id="alert-btn" onclick="closeAlert()">OK</button>
+        </div>
+    </div>
 
     <!-- AI Summary Modal -->
-    <div id="modal-overlay" onclick="if(event.target === this) closeModal()">
+    <div id="modal-overlay" class="overlay" onclick="if(event.target === this) closeModal()">
         <div class="modal-card">
             <div class="modal-header">
                 <h3 id="modal-title">AI Grading Summary</h3>
@@ -262,6 +274,7 @@
 
         // Global store to hold AI summaries securely
         const summaryDataStore = {};
+        let alertTimeout;
 
         function toggleTheme() {
             document.body.classList.toggle('dark-mode');
@@ -269,25 +282,42 @@
             btn.innerText = document.body.classList.contains('dark-mode') ? '☀️' : '🌙';
         }
 
-        // Toast Notification Function
-        function showToast(message, type = 'error') {
-            const container = document.getElementById('toast-container');
-            const toast = document.createElement('div');
-            toast.className = `toast ${type}`;
-            toast.innerHTML = type === 'error' ? `⚠️ ${message}` : `✅ ${message}`;
-            container.appendChild(toast);
-            
-            setTimeout(() => {
-                toast.classList.add('fade-out');
-                setTimeout(() => toast.remove(), 400); // Wait for exit animation
-            }, 3500);
+        // --- NEW POPUP ALERT SYSTEM ---
+        function showAlert(title, message, type = 'error', autoClose = false) {
+            clearTimeout(alertTimeout);
+            document.getElementById('alert-title').innerText = title;
+            document.getElementById('alert-message').innerText = message;
+            document.getElementById('alert-icon').innerText = type === 'error' ? '⚠️' : '✅';
+            document.getElementById('alert-overlay').classList.add('active');
+
+            if (autoClose) {
+                document.getElementById('alert-btn').style.display = 'none';
+                alertTimeout = setTimeout(closeAlert, 1500); // Auto close success messages smoothly
+            } else {
+                document.getElementById('alert-btn').style.display = 'inline-block';
+            }
         }
 
-        // Modal Functions
+        function closeAlert() {
+            document.getElementById('alert-overlay').classList.remove('active');
+            // Ensure focus returns to the PIN input if we are on the lock screen
+            if (document.getElementById('lock-screen').style.display !== 'none') {
+                document.getElementById('pin-input').focus();
+            }
+        }
+
+        // Allow closing popups with the Escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeAlert();
+                closeModal();
+            }
+        });
+
+        // --- AI SUMMARY MODAL SYSTEM ---
         function openModal(title, dataKey) {
             document.getElementById('modal-title').innerText = title;
             const text = summaryDataStore[dataKey] || "No summary available.";
-            // Format text (convert line breaks to HTML breaks)
             document.getElementById('modal-body-text').innerHTML = text.replace(/\n/g, '<br><br>');
             document.getElementById('modal-overlay').classList.add('active');
         }
@@ -304,8 +334,7 @@
         async function authenticate() {
             const pin = document.getElementById('pin-input').value;
             if (!pin) {
-                showToast("Please enter a PIN to continue.", "error");
-                document.getElementById('pin-input').focus();
+                showAlert("Input Required", "Please enter a secure PIN to continue.", "error");
                 return;
             }
             
@@ -323,7 +352,7 @@
                 const result = await response.json();
                 
                 if (result.success) {
-                    showToast("Authentication successful.", "success");
+                    // Transition to dashboard without an intrusive popup
                     document.getElementById('lock-screen').style.display = 'none';
                     document.getElementById('dashboard').style.display = 'block';
                     renderTable(result.data);
@@ -331,18 +360,22 @@
                     handleAuthFail();
                 }
             } catch (err) {
-                showToast("Network error establishing secure connection.", "error");
+                showAlert("Connection Error", "Network error establishing secure connection.", "error");
                 handleAuthFail(false);
             }
         }
 
-        function handleAuthFail(showDefaultToast = true) {
+        function handleAuthFail(showPopup = true) {
             document.getElementById('auth-text').innerText = "Unlock Dashboard";
             document.getElementById('auth-spinner').style.display = "none";
             document.getElementById('btn-auth').disabled = false;
             document.getElementById('pin-input').value = '';
-            document.getElementById('pin-input').focus();
-            if(showDefaultToast) showToast("Invalid PIN provided.", "error");
+            
+            if(showPopup) {
+                showAlert("Authentication Failed", "The PIN you entered is invalid.", "error");
+            } else {
+                document.getElementById('pin-input').focus();
+            }
         }
 
         async function fetchData() {
@@ -358,14 +391,14 @@
                 });
                 const result = await response.json();
                 if (result.success) {
-                    showToast("Data refreshed.", "success");
+                    showAlert("Success", "Candidate data has been refreshed.", "success", true);
                     renderTable(result.data);
                 } else {
-                    showToast("Session expired. Please reload.", "error");
+                    showAlert("Session Expired", "Please reload the page and enter your PIN again.", "error");
                 }
             } catch (err) {
                 tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; padding: 60px; color: var(--danger-text); font-weight: 500;">Failed to fetch records.</td></tr>';
-                showToast("Failed to fetch data.", "error");
+                showAlert("Sync Failed", "Failed to pull the latest candidate data.", "error");
             }
         }
 
