@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Assessment Admin Dashboard</title>
+    <link rel="icon" type="image/x-icon" href="https://www.google.com/s2/favicons?sz=64&domain=mindmatrix.net">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -95,7 +96,7 @@
             cursor: pointer; backdrop-filter: blur(10px); transition: all 0.2s ease;
             display: flex; align-items: center; gap: 8px; box-shadow: var(--shadow-soft);
         }
-        .btn-refresh:hover { background: var(--text-heading); color: var(--bg-gradient); }
+        .btn-refresh:hover { background: var(--primary-accent); color: #ffffff; border-color: var(--primary-accent); }
 
         .table-container {
             background: var(--glass-bg); backdrop-filter: blur(20px);
@@ -120,7 +121,16 @@
         td { font-size: 15px; color: var(--text-heading); vertical-align: middle; }
         .td-muted { color: var(--text-muted); font-size: 14px; }
         
-        .score-pill { font-weight: 700; font-size: 14px; }
+        /* Summary Tooltip Styles */
+        .score-wrapper { display: inline-flex; align-items: center; gap: 8px; }
+        .score-pill { font-weight: 700; font-size: 15px; }
+        .info-icon { 
+            display: inline-flex; align-items: center; justify-content: center;
+            width: 22px; height: 22px; border-radius: 50%; font-size: 12px;
+            background: rgba(0,0,0,0.05); color: var(--text-muted); cursor: help;
+        }
+        body.dark-mode .info-icon { background: rgba(255,255,255,0.1); }
+        .info-icon:hover { background: var(--primary-accent); color: white; }
         
         .status-flag { 
             display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; 
@@ -267,6 +277,22 @@
             }
         }
 
+        // Helper function to extract just the numeric score and clean up the tooltip text
+        function parseScoreData(rawString) {
+            if (!rawString || rawString === "Pending..." || rawString.includes("Pending Phase 2")) {
+                return { badge: "Pending", tooltip: "Awaiting candidate submission." };
+            }
+            
+            // Regex to find "Score: [numbers]" no matter where it is in the string
+            const scoreMatch = rawString.match(/Score:\s*(\d+)/i);
+            const badgeValue = scoreMatch ? `${scoreMatch[1]}/100` : "View PDF";
+            
+            // Format tooltip text (remove line breaks for native HTML tooltip compliance, escape quotes)
+            const tooltipText = rawString.replace(/\n/g, '  |  ').replace(/"/g, '&quot;');
+            
+            return { badge: badgeValue, tooltip: tooltipText };
+        }
+
         function renderTable(data) {
             const tbody = document.getElementById('table-body');
             tbody.innerHTML = '';
@@ -288,12 +314,9 @@
                 const name = row[1];
                 const email = row[2];
                 
-                // Extract just the number from "Score: X out of 100" if possible
-                const p1ScoreRaw = row[3] || "N/A";
-                const p1Score = p1ScoreRaw.includes("Score:") ? p1ScoreRaw.split("\n")[0] : "N/A";
-                
-                const p2ScoreRaw = row[9] || "Pending...";
-                const p2Score = p2ScoreRaw.includes("Score:") ? p2ScoreRaw.split("\n")[0] : p2ScoreRaw;
+                // Parse scores using the new helper
+                const p1Data = parseScoreData(row[3]);
+                const p2Data = parseScoreData(row[9]);
                 
                 const exits = parseInt(row[4]) || 0;
                 const isClean = exits === 0;
@@ -314,8 +337,18 @@
                             <div style="font-weight: 600;">${name}</div>
                             <div class="td-muted" style="margin-top: 4px;">${email}</div>
                         </td>
-                        <td><span class="score-pill" style="color: #2563eb;">${p1Score}</span></td>
-                        <td><span class="score-pill" style="color: #8b5cf6;">${p2Score}</span></td>
+                        <td>
+                            <div class="score-wrapper" title="${p1Data.tooltip}">
+                                <span class="score-pill" style="color: #2563eb;">${p1Data.badge}</span>
+                                <span class="info-icon">ℹ️</span>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="score-wrapper" title="${p2Data.tooltip}">
+                                <span class="score-pill" style="color: #8b5cf6;">${p2Data.badge}</span>
+                                <span class="info-icon">ℹ️</span>
+                            </div>
+                        </td>
                         <td>
                             <span class="status-flag ${flagClass}">
                                 <span>${flagIcon}</span> ${flagText}
