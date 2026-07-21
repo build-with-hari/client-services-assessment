@@ -7,42 +7,160 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg: #f8fafc; --text-main: #0f172a; --text-muted: #64748b; 
-            --card-bg: #ffffff; --border: #e2e8f0; --primary: #2563eb;
+            --bg-gradient: linear-gradient(135deg, #f0f4f8 0%, #e2e8f0 100%);
+            --text-heading: #0f172a; --text-body: #334155; --text-muted: #64748b;
+            --glass-bg: rgba(255, 255, 255, 0.75); --glass-border: rgba(255, 255, 255, 0.6);
+            --input-bg: rgba(255, 255, 255, 0.6); --primary-accent: #2563eb; 
+            --success-bg: rgba(16, 185, 129, 0.1); --success-text: #059669;
+            --danger-bg: rgba(239, 68, 68, 0.1); --danger-text: #dc2626;
+            --shadow-soft: 0 10px 40px -10px rgba(0, 0, 0, 0.08);
         }
-        body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text-main); margin: 0; padding: 20px; }
-        
+
+        /* DARK MODE VARS */
+        body.dark-mode {
+            --bg-gradient: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            --text-heading: #f8fafc; --text-body: #cbd5e1; --text-muted: #94a3b8;
+            --glass-bg: rgba(30, 41, 59, 0.75); --glass-border: rgba(255, 255, 255, 0.1);
+            --input-bg: rgba(15, 23, 42, 0.6);
+            --success-bg: rgba(16, 185, 129, 0.15); --success-text: #34d399;
+            --danger-bg: rgba(239, 68, 68, 0.15); --danger-text: #f87171;
+        }
+
+        * { box-sizing: border-box; }
+        body { 
+            font-family: 'Inter', sans-serif; background: var(--bg-gradient); 
+            color: var(--text-body); margin: 0; padding: 20px; min-height: 100vh;
+            background-attachment: fixed; transition: background 0.4s ease;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* Animations */
+        @keyframes slideUpFade { 
+            from { opacity: 0; transform: translateY(20px); } 
+            to { opacity: 1; transform: translateY(0); } 
+        }
+        @keyframes pulseGlow { 
+            0% { box-shadow: 0 0 0 0 rgba(37, 99, 235, 0.4); } 
+            70% { box-shadow: 0 0 0 10px rgba(37, 99, 235, 0); } 
+            100% { box-shadow: 0 0 0 0 rgba(37, 99, 235, 0); } 
+        }
+
+        #theme-toggle { 
+            position: fixed; top: 20px; right: 20px; background: var(--glass-bg); 
+            border: 1px solid var(--glass-border); font-size: 20px; padding: 10px; 
+            border-radius: 50%; cursor: pointer; box-shadow: var(--shadow-soft); 
+            z-index: 1000; backdrop-filter: blur(10px); transition: transform 0.2s; 
+        }
+        #theme-toggle:hover { transform: scale(1.1); }
+
         /* Lock Screen */
-        #lock-screen { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 90vh; }
-        .lock-box { background: var(--card-bg); padding: 40px; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); border: 1px solid var(--border); text-align: center; }
-        input[type="password"] { padding: 12px; border: 2px solid var(--border); border-radius: 8px; font-size: 16px; letter-spacing: 4px; text-align: center; width: 200px; margin-bottom: 20px; }
-        button { background: var(--primary); color: white; border: none; padding: 12px 24px; border-radius: 8px; font-weight: bold; cursor: pointer; }
+        #lock-screen { 
+            display: flex; flex-direction: column; align-items: center; 
+            justify-content: center; height: 90vh; animation: slideUpFade 0.6s cubic-bezier(0.16, 1, 0.3, 1); 
+        }
+        .lock-box { 
+            background: var(--glass-bg); backdrop-filter: blur(20px); 
+            padding: 50px 40px; border-radius: 20px; border: 1px solid var(--glass-border); 
+            box-shadow: var(--shadow-soft); text-align: center; width: 100%; max-width: 400px; 
+        }
+        .lock-box h2 { margin: 0 0 10px 0; color: var(--text-heading); font-size: 24px; }
+        .lock-box p { color: var(--text-muted); margin-bottom: 30px; font-size: 15px; }
         
+        input[type="password"] { 
+            padding: 15px; border: 2px solid #cbd5e1; border-radius: 12px; 
+            background: var(--input-bg); color: var(--text-heading);
+            font-size: 24px; letter-spacing: 8px; text-align: center; width: 220px; 
+            margin-bottom: 25px; transition: all 0.3s ease; outline: none; font-family: monospace;
+        }
+        body.dark-mode input[type="password"] { border-color: #334155; }
+        input[type="password"]:focus { border-color: var(--primary-accent); box-shadow: 0 0 0 4px rgba(37,99,235,0.1); }
+        
+        .btn-primary { 
+            background: linear-gradient(135deg, var(--primary-accent) 0%, #1e40af 100%); 
+            color: white; border: none; padding: 16px 30px; border-radius: 12px; 
+            font-weight: 600; font-size: 16px; cursor: pointer; width: 100%;
+            transition: all 0.3s ease; display: flex; justify-content: center; align-items: center; gap: 8px;
+        }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 10px 20px -10px var(--primary-accent); }
+        .btn-primary:active { transform: translateY(0); }
+
         /* Dashboard */
-        #dashboard { display: none; max-width: 1200px; margin: 0 auto; }
+        #dashboard { display: none; max-width: 1200px; margin: 40px auto; animation: slideUpFade 0.6s ease; }
         .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
-        table { width: 100%; border-collapse: collapse; background: var(--card-bg); border-radius: 12px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.02); }
-        th, td { padding: 16px; text-align: left; border-bottom: 1px solid var(--border); }
-        th { background: #f1f5f9; font-weight: 600; color: var(--text-muted); font-size: 14px; text-transform: uppercase; }
-        td { font-size: 15px; }
-        .btn-view { display: inline-block; background: #f1f5f9; color: var(--primary); padding: 6px 12px; border-radius: 6px; text-decoration: none; font-weight: 600; font-size: 13px; }
-        .btn-view:hover { background: #e2e8f0; }
-        .status-flag { padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: bold; }
-        .flag-clean { background: #dcfce7; color: #166534; }
-        .flag-warn { background: #fee2e2; color: #991b1b; }
+        .header h2 { margin: 0; color: var(--text-heading); font-size: 28px; font-weight: 700; }
+        
+        .btn-refresh { 
+            background: var(--glass-bg); color: var(--text-heading); border: 1px solid var(--glass-border); 
+            padding: 12px 20px; border-radius: 10px; font-weight: 600; font-size: 14px; 
+            cursor: pointer; backdrop-filter: blur(10px); transition: all 0.2s ease;
+            display: flex; align-items: center; gap: 8px; box-shadow: var(--shadow-soft);
+        }
+        .btn-refresh:hover { background: var(--text-heading); color: var(--bg-gradient); }
+
+        .table-container {
+            background: var(--glass-bg); backdrop-filter: blur(20px);
+            border-radius: 16px; border: 1px solid var(--glass-border);
+            box-shadow: var(--shadow-soft); overflow-x: auto;
+        }
+        
+        table { width: 100%; border-collapse: collapse; text-align: left; }
+        th, td { padding: 18px 24px; border-bottom: 1px solid var(--glass-border); }
+        th { 
+            font-size: 13px; text-transform: uppercase; letter-spacing: 1px; 
+            color: var(--text-muted); font-weight: 600; 
+            background: rgba(0,0,0,0.02); white-space: nowrap;
+        }
+        body.dark-mode th { background: rgba(255,255,255,0.02); }
+        
+        tbody tr { transition: background 0.2s; }
+        tbody tr:hover { background: rgba(0,0,0,0.02); }
+        body.dark-mode tbody tr:hover { background: rgba(255,255,255,0.02); }
+        tbody tr:last-child td { border-bottom: none; }
+        
+        td { font-size: 15px; color: var(--text-heading); vertical-align: middle; }
+        .td-muted { color: var(--text-muted); font-size: 14px; }
+        
+        .score-pill { font-weight: 700; font-size: 14px; }
+        
+        .status-flag { 
+            display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; 
+            border-radius: 50px; font-size: 12.5px; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase;
+        }
+        .flag-clean { background: var(--success-bg); color: var(--success-text); }
+        .flag-warn { background: var(--danger-bg); color: var(--danger-text); animation: pulseGlow 2s infinite; }
+        
+        .btn-view { 
+            display: inline-flex; align-items: center; gap: 6px; background: rgba(37, 99, 235, 0.1); 
+            color: var(--primary-accent); padding: 8px 16px; border-radius: 8px; 
+            text-decoration: none; font-weight: 600; font-size: 13px; transition: all 0.2s;
+        }
+        .btn-view:hover { background: var(--primary-accent); color: white; }
+
+        .spinner {
+            border: 3px solid rgba(255,255,255,0.3); border-radius: 50%;
+            border-top: 3px solid white; width: 18px; height: 18px;
+            animation: spin 1s linear infinite; display: none;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
 </head>
 <body>
 
+    <!-- DARK MODE TOGGLE -->
+    <div id="theme-toggle" onclick="toggleTheme()">🌙</div>
+
     <!-- LOCK SCREEN -->
     <div id="lock-screen">
         <div class="lock-box">
-            <h2>🛡️ Admin Access</h2>
-            <p style="color: var(--text-muted); margin-bottom: 20px;">Enter your PIN to securely fetch data.</p>
-            <input type="password" id="pin-input" placeholder="****" maxlength="4">
+            <h2>🛡️ Admin Portal</h2>
+            <p>Enter secure PIN to access candidate records.</p>
+            <input type="password" id="pin-input" placeholder="••••" maxlength="4" autofocus>
             <br>
-            <button onclick="authenticate()">Unlock Dashboard</button>
-            <div id="auth-error" style="color: red; margin-top: 15px; font-weight: bold; display: none;">Invalid PIN.</div>
+            <button class="btn-primary" id="btn-auth" onclick="authenticate()">
+                <span id="auth-text">Unlock Dashboard</span>
+                <div class="spinner" id="auth-spinner"></div>
+            </button>
+            <div id="auth-error" style="color: var(--danger-text); margin-top: 20px; font-weight: 600; font-size: 14px; display: none; background: var(--danger-bg); padding: 10px; border-radius: 8px;">Invalid PIN provided.</div>
         </div>
     </div>
 
@@ -50,33 +168,56 @@
     <div id="dashboard">
         <div class="header">
             <h2>Assessment Candidates</h2>
-            <button onclick="fetchData()" style="background: #10b981;">🔄 Refresh Data</button>
+            <button class="btn-refresh" onclick="fetchData()">
+                <span>🔄</span> Refresh Data
+            </button>
         </div>
-        <table>
-            <thead>
-                <tr>
-                    <th>Date</th>
-                    <th>Candidate Name</th>
-                    <th>Email</th>
-                    <th>Phase 1 Score</th>
-                    <th>Phase 2 (Essay)</th>
-                    <th>Integrity</th>
-                    <th>Drive Link</th>
-                </tr>
-            </thead>
-            <tbody id="table-body">
-                <tr><td colspan="7" style="text-align: center; padding: 40px;">Fetching records...</td></tr>
-            </tbody>
-        </table>
+        
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Date Submitted</th>
+                        <th>Candidate Profile</th>
+                        <th>Phase 1 (Main)</th>
+                        <th>Phase 2 (Essay)</th>
+                        <th>Proctor Status</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody id="table-body">
+                    <tr><td colspan="6" style="text-align: center; padding: 60px; color: var(--text-muted); font-weight: 500;">Connecting to secure database...</td></tr>
+                </tbody>
+            </table>
+        </div>
     </div>
 
     <script>
-        const GAS_URL = "https://script.google.com/macros/s/AKfycbwyqEg3vr_nm-6MpnNuBu2Aa7EVkC2-UBrG-wAckFEDojFrg63U0M3u4qG02mngy3OB/exec"; // Same Script URL
+        // ==========================================
+        // 🚨 IMPORTANT: Replace with your deployed GAS URL
+        // ==========================================
+        const GAS_URL = "https://script.google.com/macros/s/AKfycbwyqEg3vr_nm-6MpnNuBu2Aa7EVkC2-UBrG-wAckFEDojFrg63U0M3u4qG02mngy3OB/exec"; 
+
+        function toggleTheme() {
+            document.body.classList.toggle('dark-mode');
+            const btn = document.getElementById('theme-toggle');
+            btn.innerText = document.body.classList.contains('dark-mode') ? '☀️' : '🌙';
+        }
+
+        // Allow pressing "Enter" on the PIN input
+        document.getElementById('pin-input').addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') authenticate();
+        });
 
         async function authenticate() {
             const pin = document.getElementById('pin-input').value;
             if (!pin) return;
-            document.querySelector('.lock-box button').innerText = "Authenticating...";
+            
+            // Loading State
+            document.getElementById('auth-text').innerText = "Authenticating...";
+            document.getElementById('auth-spinner').style.display = "block";
+            document.getElementById('btn-auth').disabled = true;
+            document.getElementById('auth-error').style.display = 'none';
             
             try {
                 const response = await fetch(GAS_URL, {
@@ -91,52 +232,100 @@
                     document.getElementById('dashboard').style.display = 'block';
                     renderTable(result.data);
                 } else {
-                    document.getElementById('auth-error').style.display = 'block';
-                    document.querySelector('.lock-box button').innerText = "Unlock Dashboard";
+                    showAuthError();
                 }
             } catch (err) {
-                alert("Network error.");
-                document.querySelector('.lock-box button').innerText = "Unlock Dashboard";
+                alert("Network error establishing secure connection.");
+                showAuthError();
             }
         }
 
+        function showAuthError() {
+            document.getElementById('auth-text').innerText = "Unlock Dashboard";
+            document.getElementById('auth-spinner').style.display = "none";
+            document.getElementById('btn-auth').disabled = false;
+            document.getElementById('auth-error').style.display = 'block';
+            document.getElementById('pin-input').value = '';
+            document.getElementById('pin-input').focus();
+        }
+
         async function fetchData() {
-            document.getElementById('table-body').innerHTML = '<tr><td colspan="7" style="text-align: center; padding: 40px;">Refreshing records...</td></tr>';
-            authenticate(); 
+            const tbody = document.getElementById('table-body');
+            tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; padding: 60px; color: var(--text-muted); font-weight: 500;">Refreshing records...</td></tr>';
+            
+            const pin = document.getElementById('pin-input').value;
+            try {
+                const response = await fetch(GAS_URL, {
+                    method: 'POST',
+                    body: JSON.stringify({ action: 'getAdminData', pin: pin }),
+                    headers: { 'Content-Type': 'text/plain;charset=utf-8' }
+                });
+                const result = await response.json();
+                if (result.success) renderTable(result.data);
+            } catch (err) {
+                tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; padding: 60px; color: var(--danger-text); font-weight: 500;">Failed to fetch records.</td></tr>';
+            }
         }
 
         function renderTable(data) {
             const tbody = document.getElementById('table-body');
             tbody.innerHTML = '';
             
-            // Skip the header row (index 0) and map data
-            for (let i = data.length - 1; i > 0; i--) { // Reverse chronological
+            if (data.length <= 1) {
+                tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; padding: 60px; color: var(--text-muted);">No candidates have submitted yet.</td></tr>';
+                return;
+            }
+
+            // Skip the header row (index 0) and map data in reverse chronological order
+            for (let i = data.length - 1; i > 0; i--) { 
                 const row = data[i];
                 if (!row[1]) continue; // Skip empty rows
 
-                const dateStr = new Date(row[0]).toLocaleDateString();
+                const dateObj = new Date(row[0]);
+                const dateStr = dateObj.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' });
+                const timeStr = dateObj.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' });
+                
                 const name = row[1];
                 const email = row[2];
+                
                 // Extract just the number from "Score: X out of 100" if possible
                 const p1ScoreRaw = row[3] || "N/A";
                 const p1Score = p1ScoreRaw.includes("Score:") ? p1ScoreRaw.split("\n")[0] : "N/A";
-                const p2ScoreRaw = row[9] || "N/A";
-                const p2Score = p2ScoreRaw.includes("Score:") ? p2ScoreRaw.split("\n")[0] : "N/A";
+                
+                const p2ScoreRaw = row[9] || "Pending...";
+                const p2Score = p2ScoreRaw.includes("Score:") ? p2ScoreRaw.split("\n")[0] : p2ScoreRaw;
                 
                 const exits = parseInt(row[4]) || 0;
-                const flagClass = exits > 0 ? "flag-warn" : "flag-clean";
-                const flagText = exits > 0 ? `${exits} Violations` : "Clean";
+                const isClean = exits === 0;
+                
+                const flagClass = isClean ? "flag-clean" : "flag-warn";
+                const flagIcon = isClean ? "✓" : "⚠️";
+                const flagText = isClean ? "Clean" : `${exits} Violations`;
+                
                 const folderUrl = row[5];
 
                 tbody.innerHTML += `
                     <tr>
-                        <td style="color: var(--text-muted);">${dateStr}</td>
-                        <td style="font-weight: 600;">${name}</td>
-                        <td>${email}</td>
-                        <td style="font-weight: 600; color: #2563eb;">${p1Score}</td>
-                        <td style="font-weight: 600; color: #8b5cf6;">${p2Score}</td>
-                        <td><span class="status-flag ${flagClass}">${flagText}</span></td>
-                        <td><a href="${folderUrl}" target="_blank" class="btn-view">View Folder ↗</a></td>
+                        <td class="td-muted">
+                            <div style="font-weight: 600; color: var(--text-heading);">${dateStr}</div>
+                            <div style="font-size: 12px; margin-top: 4px;">${timeStr}</div>
+                        </td>
+                        <td>
+                            <div style="font-weight: 600;">${name}</div>
+                            <div class="td-muted" style="margin-top: 4px;">${email}</div>
+                        </td>
+                        <td><span class="score-pill" style="color: #2563eb;">${p1Score}</span></td>
+                        <td><span class="score-pill" style="color: #8b5cf6;">${p2Score}</span></td>
+                        <td>
+                            <span class="status-flag ${flagClass}">
+                                <span>${flagIcon}</span> ${flagText}
+                            </span>
+                        </td>
+                        <td>
+                            <a href="${folderUrl}" target="_blank" class="btn-view">
+                                View Folder <span>↗</span>
+                            </a>
+                        </td>
                     </tr>
                 `;
             }
