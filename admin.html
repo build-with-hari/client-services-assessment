@@ -18,7 +18,6 @@
             --shadow-hover: 0 20px 40px -10px rgba(0, 0, 0, 0.12);
         }
 
-        /* DARK MODE VARS */
         body.dark-mode {
             --bg-gradient: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
             --text-heading: #f8fafc; --text-body: #cbd5e1; --text-muted: #94a3b8;
@@ -47,78 +46,85 @@
             100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); } 
         }
 
+        /* Staggered Row Animation applied dynamically via JS */
+        .animated-row { opacity: 0; animation: slideUpFade 0.4s ease forwards; animation-delay: calc(var(--i) * 0.05s); }
+
         #theme-toggle { 
             position: fixed; top: 20px; right: 20px; background: var(--glass-bg); 
             border: 1px solid var(--glass-border); font-size: 20px; padding: 10px; 
             border-radius: 50%; cursor: pointer; box-shadow: var(--shadow-soft); 
-            z-index: 1000; backdrop-filter: blur(10px); transition: transform 0.2s, background 0.3s; 
+            z-index: 1000; backdrop-filter: blur(10px); transition: all 0.2s; 
         }
         #theme-toggle:hover { transform: scale(1.1); }
+        #theme-toggle:active { transform: scale(0.9); }
 
         /* Lock Screen */
-        #lock-screen { 
-            display: flex; flex-direction: column; align-items: center; 
-            justify-content: center; height: 90vh; animation: slideUpFade 0.6s cubic-bezier(0.16, 1, 0.3, 1); 
-        }
+        #lock-screen { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 90vh; animation: slideUpFade 0.6s cubic-bezier(0.16, 1, 0.3, 1); }
         .lock-box { 
-            background: var(--glass-bg); backdrop-filter: blur(20px); 
-            padding: 50px 40px; border-radius: 24px; border: 1px solid var(--glass-border); 
-            box-shadow: var(--shadow-soft); text-align: center; width: 100%; max-width: 420px; 
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            background: var(--glass-bg); backdrop-filter: blur(20px); padding: 50px 40px; 
+            border-radius: 24px; border: 1px solid var(--glass-border); box-shadow: var(--shadow-soft); 
+            text-align: center; width: 100%; max-width: 420px; transition: transform 0.3s ease, box-shadow 0.3s ease;
         }
         .lock-box:hover { transform: translateY(-5px); box-shadow: var(--shadow-hover); }
         .lock-box h2 { margin: 0 0 10px 0; color: var(--text-heading); font-size: 26px; }
         .lock-box p { color: var(--text-muted); margin-bottom: 30px; font-size: 15px; }
         
         input[type="password"] { 
-            padding: 16px; border: 2px solid #cbd5e1; border-radius: 14px; 
-            background: var(--input-bg); color: var(--text-heading);
-            font-size: 24px; letter-spacing: 12px; text-align: center; width: 240px; 
-            margin-bottom: 25px; transition: all 0.3s ease; outline: none; font-family: monospace;
-            box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);
+            padding: 16px; border: 2px solid #cbd5e1; border-radius: 14px; background: var(--input-bg); color: var(--text-heading);
+            font-size: 24px; letter-spacing: 12px; text-align: center; width: 240px; margin-bottom: 25px; transition: all 0.3s ease; outline: none; font-family: monospace;
         }
         body.dark-mode input[type="password"] { border-color: #334155; }
         input[type="password"]:focus { border-color: var(--primary-accent); box-shadow: 0 0 0 4px rgba(37,99,235,0.15); }
         
         .btn-primary { 
-            background: linear-gradient(135deg, var(--primary-accent) 0%, #1e40af 100%); 
-            color: white; border: none; padding: 16px 30px; border-radius: 12px; 
-            font-weight: 600; font-size: 16px; cursor: pointer; width: 100%;
-            transition: all 0.3s ease; display: flex; justify-content: center; align-items: center; gap: 8px;
-            box-shadow: 0 4px 15px rgba(37, 99, 235, 0.3);
+            background: linear-gradient(135deg, var(--primary-accent) 0%, #1e40af 100%); color: white; border: none; padding: 16px 30px; 
+            border-radius: 12px; font-weight: 600; font-size: 16px; cursor: pointer; width: 100%; transition: all 0.2s ease; 
+            display: flex; justify-content: center; align-items: center; gap: 8px; box-shadow: 0 4px 15px rgba(37, 99, 235, 0.3);
         }
         .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(37, 99, 235, 0.4); }
-        .btn-primary:active { transform: translateY(0); }
+        .btn-primary:active { transform: translateY(1px) scale(0.98); }
 
-        /* Dashboard */
+        /* Dashboard Global */
         #dashboard { display: none; max-width: 1200px; margin: 40px auto; animation: slideUpFade 0.6s ease; }
-        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
+        
+        /* Navigation Tabs */
+        .nav-tabs { display: flex; gap: 15px; margin-bottom: 30px; }
+        .tab-btn {
+            background: var(--glass-bg); color: var(--text-muted); border: 1px solid var(--glass-border); padding: 12px 24px;
+            border-radius: 12px; font-weight: 600; font-size: 15px; cursor: pointer; backdrop-filter: blur(10px); 
+            transition: all 0.3s ease; display: flex; align-items: center; gap: 8px; box-shadow: var(--shadow-soft);
+        }
+        .tab-btn:hover { color: var(--text-heading); transform: translateY(-2px); }
+        .tab-btn:active { transform: scale(0.95); }
+        .tab-btn.active { background: var(--primary-accent); color: white; border-color: var(--primary-accent); box-shadow: 0 8px 20px rgba(37, 99, 235, 0.3); }
+
+        /* View Sections */
+        .dashboard-view { display: none; animation: fadeIn 0.4s ease forwards; }
+        .dashboard-view.active { display: block; }
+
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; }
         .header h2 { margin: 0; color: var(--text-heading); font-size: 28px; font-weight: 700; }
         
-        .btn-refresh { 
-            background: var(--glass-bg); color: var(--text-heading); border: 1px solid var(--glass-border); 
-            padding: 12px 20px; border-radius: 10px; font-weight: 600; font-size: 14px; 
-            cursor: pointer; backdrop-filter: blur(10px); transition: all 0.2s ease;
-            display: flex; align-items: center; gap: 8px; box-shadow: var(--shadow-soft);
+        .header-actions { display: flex; gap: 12px; }
+        .btn-action { 
+            background: var(--glass-bg); color: var(--text-heading); border: 1px solid var(--glass-border); padding: 12px 20px; 
+            border-radius: 10px; font-weight: 600; font-size: 14px; cursor: pointer; backdrop-filter: blur(10px); 
+            transition: all 0.2s ease; display: flex; align-items: center; gap: 8px; box-shadow: var(--shadow-soft);
         }
-        .btn-refresh:hover { background: var(--primary-accent); color: #ffffff; border-color: var(--primary-accent); transform: translateY(-2px); box-shadow: 0 8px 20px rgba(37, 99, 235, 0.2); }
+        .btn-action:hover { background: var(--primary-accent); color: #ffffff; border-color: var(--primary-accent); transform: translateY(-2px); box-shadow: 0 8px 20px rgba(37, 99, 235, 0.2); }
+        .btn-action:active { transform: translateY(1px) scale(0.95); }
+        .btn-action.generate { background: rgba(16, 185, 129, 0.1); color: #059669; border-color: rgba(16, 185, 129, 0.2); }
+        body.dark-mode .btn-action.generate { color: #34d399; }
+        .btn-action.generate:hover { background: #10b981; color: white; box-shadow: 0 8px 20px rgba(16, 185, 129, 0.3); }
 
-        .table-container {
-            background: var(--glass-bg); backdrop-filter: blur(20px);
-            border-radius: 16px; border: 1px solid var(--glass-border);
-            box-shadow: var(--shadow-soft); overflow-x: auto; transition: box-shadow 0.3s;
-        }
+        .table-container { background: var(--glass-bg); backdrop-filter: blur(20px); border-radius: 16px; border: 1px solid var(--glass-border); box-shadow: var(--shadow-soft); overflow-x: auto; }
         
         table { width: 100%; border-collapse: collapse; text-align: left; }
         th, td { padding: 18px 24px; border-bottom: 1px solid var(--glass-border); }
-        th { 
-            font-size: 13px; text-transform: uppercase; letter-spacing: 1px; 
-            color: var(--text-muted); font-weight: 600; 
-            background: rgba(0,0,0,0.02); white-space: nowrap;
-        }
+        th { font-size: 13px; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted); font-weight: 600; background: rgba(0,0,0,0.02); white-space: nowrap; }
         body.dark-mode th { background: rgba(255,255,255,0.02); }
         
-        tbody tr { transition: background 0.2s, transform 0.2s; }
+        tbody tr { transition: background 0.2s; }
         tbody tr:hover { background: rgba(0,0,0,0.02); }
         body.dark-mode tbody tr:hover { background: rgba(255,255,255,0.03); }
         tbody tr:last-child td { border-bottom: none; }
@@ -126,76 +132,54 @@
         td { font-size: 15px; color: var(--text-heading); vertical-align: middle; }
         .td-muted { color: var(--text-muted); font-size: 14px; }
         
-        /* Clickable Score Buttons */
+        /* Buttons */
         .score-btn {
-            background: rgba(37, 99, 235, 0.1); color: var(--primary-accent);
-            border: 1px solid rgba(37, 99, 235, 0.2); padding: 8px 16px;
-            border-radius: 8px; font-weight: 700; font-size: 14px; cursor: pointer;
+            background: rgba(37, 99, 235, 0.1); color: var(--primary-accent); border: 1px solid rgba(37, 99, 235, 0.2); 
+            padding: 8px 16px; border-radius: 8px; font-weight: 700; font-size: 14px; cursor: pointer;
             transition: all 0.2s; display: inline-flex; align-items: center; gap: 6px; font-family: inherit;
         }
         .score-btn:hover { background: var(--primary-accent); color: white; transform: translateY(-2px); box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2); }
-        
+        .score-btn:active { transform: scale(0.95); }
         .score-btn.purple { background: rgba(139, 92, 246, 0.1); color: #8b5cf6; border-color: rgba(139, 92, 246, 0.2); }
         .score-btn.purple:hover { background: #8b5cf6; color: white; box-shadow: 0 4px 12px rgba(139, 92, 246, 0.2); }
-
         .score-btn.pending { background: rgba(100, 116, 139, 0.1); color: var(--text-muted); border-color: transparent; cursor: default; }
         .score-btn.pending:hover { transform: none; box-shadow: none; background: rgba(100, 116, 139, 0.1); color: var(--text-muted); }
         
-        /* Status Flags */
-        .status-flag { 
-            display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; 
-            border-radius: 50px; font-size: 12.5px; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase;
-        }
+        .status-flag { display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 50px; font-size: 12.5px; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase; }
         .flag-clean { background: var(--success-bg); color: var(--success-text); }
         .flag-warn { background: var(--danger-bg); color: var(--danger-text); animation: pulseGlow 2s infinite; }
+        .flag-yellow { background: rgba(234, 179, 8, 0.1); color: #ca8a04; }
+        body.dark-mode .flag-yellow { background: rgba(234, 179, 8, 0.15); color: #fde047; }
         
-        /* View Folder Button */
-        .btn-view { 
-            display: inline-flex; align-items: center; gap: 6px; background: rgba(0,0,0,0.05); 
-            color: var(--text-heading); padding: 8px 16px; border-radius: 8px; 
-            text-decoration: none; font-weight: 600; font-size: 13px; transition: all 0.2s;
-        }
+        .btn-view { display: inline-flex; align-items: center; gap: 6px; background: rgba(0,0,0,0.05); color: var(--text-heading); padding: 8px 16px; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 13px; transition: all 0.2s; }
         body.dark-mode .btn-view { background: rgba(255,255,255,0.1); color: var(--text-heading); }
-        .btn-view:hover { 
-            background: var(--primary-accent); color: #ffffff; 
-            transform: translateY(-2px); box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2); 
-        }
+        .btn-view:hover { background: var(--primary-accent); color: #ffffff; transform: translateY(-2px); box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2); }
+        .btn-view:active { transform: scale(0.95); }
 
         .spinner { border: 3px solid rgba(255,255,255,0.3); border-radius: 50%; border-top: 3px solid white; width: 18px; height: 18px; animation: spin 1s linear infinite; display: none; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
-        /* Generic Overlay Styles */
-        .overlay { 
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
-            background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(6px); z-index: 2000; 
-            display: none; align-items: center; justify-content: center; 
-            opacity: 0; transition: opacity 0.3s ease; 
-        }
+        /* Overlays */
+        .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(6px); z-index: 2000; display: none; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.3s ease; }
         .overlay.active { display: flex; opacity: 1; }
-        .modal-card { 
-            background: var(--glass-bg); padding: 30px; border-radius: 20px; 
-            max-width: 550px; width: 90%; box-shadow: var(--shadow-hover); border: 1px solid var(--glass-border); 
-            transform: scale(0.95); transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-        }
+        .modal-card { background: var(--glass-bg); padding: 30px; border-radius: 20px; max-width: 550px; width: 90%; box-shadow: var(--shadow-hover); border: 1px solid var(--glass-border); transform: scale(0.95); transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
         .overlay.active .modal-card { transform: scale(1); }
         
-        /* Summary Modal Specific */
         .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
         .modal-header h3 { margin: 0; color: var(--text-heading); font-size: 20px; }
         .modal-close { background: none; border: none; font-size: 28px; color: var(--text-muted); cursor: pointer; transition: color 0.2s; line-height: 1; }
         .modal-close:hover { color: var(--danger-text); }
         .modal-body { color: var(--text-body); font-size: 15px; line-height: 1.6; max-height: 60vh; overflow-y: auto; padding-right: 10px; }
 
-        /* Popup Alert Specific */
         .alert-card { text-align: center; max-width: 400px; padding: 40px 30px; }
         .alert-icon { font-size: 45px; margin-bottom: 15px; }
         .alert-title { margin: 0 0 10px 0; color: var(--text-heading); font-size: 22px; font-weight: 700; }
         .alert-message { color: var(--text-muted); font-size: 15px; margin-bottom: 25px; line-height: 1.5; }
-        .alert-btn {
-            background: var(--primary-accent); color: white; border: none; padding: 12px 30px;
-            border-radius: 10px; font-weight: 600; font-size: 15px; cursor: pointer; transition: all 0.2s;
-        }
+        .alert-btn { background: var(--primary-accent); color: white; border: none; padding: 12px 30px; border-radius: 10px; font-weight: 600; font-size: 15px; cursor: pointer; transition: all 0.2s; }
         .alert-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(37, 99, 235, 0.3); }
+        .alert-btn:active { transform: scale(0.95); }
+        
+        .code-display { font-family: monospace; font-size: 18px; font-weight: 700; letter-spacing: 2px; }
 
     </style>
 </head>
@@ -228,7 +212,7 @@
     <div id="lock-screen">
         <div class="lock-box">
             <h2>🛡️ Admin Portal</h2>
-            <p>Enter secure PIN to access candidate records.</p>
+            <p>Enter secure PIN to access records.</p>
             <input type="password" id="pin-input" placeholder="••••" maxlength="4" autofocus>
             <br>
             <button class="btn-primary" id="btn-auth" onclick="authenticate()">
@@ -240,30 +224,70 @@
 
     <!-- DASHBOARD -->
     <div id="dashboard">
-        <div class="header">
-            <h2>Assessment Candidates</h2>
-            <button class="btn-refresh" onclick="fetchData()">
-                <span>🔄</span> Refresh Data
-            </button>
-        </div>
         
-        <div class="table-container">
-            <table>
-                <thead>
-                    <tr>
-                        <th>Date Submitted</th>
-                        <th>Candidate Profile</th>
-                        <th>Phase 1 (Main)</th>
-                        <th>Phase 2 (Essay)</th>
-                        <th>Proctor Status</th>
-                        <th>Action</th>
-                    </tr>
-                </thead>
-                <tbody id="table-body">
-                    <tr><td colspan="6" style="text-align: center; padding: 60px; color: var(--text-muted); font-weight: 500;">Connecting to secure database...</td></tr>
-                </tbody>
-            </table>
+        <!-- Tabs -->
+        <div class="nav-tabs">
+            <button class="tab-btn active" id="tab-candidates" onclick="switchTab('candidates')">👥 Candidates</button>
+            <button class="tab-btn" id="tab-codes" onclick="switchTab('codes')">🔑 Access Codes</button>
         </div>
+
+        <!-- View: Candidates -->
+        <div id="view-candidates" class="dashboard-view active">
+            <div class="header">
+                <h2>Assessment Results</h2>
+                <button class="btn-action" onclick="fetchCandidates()">
+                    <span>🔄</span> Refresh Results
+                </button>
+            </div>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Date Submitted</th>
+                            <th>Candidate Profile</th>
+                            <th>Phase 1 (Main)</th>
+                            <th>Phase 2 (Essay)</th>
+                            <th>Proctor Status</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="candidates-body">
+                        <tr><td colspan="6" style="text-align: center; padding: 60px; color: var(--text-muted); font-weight: 500;">Loading data...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- View: Access Codes -->
+        <div id="view-codes" class="dashboard-view">
+            <div class="header">
+                <h2>Manage Access Codes</h2>
+                <div class="header-actions">
+                    <button class="btn-action" onclick="manageCodes('refresh')">
+                        <span>🔄</span> Auto-Refresh Expired
+                    </button>
+                    <button class="btn-action generate" onclick="manageCodes('generate')">
+                        <span>✨</span> Generate 10 New
+                    </button>
+                </div>
+            </div>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Generated Date</th>
+                            <th>Access Code</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="codes-body">
+                        <tr><td colspan="4" style="text-align: center; padding: 60px; color: var(--text-muted); font-weight: 500;">Loading codes...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
     </div>
 
     <script>
@@ -272,9 +296,9 @@
         // ==========================================
         const GAS_URL = "https://script.google.com/macros/s/AKfycbwyqEg3vr_nm-6MpnNuBu2Aa7EVkC2-UBrG-wAckFEDojFrg63U0M3u4qG02mngy3OB/exec"; 
 
-        // Global store to hold AI summaries securely
         const summaryDataStore = {};
         let alertTimeout;
+        let isCodeDataFetched = false;
 
         function toggleTheme() {
             document.body.classList.toggle('dark-mode');
@@ -282,7 +306,19 @@
             btn.innerText = document.body.classList.contains('dark-mode') ? '☀️' : '🌙';
         }
 
-        // --- NEW POPUP ALERT SYSTEM ---
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.dashboard-view').forEach(view => view.classList.remove('active'));
+            
+            document.getElementById(`tab-${tabId}`).classList.add('active');
+            document.getElementById(`view-${tabId}`).classList.add('active');
+
+            if (tabId === 'codes' && !isCodeDataFetched) {
+                manageCodes('fetch');
+            }
+        }
+
+        // --- POPUP ALERT SYSTEM ---
         function showAlert(title, message, type = 'error', autoClose = false) {
             clearTimeout(alertTimeout);
             document.getElementById('alert-title').innerText = title;
@@ -292,7 +328,7 @@
 
             if (autoClose) {
                 document.getElementById('alert-btn').style.display = 'none';
-                alertTimeout = setTimeout(closeAlert, 1500); // Auto close success messages smoothly
+                alertTimeout = setTimeout(closeAlert, 1500);
             } else {
                 document.getElementById('alert-btn').style.display = 'inline-block';
             }
@@ -300,21 +336,16 @@
 
         function closeAlert() {
             document.getElementById('alert-overlay').classList.remove('active');
-            // Ensure focus returns to the PIN input if we are on the lock screen
             if (document.getElementById('lock-screen').style.display !== 'none') {
                 document.getElementById('pin-input').focus();
             }
         }
 
-        // Allow closing popups with the Escape key
         document.addEventListener('keydown', function(e) {
-            if (e.key === 'Escape') {
-                closeAlert();
-                closeModal();
-            }
+            if (e.key === 'Escape') { closeAlert(); closeModal(); }
         });
 
-        // --- AI SUMMARY MODAL SYSTEM ---
+        // --- MODAL SYSTEM ---
         function openModal(title, dataKey) {
             document.getElementById('modal-title').innerText = title;
             const text = summaryDataStore[dataKey] || "No summary available.";
@@ -326,36 +357,30 @@
             document.getElementById('modal-overlay').classList.remove('active');
         }
 
-        // Allow pressing "Enter" on the PIN input
         document.getElementById('pin-input').addEventListener('keypress', function (e) {
             if (e.key === 'Enter') authenticate();
         });
 
+        // --- AUTH & FETCH LOGIC ---
         async function authenticate() {
             const pin = document.getElementById('pin-input').value;
-            if (!pin) {
-                showAlert("Input Required", "Please enter a secure PIN to continue.", "error");
-                return;
-            }
+            if (!pin) return showAlert("Input Required", "Please enter a secure PIN to continue.", "error");
             
-            // Loading State
             document.getElementById('auth-text').innerText = "Authenticating...";
             document.getElementById('auth-spinner').style.display = "block";
             document.getElementById('btn-auth').disabled = true;
             
             try {
                 const response = await fetch(GAS_URL, {
-                    method: 'POST',
-                    body: JSON.stringify({ action: 'getAdminData', pin: pin }),
+                    method: 'POST', body: JSON.stringify({ action: 'getAdminData', pin: pin }),
                     headers: { 'Content-Type': 'text/plain;charset=utf-8' }
                 });
                 const result = await response.json();
                 
                 if (result.success) {
-                    // Transition to dashboard without an intrusive popup
                     document.getElementById('lock-screen').style.display = 'none';
                     document.getElementById('dashboard').style.display = 'block';
-                    renderTable(result.data);
+                    renderCandidates(result.data);
                 } else {
                     handleAuthFail();
                 }
@@ -370,52 +395,40 @@
             document.getElementById('auth-spinner').style.display = "none";
             document.getElementById('btn-auth').disabled = false;
             document.getElementById('pin-input').value = '';
-            
-            if(showPopup) {
-                showAlert("Authentication Failed", "The PIN you entered is invalid.", "error");
-            } else {
-                document.getElementById('pin-input').focus();
-            }
+            if(showPopup) showAlert("Authentication Failed", "The PIN you entered is invalid.", "error");
+            else document.getElementById('pin-input').focus();
         }
 
-        async function fetchData() {
-            const tbody = document.getElementById('table-body');
+        // --- CANDIDATE METHODS ---
+        async function fetchCandidates() {
+            const tbody = document.getElementById('candidates-body');
             tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; padding: 60px; color: var(--text-muted); font-weight: 500;">Refreshing records...</td></tr>';
             
             const pin = document.getElementById('pin-input').value;
             try {
                 const response = await fetch(GAS_URL, {
-                    method: 'POST',
-                    body: JSON.stringify({ action: 'getAdminData', pin: pin }),
+                    method: 'POST', body: JSON.stringify({ action: 'getAdminData', pin: pin }),
                     headers: { 'Content-Type': 'text/plain;charset=utf-8' }
                 });
                 const result = await response.json();
                 if (result.success) {
                     showAlert("Success", "Candidate data has been refreshed.", "success", true);
-                    renderTable(result.data);
-                } else {
-                    showAlert("Session Expired", "Please reload the page and enter your PIN again.", "error");
-                }
+                    renderCandidates(result.data);
+                } else showAlert("Session Expired", "Please reload and enter PIN.", "error");
             } catch (err) {
-                tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; padding: 60px; color: var(--danger-text); font-weight: 500;">Failed to fetch records.</td></tr>';
-                showAlert("Sync Failed", "Failed to pull the latest candidate data.", "error");
+                tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: var(--danger-text);">Failed to fetch records.</td></tr>';
+                showAlert("Sync Failed", "Failed to pull candidate data.", "error");
             }
         }
 
-        // Helper function to extract just the numeric score
         function parseScoreData(rawString) {
-            if (!rawString || rawString === "Pending..." || rawString.includes("Pending Phase 2")) {
-                return { isPending: true, badge: "Pending Phase 2" };
-            }
-            // Regex to find "Score: [numbers]"
+            if (!rawString || rawString === "Pending..." || rawString.includes("Pending Phase 2")) return { isPending: true, badge: "Pending Phase 2" };
             const scoreMatch = rawString.match(/Score:\s*(\d+)/i);
-            const badgeValue = scoreMatch ? `${scoreMatch[1]}/100` : "View Details";
-            
-            return { isPending: false, badge: badgeValue };
+            return { isPending: false, badge: scoreMatch ? `${scoreMatch[1]}/100` : "View Details" };
         }
 
-        function renderTable(data) {
-            const tbody = document.getElementById('table-body');
+        function renderCandidates(data) {
+            const tbody = document.getElementById('candidates-body');
             tbody.innerHTML = '';
             
             if (data.length <= 1) {
@@ -423,7 +436,7 @@
                 return;
             }
 
-            // Skip the header row (index 0) and map data in reverse chronological order
+            let animationDelayIndex = 0;
             for (let i = data.length - 1; i > 0; i--) { 
                 const row = data[i];
                 if (!row[1]) continue; 
@@ -432,58 +445,108 @@
                 const dateStr = dateObj.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' });
                 const timeStr = dateObj.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' });
                 
-                const name = row[1];
-                const email = row[2];
+                const name = row[1], email = row[2];
+                const p1Data = parseScoreData(row[3]), p2Data = parseScoreData(row[9]);
+                summaryDataStore[`p1_${i}`] = row[3]; summaryDataStore[`p2_${i}`] = row[9];
                 
-                // Parse scores & store raw data safely
-                const p1Data = parseScoreData(row[3]);
-                const p2Data = parseScoreData(row[9]);
-                
-                summaryDataStore[`p1_${i}`] = row[3];
-                summaryDataStore[`p2_${i}`] = row[9];
-                
-                // Construct HTML for Buttons
-                const p1Html = p1Data.isPending 
-                    ? `<span class="score-btn pending">${p1Data.badge}</span>`
-                    : `<button class="score-btn" onclick="openModal('${name} - Phase 1 Assessment', 'p1_${i}')">🧠 ${p1Data.badge}</button>`;
-                    
-                const p2Html = p2Data.isPending 
-                    ? `<span class="score-btn pending">${p2Data.badge}</span>`
-                    : `<button class="score-btn purple" onclick="openModal('${name} - Phase 2 Essay', 'p2_${i}')">📝 ${p2Data.badge}</button>`;
+                const p1Html = p1Data.isPending ? `<span class="score-btn pending">${p1Data.badge}</span>` : `<button class="score-btn" onclick="openModal('${name} - Phase 1 Assessment', 'p1_${i}')">🧠 ${p1Data.badge}</button>`;
+                const p2Html = p2Data.isPending ? `<span class="score-btn pending">${p2Data.badge}</span>` : `<button class="score-btn purple" onclick="openModal('${name} - Phase 2 Essay', 'p2_${i}')">📝 ${p2Data.badge}</button>`;
 
                 const exits = parseInt(row[4]) || 0;
                 const isClean = exits === 0;
                 const flagClass = isClean ? "flag-clean" : "flag-warn";
                 const flagIcon = isClean ? "✓" : "⚠️";
                 const flagText = isClean ? "Clean" : `${exits} Violations`;
-                
-                const folderUrl = row[5];
 
+                // Applied Staggered Animation Logic using --i var
                 tbody.innerHTML += `
-                    <tr>
-                        <td class="td-muted">
-                            <div style="font-weight: 600; color: var(--text-heading);">${dateStr}</div>
-                            <div style="font-size: 12px; margin-top: 4px;">${timeStr}</div>
-                        </td>
-                        <td>
-                            <div style="font-weight: 600;">${name}</div>
-                            <div class="td-muted" style="margin-top: 4px;">${email}</div>
-                        </td>
-                        <td>${p1Html}</td>
-                        <td>${p2Html}</td>
-                        <td>
-                            <span class="status-flag ${flagClass}">
-                                <span>${flagIcon}</span> ${flagText}
-                            </span>
-                        </td>
-                        <td>
-                            <a href="${folderUrl}" target="_blank" class="btn-view">
-                                View Folder <span>↗</span>
-                            </a>
-                        </td>
+                    <tr class="animated-row" style="--i: ${animationDelayIndex++}">
+                        <td class="td-muted"><div style="font-weight: 600; color: var(--text-heading);">${dateStr}</div><div style="font-size: 12px; margin-top: 4px;">${timeStr}</div></td>
+                        <td><div style="font-weight: 600;">${name}</div><div class="td-muted" style="margin-top: 4px;">${email}</div></td>
+                        <td>${p1Html}</td><td>${p2Html}</td>
+                        <td><span class="status-flag ${flagClass}"><span>${flagIcon}</span> ${flagText}</span></td>
+                        <td><a href="${row[5]}" target="_blank" class="btn-view">View Folder <span>↗</span></a></td>
                     </tr>
                 `;
             }
+        }
+
+        // --- ACCESS CODES METHODS ---
+        async function manageCodes(actionType) {
+            const tbody = document.getElementById('codes-body');
+            tbody.innerHTML = '<tr><td colspan="4" style="text-align: center; padding: 60px; color: var(--text-muted); font-weight: 500;">Processing Request...</td></tr>';
+            
+            const pin = document.getElementById('pin-input').value;
+            try {
+                const response = await fetch(GAS_URL, {
+                    method: 'POST', body: JSON.stringify({ action: 'manageCodes', subAction: actionType, pin: pin }),
+                    headers: { 'Content-Type': 'text/plain;charset=utf-8' }
+                });
+                const result = await response.json();
+                if (result.success) {
+                    if(actionType !== 'fetch') showAlert("Success", "Codes database updated successfully.", "success", true);
+                    isCodeDataFetched = true;
+                    renderCodes(result.data);
+                } else showAlert("Error", "Action denied.", "error");
+            } catch (err) {
+                tbody.innerHTML = '<tr><td colspan="4" style="text-align: center; color: var(--danger-text);">Failed to sync codes.</td></tr>';
+                showAlert("Sync Failed", "Failed to communicate with database.", "error");
+            }
+        }
+
+        function renderCodes(data) {
+            const tbody = document.getElementById('codes-body');
+            tbody.innerHTML = '';
+            
+            if (data.length <= 1) {
+                tbody.innerHTML = '<tr><td colspan="4" style="text-align: center; padding: 60px; color: var(--text-muted);">No access codes found. Generate some above.</td></tr>';
+                return;
+            }
+
+            let animationDelayIndex = 0;
+            for (let i = data.length - 1; i > 0; i--) { 
+                const row = data[i];
+                if (!row[0]) continue; 
+
+                const code = row[0];
+                const status = row[1];
+                
+                const dateObj = new Date(row[2]);
+                const dateStr = dateObj.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' });
+                const timeStr = dateObj.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' });
+
+                let flagClass = "flag-clean";
+                let flagIcon = "✓";
+                if (status === 'USED') { flagClass = "flag-warn"; flagIcon = "🔒"; }
+                if (status === 'EXPIRED') { flagClass = "flag-yellow"; flagIcon = "⏳"; }
+
+                const copyBtn = status === 'VALID' 
+                    ? `<button class="btn-view" onclick="copyToClipboard('${code}', this)">Copy</button>`
+                    : `<button class="btn-view" style="opacity: 0.5; cursor: not-allowed;" disabled>Used</button>`;
+
+                tbody.innerHTML += `
+                    <tr class="animated-row" style="--i: ${animationDelayIndex++}">
+                        <td class="td-muted"><div style="font-weight: 600; color: var(--text-heading);">${dateStr}</div><div style="font-size: 12px; margin-top: 4px;">${timeStr}</div></td>
+                        <td><span class="code-display" style="color: ${status === 'VALID' ? 'var(--primary-accent)' : 'var(--text-muted)'}">${code}</span></td>
+                        <td><span class="status-flag ${flagClass}"><span>${flagIcon}</span> ${status}</span></td>
+                        <td>${copyBtn}</td>
+                    </tr>
+                `;
+            }
+        }
+
+        function copyToClipboard(text, btnElement) {
+            navigator.clipboard.writeText(text).then(() => {
+                const originalText = btnElement.innerText;
+                btnElement.innerText = "Copied!";
+                btnElement.style.background = "#10b981";
+                btnElement.style.color = "white";
+                setTimeout(() => {
+                    btnElement.innerText = "Copy";
+                    btnElement.style.background = "";
+                    btnElement.style.color = "";
+                }, 2000);
+            });
         }
     </script>
 </body>
