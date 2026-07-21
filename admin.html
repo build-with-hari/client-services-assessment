@@ -46,7 +46,6 @@
             100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); } 
         }
 
-        /* Staggered Row Animation */
         .animated-row { opacity: 0; animation: slideUpFade 0.4s ease forwards; animation-delay: calc(var(--i) * 0.05s); }
 
         #theme-toggle { 
@@ -58,7 +57,7 @@
         #theme-toggle:hover { transform: scale(1.1); }
         #theme-toggle:active { transform: scale(0.9); }
 
-        /* Lock Screen */
+        /* Lock Screen - UPDATED FOR OTP */
         #lock-screen { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 90vh; animation: slideUpFade 0.6s cubic-bezier(0.16, 1, 0.3, 1); }
         .lock-box { 
             background: var(--glass-bg); backdrop-filter: blur(20px); padding: 50px 40px; 
@@ -69,12 +68,14 @@
         .lock-box h2 { margin: 0 0 10px 0; color: var(--text-heading); font-size: 26px; }
         .lock-box p { color: var(--text-muted); margin-bottom: 30px; font-size: 15px; }
         
-        input[type="password"] { 
+        input.admin-input { 
             padding: 16px; border: 2px solid #cbd5e1; border-radius: 14px; background: var(--input-bg); color: var(--text-heading);
-            font-size: 24px; letter-spacing: 12px; text-align: center; width: 240px; margin-bottom: 25px; transition: all 0.3s ease; outline: none; font-family: monospace;
+            font-size: 18px; text-align: center; width: 100%; max-width: 300px; margin-bottom: 25px; transition: all 0.3s ease; outline: none; font-family: inherit;
         }
-        body.dark-mode input[type="password"] { border-color: #334155; }
-        input[type="password"]:focus { border-color: var(--primary-accent); box-shadow: 0 0 0 4px rgba(37,99,235,0.15); }
+        body.dark-mode input.admin-input { border-color: #334155; }
+        input.admin-input:focus { border-color: var(--primary-accent); box-shadow: 0 0 0 4px rgba(37,99,235,0.15); }
+        
+        input#otp-input { letter-spacing: 12px; font-family: monospace; font-size: 24px; font-weight: 700; text-transform: uppercase; }
         
         .btn-primary { 
             background: linear-gradient(135deg, var(--primary-accent) 0%, #1e40af 100%); color: white; border: none; padding: 16px 30px; 
@@ -84,10 +85,8 @@
         .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(37, 99, 235, 0.4); }
         .btn-primary:active { transform: translateY(1px) scale(0.98); }
 
-        /* Dashboard Global */
         #dashboard { display: none; max-width: 1400px; margin: 40px auto; animation: slideUpFade 0.6s ease; width: 95%; }
         
-        /* Navigation Tabs */
         .nav-tabs { display: flex; gap: 15px; margin-bottom: 30px; }
         .tab-btn {
             background: var(--glass-bg); color: var(--text-muted); border: 1px solid var(--glass-border); padding: 12px 24px;
@@ -98,7 +97,6 @@
         .tab-btn:active { transform: scale(0.95); }
         .tab-btn.active { background: var(--primary-accent); color: white; border-color: var(--primary-accent); box-shadow: 0 8px 20px rgba(37, 99, 235, 0.3); }
 
-        /* View Sections */
         .dashboard-view { display: none; animation: fadeIn 0.4s ease forwards; }
         .dashboard-view.active { display: block; }
 
@@ -133,16 +131,9 @@
         td { font-size: 15px; color: var(--text-heading); vertical-align: middle; }
         .td-muted { color: var(--text-muted); font-size: 14px; }
 
-        /* Hidden Row Styling */
-        .row-hidden { 
-            opacity: 0.45; 
-            background: repeating-linear-gradient(45deg, rgba(0,0,0,0.03), rgba(0,0,0,0.03) 10px, transparent 10px, transparent 20px); 
-        }
-        body.dark-mode .row-hidden { 
-            background: repeating-linear-gradient(45deg, rgba(255,255,255,0.02), rgba(255,255,255,0.02) 10px, transparent 10px, transparent 20px); 
-        }
+        .row-hidden { opacity: 0.45; background: repeating-linear-gradient(45deg, rgba(0,0,0,0.03), rgba(0,0,0,0.03) 10px, transparent 10px, transparent 20px); }
+        body.dark-mode .row-hidden { background: repeating-linear-gradient(45deg, rgba(255,255,255,0.02), rgba(255,255,255,0.02) 10px, transparent 10px, transparent 20px); }
         
-        /* Buttons - FIXED WIDTHS */
         .score-btn {
             background: rgba(37, 99, 235, 0.1); color: var(--primary-accent); border: 1px solid rgba(37, 99, 235, 0.2); 
             padding: 8px 16px; border-radius: 8px; font-weight: 700; font-size: 14px; cursor: pointer;
@@ -156,7 +147,6 @@
         .score-btn.pending { background: rgba(100, 116, 139, 0.1); color: var(--text-muted); border-color: transparent; cursor: default; }
         .score-btn.pending:hover { transform: none; box-shadow: none; background: rgba(100, 116, 139, 0.1); color: var(--text-muted); }
         
-        /* Status Flag - FIXED WIDTHS */
         .status-flag { 
             display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; 
             border-radius: 50px; font-size: 12.5px; font-weight: 700; letter-spacing: 0.5px; 
@@ -179,7 +169,6 @@
         .btn-view:hover { background: var(--primary-accent); color: #ffffff; transform: translateY(-2px); box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2); }
         .btn-view:active { transform: scale(0.95); }
 
-        /* Upgraded Copy Button */
         .btn-copy {
             display: inline-flex; align-items: center; justify-content: center; gap: 6px;
             background: #ffffff; color: var(--text-heading); border: 1px solid #cbd5e1;
@@ -192,33 +181,17 @@
         .btn-copy:active { transform: scale(0.95); }
         .btn-copy.copied { background: var(--success-bg); color: var(--success-text); border-color: var(--success-text); }
 
-        .btn-hide-row { 
-            background: none; border: none; cursor: pointer; padding: 6px; border-radius: 8px; color: var(--text-muted);
-            transition: all 0.2s; display: flex; align-items: center; justify-content: center;
-        }
+        .btn-hide-row { background: none; border: none; cursor: pointer; padding: 6px; border-radius: 8px; color: var(--text-muted); transition: all 0.2s; display: flex; align-items: center; justify-content: center; }
         .btn-hide-row:hover { background: rgba(239, 68, 68, 0.1); color: var(--danger-text); transform: scale(1.1); }
         .btn-hide-row.is-hidden:hover { background: rgba(16, 185, 129, 0.1); color: var(--success-text); }
 
         .spinner { border: 3px solid rgba(255,255,255,0.3); border-radius: 50%; border-top: 3px solid white; width: 18px; height: 18px; animation: spin 1s linear infinite; display: none; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
-        /* OVERLAYS & MODALS */
-        .overlay { 
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
-            background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(6px); z-index: 2000; 
-            display: flex; align-items: center; justify-content: center; 
-            opacity: 0; visibility: hidden; pointer-events: none; 
-            transition: opacity 0.3s ease, visibility 0.3s ease; 
-        }
-        
+        .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(6px); z-index: 2000; display: flex; align-items: center; justify-content: center; opacity: 0; visibility: hidden; pointer-events: none; transition: opacity 0.3s ease, visibility 0.3s ease; }
         .overlay.active { opacity: 1; visibility: visible; pointer-events: auto; }
         
-        .modal-card { 
-            background: var(--glass-bg); padding: 30px; border-radius: 20px; 
-            max-width: 550px; width: 90%; box-shadow: var(--shadow-hover); border: 1px solid var(--glass-border); 
-            transform: scale(0.92); opacity: 0; 
-            transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.4s ease; 
-        }
+        .modal-card { background: var(--glass-bg); padding: 30px; border-radius: 20px; max-width: 550px; width: 90%; box-shadow: var(--shadow-hover); border: 1px solid var(--glass-border); transform: scale(0.92); opacity: 0; transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.4s ease; }
         .overlay.active .modal-card { transform: scale(1); opacity: 1; }
         
         .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
@@ -247,7 +220,7 @@
         <div class="modal-card alert-card">
             <div class="alert-icon" id="alert-icon">⚠️</div>
             <h3 class="alert-title" id="alert-title">Error</h3>
-            <p class="alert-message" id="alert-message">Invalid PIN provided.</p>
+            <p class="alert-message" id="alert-message">Invalid request.</p>
             <button class="alert-btn" id="alert-btn" onclick="closeAlert()">OK</button>
         </div>
     </div>
@@ -263,30 +236,41 @@
         </div>
     </div>
 
-    <!-- LOCK SCREEN -->
+    <!-- LOCK SCREEN (OTP Based) -->
     <div id="lock-screen">
-        <div class="lock-box">
+        <div class="lock-box" id="step-email">
             <h2>🛡️ Admin Portal</h2>
-            <p>Enter secure PIN to access records.</p>
-            <input type="password" id="pin-input" placeholder="••••" maxlength="4" autofocus>
+            <p>Enter your authorized email to receive a secure OTP.</p>
+            <input type="email" class="admin-input" id="email-input" placeholder="admin@example.com" autofocus>
             <br>
-            <button class="btn-primary" id="btn-auth" onclick="authenticate()">
-                <span id="auth-text">Unlock Dashboard</span>
-                <div class="spinner" id="auth-spinner"></div>
+            <button class="btn-primary" id="btn-request" onclick="requestOTP()">
+                <span id="req-text">Send Access Code</span>
+                <div class="spinner" id="req-spinner"></div>
             </button>
+        </div>
+        
+        <div class="lock-box" id="step-otp" style="display: none;">
+            <h2>🔒 Verify OTP</h2>
+            <p>Enter the 6-digit code sent to your email.</p>
+            <input type="text" class="admin-input" id="otp-input" placeholder="••••••" maxlength="6">
+            <br>
+            <button class="btn-primary" id="btn-verify" onclick="verifyOTP()">
+                <span id="ver-text">Unlock Dashboard</span>
+                <div class="spinner" id="ver-spinner"></div>
+            </button>
+            <p style="margin-top: 20px; font-size: 13px; margin-bottom: 0;">
+                <a href="#" onclick="goBackToEmail()" style="color: var(--primary-accent); font-weight: 600; text-decoration: none;">← Change Email</a>
+            </p>
         </div>
     </div>
 
     <!-- DASHBOARD -->
     <div id="dashboard">
-        
-        <!-- Tabs -->
         <div class="nav-tabs">
             <button class="tab-btn active" id="tab-candidates" onclick="switchTab('candidates')">👥 Candidates</button>
             <button class="tab-btn" id="tab-codes" onclick="switchTab('codes')">🔑 Access Codes</button>
         </div>
 
-        <!-- View: Candidates -->
         <div id="view-candidates" class="dashboard-view active">
             <div class="header">
                 <h2>Assessment Results</h2>
@@ -319,7 +303,6 @@
             </div>
         </div>
 
-        <!-- View: Access Codes -->
         <div id="view-codes" class="dashboard-view">
             <div class="header">
                 <h2>Manage Access Codes</h2>
@@ -348,7 +331,6 @@
                 </table>
             </div>
         </div>
-
     </div>
 
     <script>
@@ -360,8 +342,10 @@
         const summaryDataStore = {};
         let alertTimeout;
         let isCodeDataFetched = false;
+        
+        let sessionToken = null; // Stores the secure token after OTP
+        let adminEmail = "";
 
-        // Data Caching
         let cachedCandidatesData = [];
         let showHiddenCandidates = false;
 
@@ -374,27 +358,17 @@
         function switchTab(tabId) {
             document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
             document.querySelectorAll('.dashboard-view').forEach(view => view.classList.remove('active'));
-            
             document.getElementById(`tab-${tabId}`).classList.add('active');
             document.getElementById(`view-${tabId}`).classList.add('active');
-
-            if (tabId === 'codes' && !isCodeDataFetched) {
-                manageCodes('fetch');
-            }
+            if (tabId === 'codes' && !isCodeDataFetched) manageCodes('fetch');
         }
 
-        // --- VISIBILITY & STORAGE LOGIC ---
-        function getHiddenList() {
-            return JSON.parse(localStorage.getItem('hidden_candidates') || '[]');
-        }
+        function getHiddenList() { return JSON.parse(localStorage.getItem('hidden_candidates') || '[]'); }
 
         function setRowHidden(id, makeHidden) {
             let hiddenList = getHiddenList();
-            if (makeHidden && !hiddenList.includes(id)) {
-                hiddenList.push(id);
-            } else if (!makeHidden) {
-                hiddenList = hiddenList.filter(item => item !== id);
-            }
+            if (makeHidden && !hiddenList.includes(id)) hiddenList.push(id);
+            else if (!makeHidden) hiddenList = hiddenList.filter(item => item !== id);
             localStorage.setItem('hidden_candidates', JSON.stringify(hiddenList));
             renderCandidates(cachedCandidatesData);
         }
@@ -402,112 +376,125 @@
         function toggleVisibility() {
             showHiddenCandidates = !showHiddenCandidates;
             const btn = document.getElementById('toggle-hidden-candidates');
-            
-            if (showHiddenCandidates) {
-                btn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.88 9.88a3 3 0 1 0 4.24 4.24"/><path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68"/><path d="M6.61 6.61A13.526 13.526 0 0 0 2 12s3 7 10 7a9.74 9.74 0 0 0 5.39-1.61"/><line x1="2" x2="22" y1="2" y2="22"/></svg> Hide Records`;
-            } else {
-                btn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg> Show Hidden`;
-            }
+            if (showHiddenCandidates) btn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.88 9.88a3 3 0 1 0 4.24 4.24"/><path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68"/><path d="M6.61 6.61A13.526 13.526 0 0 0 2 12s3 7 10 7a9.74 9.74 0 0 0 5.39-1.61"/><line x1="2" x2="22" y1="2" y2="22"/></svg> Hide Records`;
+            else btn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg> Show Hidden`;
             renderCandidates(cachedCandidatesData);
         }
 
-        // --- POPUP ALERT SYSTEM ---
         function showAlert(title, message, type = 'error', autoClose = false) {
             clearTimeout(alertTimeout);
             document.getElementById('alert-title').innerText = title;
             document.getElementById('alert-message').innerText = message;
             document.getElementById('alert-icon').innerText = type === 'error' ? '⚠️' : '✅';
             document.getElementById('alert-overlay').classList.add('active');
-
             if (autoClose) {
                 document.getElementById('alert-btn').style.display = 'none';
                 alertTimeout = setTimeout(closeAlert, 1500);
-            } else {
-                document.getElementById('alert-btn').style.display = 'inline-block';
-            }
+            } else document.getElementById('alert-btn').style.display = 'inline-block';
         }
 
-        function closeAlert() {
-            document.getElementById('alert-overlay').classList.remove('active');
-            if (document.getElementById('lock-screen').style.display !== 'none') {
-                document.getElementById('pin-input').focus();
-            }
-        }
+        function closeAlert() { document.getElementById('alert-overlay').classList.remove('active'); }
+        document.addEventListener('keydown', function(e) { if (e.key === 'Escape') { closeAlert(); closeModal(); } });
 
-        document.addEventListener('keydown', function(e) {
-            if (e.key === 'Escape') { closeAlert(); closeModal(); }
-        });
-
-        // --- MODAL SYSTEM ---
         function openModal(title, dataKey) {
             document.getElementById('modal-title').innerText = title;
             const text = summaryDataStore[dataKey] || "No data available.";
             document.getElementById('modal-body-text').innerHTML = text.replace(/\n/g, '<br>');
             document.getElementById('modal-overlay').classList.add('active');
         }
+        function closeModal() { document.getElementById('modal-overlay').classList.remove('active'); }
 
-        function closeModal() {
-            document.getElementById('modal-overlay').classList.remove('active');
-        }
+        // --- NEW OTP AUTH FLOW ---
+        document.getElementById('email-input').addEventListener('keypress', function (e) { if (e.key === 'Enter') requestOTP(); });
+        document.getElementById('otp-input').addEventListener('keypress', function (e) { if (e.key === 'Enter') verifyOTP(); });
 
-        document.getElementById('pin-input').addEventListener('keypress', function (e) {
-            if (e.key === 'Enter') authenticate();
-        });
-
-        // --- AUTH & FETCH LOGIC ---
-        async function authenticate() {
-            const pin = document.getElementById('pin-input').value;
-            if (!pin) return showAlert("Input Required", "Please enter a secure PIN to continue.", "error");
+        async function requestOTP() {
+            const input = document.getElementById('email-input').value;
+            if (!input || !input.includes('@')) return showAlert("Input Required", "Please enter a valid email address.", "error");
             
-            document.getElementById('auth-text').innerText = "Authenticating...";
-            document.getElementById('auth-spinner').style.display = "block";
-            document.getElementById('btn-auth').disabled = true;
+            adminEmail = input;
+            document.getElementById('req-text').innerText = "Sending...";
+            document.getElementById('req-spinner').style.display = "block";
+            document.getElementById('btn-request').disabled = true;
             
             try {
                 const response = await fetch(GAS_URL, {
-                    method: 'POST', body: JSON.stringify({ action: 'getAdminData', pin: pin }),
-                    headers: { 'Content-Type': 'text/plain;charset=utf-8' }
+                    method: 'POST', body: JSON.stringify({ action: 'requestOTP', email: adminEmail }), headers: { 'Content-Type': 'text/plain;charset=utf-8' }
                 });
                 const result = await response.json();
                 
                 if (result.success) {
-                    document.getElementById('lock-screen').style.display = 'none';
-                    document.getElementById('dashboard').style.display = 'block';
-                    renderCandidates(result.data);
+                    document.getElementById('step-email').style.display = 'none';
+                    document.getElementById('step-otp').style.display = 'block';
+                    document.getElementById('otp-input').focus();
                 } else {
-                    handleAuthFail();
+                    showAlert("Access Denied", "Unauthorized email address.", "error");
                 }
             } catch (err) {
-                showAlert("Connection Error", "Network error establishing secure connection.", "error");
-                handleAuthFail(false);
+                showAlert("Connection Error", "Network error.", "error");
+            } finally {
+                document.getElementById('req-text').innerText = "Send Access Code";
+                document.getElementById('req-spinner').style.display = "none";
+                document.getElementById('btn-request').disabled = false;
             }
         }
 
-        function handleAuthFail(showPopup = true) {
-            document.getElementById('auth-text').innerText = "Unlock Dashboard";
-            document.getElementById('auth-spinner').style.display = "none";
-            document.getElementById('btn-auth').disabled = false;
-            document.getElementById('pin-input').value = '';
-            if(showPopup) showAlert("Authentication Failed", "The PIN you entered is invalid.", "error");
-            else document.getElementById('pin-input').focus();
+        function goBackToEmail() {
+            document.getElementById('step-otp').style.display = 'none';
+            document.getElementById('step-email').style.display = 'block';
+            document.getElementById('otp-input').value = "";
+            document.getElementById('email-input').focus();
         }
 
-        // --- CANDIDATE METHODS ---
+        async function verifyOTP() {
+            const otp = document.getElementById('otp-input').value;
+            if (!otp || otp.length < 5) return showAlert("Input Required", "Please enter the complete OTP.", "error");
+            
+            document.getElementById('ver-text').innerText = "Verifying...";
+            document.getElementById('ver-spinner').style.display = "block";
+            document.getElementById('btn-verify').disabled = true;
+            
+            try {
+                const response = await fetch(GAS_URL, {
+                    method: 'POST', body: JSON.stringify({ action: 'verifyOTP', email: adminEmail, otp: otp }), headers: { 'Content-Type': 'text/plain;charset=utf-8' }
+                });
+                const result = await response.json();
+                
+                if (result.success) {
+                    sessionToken = result.token; // Save the secure session token
+                    document.getElementById('lock-screen').style.display = 'none';
+                    document.getElementById('dashboard').style.display = 'block';
+                    fetchCandidates(); // Initial data load
+                } else {
+                    showAlert("Authentication Failed", "Invalid or expired OTP.", "error");
+                    document.getElementById('otp-input').value = "";
+                }
+            } catch (err) {
+                showAlert("Connection Error", "Network error establishing secure connection.", "error");
+            } finally {
+                document.getElementById('ver-text').innerText = "Unlock Dashboard";
+                document.getElementById('ver-spinner').style.display = "none";
+                document.getElementById('btn-verify').disabled = false;
+            }
+        }
+
+        // --- DASHBOARD METHODS (Updated to use Session Token) ---
         async function fetchCandidates() {
             const tbody = document.getElementById('candidates-body');
             tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; padding: 60px; color: var(--text-muted); font-weight: 500;">Refreshing records...</td></tr>';
             
-            const pin = document.getElementById('pin-input').value;
             try {
                 const response = await fetch(GAS_URL, {
-                    method: 'POST', body: JSON.stringify({ action: 'getAdminData', pin: pin }),
+                    method: 'POST', body: JSON.stringify({ action: 'getAdminData', token: sessionToken }),
                     headers: { 'Content-Type': 'text/plain;charset=utf-8' }
                 });
                 const result = await response.json();
                 if (result.success) {
-                    showAlert("Success", "Candidate data has been refreshed.", "success", true);
                     renderCandidates(result.data);
-                } else showAlert("Session Expired", "Please reload and enter PIN.", "error");
+                } else {
+                    showAlert("Session Expired", result.error, "error");
+                    setTimeout(() => location.reload(), 2000); // Reload if token expired
+                }
             } catch (err) {
                 tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: var(--danger-text);">Failed to fetch records.</td></tr>';
                 showAlert("Sync Failed", "Failed to pull candidate data.", "error");
@@ -524,7 +511,6 @@
             cachedCandidatesData = data; 
             const tbody = document.getElementById('candidates-body');
             tbody.innerHTML = '';
-            
             if (data.length <= 1) {
                 tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; padding: 60px; color: var(--text-muted);">No candidates have submitted yet.</td></tr>';
                 return;
@@ -532,8 +518,6 @@
 
             const hiddenList = getHiddenList();
             let animationDelayIndex = 0;
-            
-            // Reusable SVG icons for Hide/Unhide
             const eyeIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>`;
             const eyeOffIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.88 9.88a3 3 0 1 0 4.24 4.24"/><path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68"/><path d="M6.61 6.61A13.526 13.526 0 0 0 2 12s3 7 10 7a9.74 9.74 0 0 0 5.39-1.61"/><line x1="2" x2="22" y1="2" y2="22"/></svg>`;
             
@@ -543,28 +527,21 @@
 
                 const uid = row[2] + "_" + new Date(row[0]).getTime();
                 const isHidden = hiddenList.includes(uid);
-                
                 if (isHidden && !showHiddenCandidates) continue;
 
                 const dateObj = new Date(row[0]);
                 const dateStr = dateObj.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' });
                 const timeStr = dateObj.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' });
                 
-                const name = row[1];
-                const safeName = name.replace(/'/g, "\\'"); 
-                const email = row[2];
-
-                // Grades mapping
+                const name = row[1], safeName = name.replace(/'/g, "\\'"), email = row[2];
                 const p1Data = parseScoreData(row[3]), p2Data = parseScoreData(row[9]);
                 summaryDataStore[`p1_${i}`] = row[3]; summaryDataStore[`p2_${i}`] = row[9];
                 
                 const p1Html = p1Data.isPending ? `<span class="score-btn pending">${p1Data.badge}</span>` : `<button class="score-btn" onclick="openModal('${safeName} - Phase 1 Assessment', 'p1_${i}')">🧠 ${p1Data.badge}</button>`;
                 const p2Html = p2Data.isPending ? `<span class="score-btn pending">${p2Data.badge}</span>` : `<button class="score-btn purple" onclick="openModal('${safeName} - Phase 2 Essay', 'p2_${i}')">📝 ${p2Data.badge}</button>`;
 
-                // Proctoring & Violations Mapping
                 const exits = parseInt(row[4]) || 0;
                 const flagsInfo = row[7] || "Clean Submission"; 
-                
                 const isClean = exits === 0 && (flagsInfo.toLowerCase().includes("clean") || flagsInfo === "");
                 const flagClass = isClean ? "flag-clean" : "flag-warn";
                 const flagIcon = isClean ? "✓" : "⚠️";
@@ -595,21 +572,16 @@
                     </tr>
                 `;
             }
-
-            if (animationDelayIndex === 0) {
-                tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; padding: 60px; color: var(--text-muted);">All records are currently hidden. Toggle "Show Hidden" to view them.</td></tr>';
-            }
+            if (animationDelayIndex === 0) tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; padding: 60px; color: var(--text-muted);">All records are currently hidden.</td></tr>';
         }
 
-        // --- ACCESS CODES METHODS ---
         async function manageCodes(actionType) {
             const tbody = document.getElementById('codes-body');
             tbody.innerHTML = '<tr><td colspan="4" style="text-align: center; padding: 60px; color: var(--text-muted); font-weight: 500;">Processing Request...</td></tr>';
             
-            const pin = document.getElementById('pin-input').value;
             try {
                 const response = await fetch(GAS_URL, {
-                    method: 'POST', body: JSON.stringify({ action: 'manageCodes', subAction: actionType, pin: pin }),
+                    method: 'POST', body: JSON.stringify({ action: 'manageCodes', subAction: actionType, token: sessionToken }),
                     headers: { 'Content-Type': 'text/plain;charset=utf-8' }
                 });
                 const result = await response.json();
@@ -617,7 +589,10 @@
                     if(actionType !== 'fetch') showAlert("Success", "Codes database updated successfully.", "success", true);
                     isCodeDataFetched = true;
                     renderCodes(result.data);
-                } else showAlert("Error", "Action denied.", "error");
+                } else {
+                    showAlert("Session Expired", result.error, "error");
+                    setTimeout(() => location.reload(), 2000);
+                }
             } catch (err) {
                 tbody.innerHTML = '<tr><td colspan="4" style="text-align: center; color: var(--danger-text);">Failed to sync codes.</td></tr>';
                 showAlert("Sync Failed", "Failed to communicate with database.", "error");
@@ -627,7 +602,6 @@
         function renderCodes(data) {
             const tbody = document.getElementById('codes-body');
             tbody.innerHTML = '';
-            
             if (data.length <= 1) {
                 tbody.innerHTML = '<tr><td colspan="4" style="text-align: center; padding: 60px; color: var(--text-muted);">No access codes found. Generate some above.</td></tr>';
                 return;
@@ -639,18 +613,14 @@
                 const row = data[i];
                 if (!row[0]) continue; 
 
-                const code = row[0];
-                const status = row[1];
-                const dateObj = new Date(row[2]);
+                const code = row[0], status = row[1], dateObj = new Date(row[2]);
                 const dateStr = dateObj.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' });
                 const timeStr = dateObj.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' });
 
-                let flagClass = "flag-clean";
-                let flagIcon = "✓";
+                let flagClass = "flag-clean", flagIcon = "✓";
                 if (status === 'USED') { flagClass = "flag-warn"; flagIcon = "🔒"; }
                 if (status === 'EXPIRED') { flagClass = "flag-yellow"; flagIcon = "⏳"; }
 
-                // Upgraded Copy Button with SVG
                 const copyBtn = status === 'VALID' 
                     ? `<button class="btn-copy" onclick="copyToClipboard('${code}', this)">
                          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
@@ -663,24 +633,17 @@
                         <td class="td-muted"><div style="font-weight: 600; color: var(--text-heading);">${dateStr}</div><div style="font-size: 12px; margin-top: 4px;">${timeStr}</div></td>
                         <td><span class="code-display" style="color: ${status === 'VALID' ? 'var(--primary-accent)' : 'var(--text-muted)'}">${code}</span></td>
                         <td><span class="status-flag ${flagClass}" style="cursor:default; pointer-events:none;"><span>${flagIcon}</span> ${status}</span></td>
-                        <td>
-                            <div class="action-group">
-                                ${copyBtn}
-                            </div>
-                        </td>
+                        <td><div class="action-group">${copyBtn}</div></td>
                     </tr>
                 `;
             }
         }
 
-        // Upgraded Copy To Clipboard logic
         function copyToClipboard(text, btnElement) {
             navigator.clipboard.writeText(text).then(() => {
                 const originalHTML = btnElement.innerHTML;
-                // Swap to checkmark
                 btnElement.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> Copied!`;
                 btnElement.classList.add('copied');
-                
                 setTimeout(() => {
                     btnElement.innerHTML = originalHTML;
                     btnElement.classList.remove('copied');
