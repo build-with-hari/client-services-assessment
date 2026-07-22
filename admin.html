@@ -57,7 +57,7 @@
         #theme-toggle:hover { transform: scale(1.1); }
         #theme-toggle:active { transform: scale(0.9); }
 
-        /* Lock Screen - UPDATED FOR OTP */
+        /* Lock Screen - OTP Based */
         #lock-screen { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 90vh; animation: slideUpFade 0.6s cubic-bezier(0.16, 1, 0.3, 1); }
         .lock-box { 
             background: var(--glass-bg); backdrop-filter: blur(20px); padding: 50px 40px; 
@@ -85,6 +85,7 @@
         .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(37, 99, 235, 0.4); }
         .btn-primary:active { transform: translateY(1px) scale(0.98); }
 
+        /* Dashboard Global */
         #dashboard { display: none; max-width: 1400px; margin: 40px auto; animation: slideUpFade 0.6s ease; width: 95%; }
         
         .nav-tabs { display: flex; gap: 15px; margin-bottom: 30px; }
@@ -115,6 +116,9 @@
         .btn-action.generate { background: rgba(16, 185, 129, 0.1); color: #059669; border-color: rgba(16, 185, 129, 0.2); }
         body.dark-mode .btn-action.generate { color: #34d399; }
         .btn-action.generate:hover { background: #10b981; color: white; box-shadow: 0 8px 20px rgba(16, 185, 129, 0.3); }
+        
+        /* Logout specific styling */
+        .btn-action.logout:hover { background: #ef4444; border-color: #ef4444; color: white; box-shadow: 0 8px 20px rgba(239, 68, 68, 0.3); }
 
         .table-container { background: var(--glass-bg); backdrop-filter: blur(20px); border-radius: 16px; border: 1px solid var(--glass-border); box-shadow: var(--shadow-soft); overflow-x: auto; }
         
@@ -282,6 +286,10 @@
                     <button class="btn-action" onclick="fetchCandidates()">
                         <span>🔄</span> Refresh Results
                     </button>
+                    <!-- LOGOUT BUTTON -->
+                    <button class="btn-action logout" onclick="logoutAdmin()">
+                        🚪 Logout
+                    </button>
                 </div>
             </div>
             <div class="table-container">
@@ -313,6 +321,10 @@
                     <button class="btn-action generate" onclick="manageCodes('generate')">
                         <span>✨</span> Generate 10 New
                     </button>
+                    <!-- LOGOUT BUTTON -->
+                    <button class="btn-action logout" onclick="logoutAdmin()">
+                        🚪 Logout
+                    </button>
                 </div>
             </div>
             <div class="table-container">
@@ -343,11 +355,32 @@
         let alertTimeout;
         let isCodeDataFetched = false;
         
-        let sessionToken = null; // Stores the secure token after OTP
+        // --- SESSION MANAGEMENT ---
+        // Pull token from localStorage so it persists across refreshes
+        let sessionToken = localStorage.getItem('adminSessionToken'); 
         let adminEmail = "";
 
         let cachedCandidatesData = [];
         let showHiddenCandidates = false;
+
+        // Auto-login on page refresh if token exists
+        window.onload = function() {
+            if (sessionToken) {
+                document.getElementById('lock-screen').style.display = 'none';
+                document.getElementById('dashboard').style.display = 'block';
+                fetchCandidates(); // Fallback to lock screen if backend rejects the token
+            }
+        };
+
+        // Utility: Force Logout
+        function logoutAdmin() {
+            localStorage.removeItem('adminSessionToken');
+            sessionToken = null;
+            document.getElementById('dashboard').style.display = 'none';
+            document.getElementById('lock-screen').style.display = 'flex';
+            goBackToEmail();
+            showAlert("Logged Out", "Your session has been securely closed.", "success", true);
+        }
 
         function toggleTheme() {
             document.body.classList.toggle('dark-mode');
@@ -404,7 +437,7 @@
         }
         function closeModal() { document.getElementById('modal-overlay').classList.remove('active'); }
 
-        // --- NEW OTP AUTH FLOW ---
+        // --- AUTH FLOW ---
         document.getElementById('email-input').addEventListener('keypress', function (e) { if (e.key === 'Enter') requestOTP(); });
         document.getElementById('otp-input').addEventListener('keypress', function (e) { if (e.key === 'Enter') verifyOTP(); });
 
@@ -461,10 +494,11 @@
                 const result = await response.json();
                 
                 if (result.success) {
-                    sessionToken = result.token; // Save the secure session token
+                    sessionToken = result.token; 
+                    localStorage.setItem('adminSessionToken', sessionToken); // Securely store token for persistence
                     document.getElementById('lock-screen').style.display = 'none';
                     document.getElementById('dashboard').style.display = 'block';
-                    fetchCandidates(); // Initial data load
+                    fetchCandidates(); 
                 } else {
                     showAlert("Authentication Failed", "Invalid or expired OTP.", "error");
                     document.getElementById('otp-input').value = "";
@@ -478,7 +512,7 @@
             }
         }
 
-        // --- DASHBOARD METHODS (Updated to use Session Token) ---
+        // --- DASHBOARD METHODS ---
         async function fetchCandidates() {
             const tbody = document.getElementById('candidates-body');
             tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; padding: 60px; color: var(--text-muted); font-weight: 500;">Refreshing records...</td></tr>';
@@ -492,8 +526,9 @@
                 if (result.success) {
                     renderCandidates(result.data);
                 } else {
-                    showAlert("Session Expired", result.error, "error");
-                    setTimeout(() => location.reload(), 2000); // Reload if token expired
+                    // Backend rejected token -> wipe it and kick user to lock screen
+                    logoutAdmin();
+                    showAlert("Session Expired", "Please log in again.", "error");
                 }
             } catch (err) {
                 tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: var(--danger-text);">Failed to fetch records.</td></tr>';
@@ -590,8 +625,9 @@
                     isCodeDataFetched = true;
                     renderCodes(result.data);
                 } else {
-                    showAlert("Session Expired", result.error, "error");
-                    setTimeout(() => location.reload(), 2000);
+                    // Backend rejected token -> wipe it and kick user to lock screen
+                    logoutAdmin();
+                    showAlert("Session Expired", "Please log in again.", "error");
                 }
             } catch (err) {
                 tbody.innerHTML = '<tr><td colspan="4" style="text-align: center; color: var(--danger-text);">Failed to sync codes.</td></tr>';
